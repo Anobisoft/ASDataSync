@@ -21,6 +21,10 @@ NSString *uuidString;
     return uuidString;
 }
 
+- (NSString *)entityName {
+    return [NSString stringWithString:self.entity.name];
+}
+
 + (void)selectObjectsFromContext:(NSManagedObjectContext *)context fetch:(FetchArray)fetch {
     [self selectObjectsFromContext:context limit:0 fetch:fetch];
 }
