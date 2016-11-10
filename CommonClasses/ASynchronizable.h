@@ -15,19 +15,20 @@
 #define ASynchronizable_h
 
 #import "ASWatchConnector.h"
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableDescription <NSObject>
 @required
-@property (nonatomic, strong) NSData *uniqueID;
-@property (nonatomic, strong) NSDate *modifyDate;
+@property (nullable, nonatomic, retain) NSData *uniqueID;
+@property (nullable, nonatomic, copy) NSDate *modifyDate;
 - (NSString *)entityName;
 + (NSPredicate *)predicateWithUniqueID:(NSData *)uniqueID;
 @end
 
 @protocol ASynchronizableObject <ASynchronizableDescription>
-@property (nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
+@property (nonnull, nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
 @optional
-@property (nonatomic, weak) id <ASynchronizableObjectDelegate> delegate;
+@property (nullable, nonatomic, weak) id <ASynchronizableObjectDelegate> delegate;
 @end
 
 @protocol ASynchronizableRelatableObject <ASynchronizableObject>
@@ -56,4 +57,7 @@
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
 @end
 
+NS_ASSUME_NONNULL_END
+
 #endif /* ASynchronizable_h */
+
