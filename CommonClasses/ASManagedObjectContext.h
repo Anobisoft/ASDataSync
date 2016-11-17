@@ -15,7 +15,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^FetchArray)(NSArray <__kindof NSManagedObject <ASynchronizableObject> *> *objects);
 typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 @interface ASManagedObjectContext : NSManagedObjectContext <ASynchronizableContext>

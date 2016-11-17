@@ -9,7 +9,7 @@
 #import <CoreData/CoreData.h>
 #import "ASynchronizable.h"
 
-typedef void (^FetchArray)(NSArray <__kindof NSManagedObject <ASynchronizableObject> *> *objects);
+typedef void (^FetchArray)(NSArray <__kindof NSManagedObject *> *objects);
 
 @interface NSManagedObject (ASDataSync)
 
