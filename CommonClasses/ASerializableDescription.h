@@ -19,7 +19,7 @@
 + (instancetype)instantiateWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
 - (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
 
-- (NSString *)UUIDString;
+//- (NSString *)UUIDString;
 
 @end
 

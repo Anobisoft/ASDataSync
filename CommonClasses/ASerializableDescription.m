@@ -24,6 +24,10 @@
     return nil;
 }
 
++ (NSString *)entityName {
+    return nil;
+}
+
 @synthesize uniqueID = _uniqueID;
 @synthesize entityName = _entityName;
 @synthesize modifyDate = _modifyDate;
@@ -43,17 +47,17 @@
     return self;
 }
 
-- (NSString *)UUIDString {
-    if (!uuidString) {
-        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:self.uniqueID]).UUIDString;
-    }
-    return uuidString;
-}
+//- (NSString *)UUIDString {
+//    if (!uuidString) {
+//        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:self.uniqueID]).UUIDString;
+//    }
+//    return uuidString;
+//}
 
 - (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj {
     if (self = [super init]) {
         _uniqueID = descriptionObj.uniqueID;
-        _entityName = [descriptionObj entityName];
+        _entityName = [[descriptionObj class] entityName];
         _modifyDate = [descriptionObj modifyDate];
     }
     return self;

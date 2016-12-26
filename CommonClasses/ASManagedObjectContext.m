@@ -11,6 +11,7 @@
 #import "NSString+LogLevel.h"
 #import "NSManagedObjectContext+SQLike.h"
 #import "ASynchronizablePrivate.h"
+#import "NSObject+ASDataSync.h"
 
 
 @interface ASManagedObjectContext()<ASynchronizableContextPrivate>

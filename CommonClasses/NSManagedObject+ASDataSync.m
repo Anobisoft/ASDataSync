@@ -11,17 +11,11 @@
 
 @implementation NSManagedObject (ASDataSync)
 
-NSString *uuidString;
-
-- (NSString *)UUIDString {
-    if (!uuidString && [self conformsToProtocol:@protocol(ASynchronizableDescription)]) {
-        NSData *data = ((NSManagedObject <ASynchronizableDescription> *)self).uniqueID;
-        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:data]).UUIDString;
-    }
-    return uuidString;
+- (NSString *)entityName {
+    return [NSString stringWithString:self.entity.name];
 }
 
-- (NSString *)entityName {
++ (NSString *)entityName {
     return [NSString stringWithString:self.entity.name];
 }
 

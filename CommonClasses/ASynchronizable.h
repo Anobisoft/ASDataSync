@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 @property (nullable, nonatomic, retain) NSData *uniqueID;
 @property (nullable, nonatomic, copy) NSDate *modifyDate;
-- (NSString *)entityName;
++ (NSString *)entityName;
 + (NSPredicate *)predicateWithUniqueID:(NSData *)uniqueID;
 @end
 

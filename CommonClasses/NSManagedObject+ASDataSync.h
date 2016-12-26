@@ -13,8 +13,8 @@ typedef void (^FetchArray)(NSArray <__kindof NSManagedObject *> *objects);
 
 @interface NSManagedObject (ASDataSync)
 
-- (NSString *)UUIDString;
 - (NSString *)entityName;
++ (NSString *)entityName;
 
 + (void)selectObjectsFromContext:(NSManagedObjectContext *)context fetch:(FetchArray)fetch;
 + (void)selectObjectsFromContext:(NSManagedObjectContext *)context limit:(NSUInteger)limit fetch:(FetchArray)fetch;
