@@ -47,12 +47,12 @@
     return self;
 }
 
-//- (NSString *)UUIDString {
-//    if (!uuidString) {
-//        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:self.uniqueID]).UUIDString;
-//    }
-//    return uuidString;
-//}
+- (NSString *)UUIDString {
+    if (!uuidString) {
+        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:self.uniqueID]).UUIDString;
+    }
+    return uuidString;
+}
 
 - (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj {
     if (self = [super init]) {

@@ -11,8 +11,6 @@
 #import "NSString+LogLevel.h"
 #import "NSManagedObjectContext+SQLike.h"
 #import "ASynchronizablePrivate.h"
-#import "NSObject+ASDataSync.h"
-
 
 @interface ASManagedObjectContext()<ASynchronizableContextPrivate>
 @property (nonatomic, weak) id<ASDataSyncAgregator> agregator;
@@ -103,10 +101,11 @@
         if (objects.count == 1) {
             resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
         } else if (objects.count) {
+            resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
             @throw [NSException exceptionWithName:@"DataBaseIntegrityConstraintViolation"
                                            reason:[NSString stringWithFormat:@"Object count with UUID <%@>: %ld\n"
                                                    "Check your ASynchronizableDescription protocol implementation for Entity <%@>",
-                                                   objects[0].UUIDString, (unsigned long)objects.count,
+                                                   resultObject.UUIDString, (unsigned long)objects.count,
                                                    entityName
                                                    ]
                                          userInfo:nil];

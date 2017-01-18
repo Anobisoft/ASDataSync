@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDate *modifyDate;
 + (NSString *)entityName;
 + (NSPredicate *)predicateWithUniqueID:(NSData *)uniqueID;
+@optional
+@property (nullable, nonatomic, retain) NSString *UUIDString;
 @end
 
 @protocol ASynchronizableObject <ASynchronizableDescription>
