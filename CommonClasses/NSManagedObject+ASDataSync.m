@@ -7,7 +7,6 @@
 //
 
 #import "NSManagedObject+ASDataSync.h"
-#import "NSString+LogLevel.h"
 
 @implementation NSManagedObject (ASDataSync)
 
@@ -55,7 +54,7 @@
         [request setFetchLimit:limit];
         NSError *error = nil;
         NSArray *entities = [context executeFetchRequest:request error:&error];
-        if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+        if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         fetch(entities);
     }];
 }

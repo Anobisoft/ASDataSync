@@ -7,7 +7,6 @@
 //
 
 #import "ASWatchConnector.h"
-#import "NSString+LogLevel.h"
 #import "ASerializableContext.h"
 #import "ASynchronizablePrivate.h"
 #import "ASDataSyncAgregator.h"
@@ -44,7 +43,7 @@
         if (WCSession.isSupported) {
             shared = [[super alloc] initUniqueInstance];
         } else {
-            [[NSString stringWithFormat:@"%s WCSession not supported", __PRETTY_FUNCTION__] logError];
+            NSLog(@"[ERROR] %s WCSession not supported", __PRETTY_FUNCTION__);
         }
     });
     return shared;
@@ -104,31 +103,31 @@
     dispatch_semaphore_signal(sessionActivationSemaphore);
     switch (activationState) {
         case WCSessionActivationStateInactive:
-            [[NSString stringWithFormat:@"WCSession activationDidCompleteWithState: WCSessionActivationStateInactive"] logError];
+            NSLog(@"[ERROR] WCSession activationDidCompleteWithState: WCSessionActivationStateInactive");
             break;
         case WCSessionActivationStateNotActivated:
-            [[NSString stringWithFormat:@"WCSession activationDidCompleteWithState: WCSessionActivationStateNotActivated"] logError];
+            NSLog(@"[ERROR] WCSession activationDidCompleteWithState: WCSessionActivationStateNotActivated");
 
             break;
         default:
             #ifdef DEBUG
-            [[NSString stringWithFormat:@"WCSession activationDidCompleteWithState: WCSessionActivationStateActivated"] logDebug];
+            NSLog(@"[DEBUG] WCSession activationDidCompleteWithState: WCSessionActivationStateActivated");
             #endif
             if (self.ready) {
                 #ifdef DEBUG
-                [[NSString stringWithFormat:@"%@ ready", self.class] logDebug];
+                NSLog(@"[DEBUG] %@ ready", self.class);
                 [self dequeue];
                 #endif
             } else {
                 #if TARGET_OS_IOS
-                [[NSString stringWithFormat:@"%@ not ready: %@, %@", self.class,
-                  WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
-                  WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed"] logError];
+                NSLog(@"[ERROR] %@ not ready: %@, %@", self.class,
+                      WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
+                      WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed");
                 #endif
             }
             break;
     }
-    if (error) [[NSString stringWithFormat:@"WCSession activation error(%ld): %@\n%@", (long)error.code, error.localizedDescription, error.userInfo] logError];
+    if (error) NSLog(@"[ERROR] WCSession activation error(%ld): %@\n%@", (long)error.code, error.localizedDescription, error.userInfo);
 }
 
 - (void)sessionDidDeactivate:(WCSession *)session {
@@ -142,12 +141,12 @@
 #if TARGET_OS_IOS
 - (void)sessionWatchStateDidChange:(WCSession *)session {
     if (self.ready) {
-        [[NSString stringWithFormat:@"%@ ready now", self.class] logInfo];
+        NSLog(@"[INFO] %@ ready now", self.class);
         [self dequeue];
     } else {
-        [[NSString stringWithFormat:@"%@ not ready: %@, %@", self.class,
-          WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
-          WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed"] logWarning];
+        NSLog(@"[WARNING] %@ not ready: %@, %@", self.class,
+              WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
+              WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed");
     }
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:statusChanged:)]) {
         [self.delegate watchConnector:self statusChanged:self.ready];
@@ -170,32 +169,32 @@
                     [WCSession.defaultSession transferUserInfo:userInfo];
                 });
 #ifdef DEBUG
-                [[NSString stringWithFormat:@"%s context <%@> sended", __PRETTY_FUNCTION__, contextSerializable.identifier] logDebug];
+                NSLog(@"[DEBUG] %s context <%@> sended", __PRETTY_FUNCTION__, contextSerializable.identifier);
 #endif
             } else {
                 [self enqueueUserInfo:userInfo];
 #if TARGET_OS_IOS
-                [[NSString stringWithFormat:@"%@ not ready: %@, %@", self.class,
-                  WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
-                  WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed"] logError];
+                NSLog(@"[ERROR] %@ not ready: %@, %@", self.class,
+                      WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
+                      WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed");
 #else
-                [[NSString stringWithFormat:@"%@ not ready: WCSession has not activated", self.class] logError];
+                NSLog(@"[ERROR] %@ not ready: WCSession has not activated", self.class);
 #endif
             }
         } else {
-            [[NSString stringWithFormat:@"%s empty context, skipped", __PRETTY_FUNCTION__] logNotice];
+            NSLog(@"[NOTICE] %s empty context, skipped", __PRETTY_FUNCTION__);
         }
         return true;
     } else {
-        [[NSString stringWithFormat:@"%s context is nil", __PRETTY_FUNCTION__] logNotice];
+        NSLog(@"[NOTICE] %s context is nil", __PRETTY_FUNCTION__);
         return false;
     }
 }
 
 - (void)session:(WCSession * __nonnull)session didFinishUserInfoTransfer:(WCSessionUserInfoTransfer *)userInfoTransfer error:(nullable NSError *)error {
-    if (error) [[NSString stringWithFormat:@"%s %@\n%@\n%@", __PRETTY_FUNCTION__, userInfoTransfer, error.localizedDescription, error.userInfo] logError];
+    if (error) NSLog(@"[ERROR] %s %@\n%@\n%@", __PRETTY_FUNCTION__, userInfoTransfer, error.localizedDescription, error.userInfo);
 #ifdef DEBUG
-    else [[NSString stringWithFormat:@"%s %@ success", __PRETTY_FUNCTION__, userInfoTransfer] logDebug];
+    else NSLog(@"[DEBUG] %s %@ success", __PRETTY_FUNCTION__, userInfoTransfer);
     dispatch_async(dispatch_get_main_queue(), ^{
         [logTimer invalidate];
         logTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(logOutstandingUserInfoTransfers) userInfo:nil repeats:YES];
@@ -209,7 +208,7 @@
 #ifdef DEBUG
 - (void)logOutstandingUserInfoTransfers {
     if (WCSession.defaultSession.outstandingUserInfoTransfers.count) {
-        [[NSString stringWithFormat:@"WCSession.outstandingUserInfoTransfers: %@", WCSession.defaultSession.outstandingUserInfoTransfers] logNotice];
+        NSLog(@"[NOTICE] WCSession.outstandingUserInfoTransfers: %@", WCSession.defaultSession.outstandingUserInfoTransfers);
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [logTimer invalidate];
@@ -220,11 +219,11 @@
 
 - (void)session:(WCSession *)session didReceiveUserInfo:(NSDictionary<NSString *, id> *)userInfo {
     #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
     #endif
     if ([[userInfo objectForKey:AS_WC_targetKey] isEqualToString:NSStringFromClass(self.class)]) {
         #ifdef DEBUG
-        [[NSString stringWithFormat:@"Send date: %@", [userInfo objectForKey:AS_WC_dateKey]] logDebug];
+        NSLog(@"[DEBUG] Send date: %@", [userInfo objectForKey:AS_WC_dateKey]);
         #endif
         NSData *contextData = [userInfo objectForKey:AS_WC_contextDataKey];
         if (contextData) {
@@ -233,13 +232,13 @@
                 if ([self.agregator respondsToSelector:@selector(watchConnector:didRecieveContext:)]) {
                     [self.agregator watchConnector:self didRecieveContext:context];
                 } else {
-                   [[NSString stringWithFormat:@"%s %@ agregator not respods to @selector(watchConnector:didRecieveContext:)", __PRETTY_FUNCTION__, self.class] logError];
+                   NSLog(@"[ERROR] %s %@ agregator not respods to @selector(watchConnector:didRecieveContext:)", __PRETTY_FUNCTION__, self.class);
                 }
             } else {
-                [[NSString stringWithFormat:@"%s %@ agregator required", __PRETTY_FUNCTION__, self.class] logError];
+                NSLog(@"[ERROR] %s %@ agregator required", __PRETTY_FUNCTION__, self.class);
             }
         } else {
-            [[NSString stringWithFormat:@"%s contextData is empty", __PRETTY_FUNCTION__] logError];
+            NSLog(@"[ERROR] %s contextData is empty", __PRETTY_FUNCTION__);
         }
     } else {
         if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveUserInfo:)]) {
@@ -252,7 +251,7 @@
 
 - (void)session:(WCSession *)session didReceiveApplicationContext:(NSDictionary<NSString *, id> *)applicationContext {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveApplicationContext:)]) {
         [self.delegate watchConnector:self didReceiveApplicationContext:applicationContext];
@@ -261,7 +260,7 @@
 
 - (void)session:(WCSession *)session didFinishFileTransfer:(WCSessionFileTransfer *)fileTransfer error:(nullable NSError *)error {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didFinishFileTransfer:error:)]) {
         [self.delegate watchConnector:self didFinishFileTransfer:fileTransfer error:error];
@@ -270,7 +269,7 @@
 
 - (void)session:(WCSession *)session didReceiveFile:(WCSessionFile *)file {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveFile:)]) {
         [self.delegate watchConnector:self didReceiveFile:file];
@@ -281,7 +280,7 @@
 
 - (void)sessionReachabilityDidChange:(WCSession *)session {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(sessionReachabilityDidChange:)]) {
         [self.delegate sessionReachabilityDidChange:session.reachable];
@@ -290,7 +289,7 @@
 
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *, id> *)message {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveMessage:)]) {
         [self.delegate watchConnector:self didReceiveMessage:message];
@@ -299,7 +298,7 @@
 
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *, id> *)message replyHandler:(void(^)(NSDictionary<NSString *, id> *replyMessage))replyHandler {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveMessage:replyHandler:)]) {
         [self.delegate watchConnector:self didReceiveMessage:message replyHandler:replyHandler];
@@ -309,7 +308,7 @@
 
 - (void)session:(WCSession *)session didReceiveMessageData:(NSData *)messageData {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveMessageData:)]) {
         [self.delegate watchConnector:self didReceiveMessageData:messageData];
@@ -318,7 +317,7 @@
 
 - (void)session:(WCSession *)session didReceiveMessageData:(NSData *)messageData replyHandler:(void(^)(NSData *replyMessageData))replyHandler {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logDebug];
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didReceiveMessageData:replyHandler:)]) {
         [self.delegate watchConnector:self didReceiveMessageData:messageData replyHandler:replyHandler];

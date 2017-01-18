@@ -8,7 +8,6 @@
 
 #import "ASManagedObjectContext.h"
 #import "ASerializableContext.h"
-#import "NSString+LogLevel.h"
 #import "NSManagedObjectContext+SQLike.h"
 #import "ASynchronizablePrivate.h"
 
@@ -122,7 +121,7 @@
         @try {
             object = [self objectByUniqueID:uniqueID entityName:entityName];
         } @catch (NSException *exception) {
-            [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+            NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
         } @finally {
             fetch(object);
         }
@@ -153,14 +152,14 @@
                         synchronizableObject.modifyDate = recievedObject.modifyDate;
                     } else {
                         #ifdef DEBUG
-                        [[NSString stringWithFormat:@"%s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString] logWarning];
+                        NSLog(@"[WARNING] %s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString);
                         #endif
                     }
                 } else {
                     [self insertRecievedObject:recievedObject];
                 }
             } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
             }
         }
         
@@ -169,7 +168,7 @@
             @try {
                 object = [self objectByDescription:relation.objectDescription];
             } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
             }
             if ([object conformsToProtocol:@protocol(ASynchronizableRelatableObject)] && [object respondsToSelector:@selector(clearRelationsToSetRecieved)]) {
                 NSManagedObject <ASynchronizableRelatableObject> *relatableObject = (NSManagedObject <ASynchronizableRelatableObject> *)object;
@@ -177,7 +176,7 @@
                 @try {
                     subject = [self objectByDescription:relation.relatedDescription];
                 } @catch (NSException *exception) {
-                    [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                    NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
                 }
                 if (subject) [relatableObject clearRelationsToSetRecieved];
             }
@@ -188,7 +187,7 @@
             @try {
                 object = [self objectByDescription:relation.objectDescription];
             } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
             }
             if ([object conformsToProtocol:@protocol(ASynchronizableRelatableObject)]) {
                 NSManagedObject <ASynchronizableRelatableObject> *relatableObject = (NSManagedObject <ASynchronizableRelatableObject> *)object;
@@ -196,7 +195,7 @@
                 @try {
                     subject = [self objectByDescription:relation.relatedDescription];
                 } @catch (NSException *exception) {
-                    [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                    NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
                 }
                 if (subject) [relatableObject setRelation:relation.relationKey toObject:subject];
             }
@@ -209,11 +208,11 @@
                     [self deleteObject:synchronizableObject];
                 } else {
                     #ifdef DEBUG
-                    [[NSString stringWithFormat:@"%s dequeue DELETE: object with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.UUIDString] logWarning];
+                    NSLog(@"[WARNING] %s dequeue DELETE: object with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.UUIDString);
                     #endif
                 }
             } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
             }
         }
     }];
@@ -222,11 +221,11 @@
 - (void)saveMainContext {
     dispatch_async(dispatch_get_main_queue(), ^{
 #ifdef DEBUG
-        [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logError];
+        NSLog(@"[ERROR] %s", __PRETTY_FUNCTION__);
 #endif
         NSError *error;
         if (![mainContext save:&error]) {
-            if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+            if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         }
         
     });
@@ -241,7 +240,7 @@
             }
             [self saveMainContext];
         } else {
-            if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+            if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         }
     }];
 }
@@ -255,7 +254,7 @@
             if ([self save:&error]) {
                 [self saveMainContext];
             } else {
-                if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+                if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
             }
             [self mergeQueue];
         }];
@@ -336,7 +335,7 @@
         NSDictionary *autoMigration = @{ NSMigratePersistentStoresAutomaticallyOption : @(YES),
                                          NSInferMappingModelAutomaticallyOption : @(YES) };
         if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:autoMigration error:&error]) {
-            if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+            if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         }
         [mainContext setPersistentStoreCoordinator:persistentStoreCoordinator];
         self.parentContext = mainContext;
@@ -403,7 +402,7 @@
         [request setFetchLimit:limit];
         NSError *error = nil;
         NSArray *entities = [self executeFetchRequest:request error:&error];
-        if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+        if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         fetch(entities);
     }];
 }

@@ -7,7 +7,6 @@
 //
 
 #import "ASDataSyncAgregator.h"
-#import "NSString+LogLevel.h"
 #import "ASWatchConnector.h"
 #import "ASynchronizable.h"
 #import "ASynchronizablePrivate.h"
@@ -67,7 +66,7 @@
 #warning some error on sending context. throw error? try to send another way?
             }
         } else {
-            [[NSString stringWithFormat:@"%s : watchConnector is not ready", __PRETTY_FUNCTION__] logError];
+            NSLog(@"[ERROR] %s : watchConnector is not ready", __PRETTY_FUNCTION__);
 #warning ERROR -> WARNING. Save status "replication needed".
         }
     } else {
@@ -82,7 +81,7 @@
 
 - (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASerializableContext *)context {
 #ifdef DEBUG
-    [[NSString stringWithFormat:@"%s : <%@>", __PRETTY_FUNCTION__, context.identifier] logDebug];
+    NSLog(@"[DEBUG] %s : <%@>", __PRETTY_FUNCTION__, context.identifier);
 #endif
     for (id<ASynchronizableContextPrivate> cc in contextSet) {
         if ([cc.identifier isEqualToString:context.identifier]) {
@@ -90,7 +89,7 @@
             return ;
         }
     }
-   [[NSString stringWithFormat:@"%s : context <%@> not found", __PRETTY_FUNCTION__, context.identifier] logError];
+   NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, context.identifier);
 }
 
 - (void)addSynchronizableContext:(id<ASynchronizableContextPrivate>)context {
