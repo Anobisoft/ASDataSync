@@ -9,8 +9,8 @@
 #import "ASerializableDescription.h"
 #import "NSUUID+NSData.h"
 
-#define AS_uniqueIDKey @"AS_uniqueID"
-#define AS_modifyDateKey @"AS_modifyDate"
+#define AS_uniqueUUIDDataKey @"AS_uniqueUUIDData"
+#define AS_modificationDateKey @"AS_modificationDate"
 #define AS_entityNameKey @"AS_entityName"
 
 @interface ASerializableDescription()
@@ -21,7 +21,7 @@
     NSString *uuidString;
 }
 
-+ (NSPredicate *)predicateWithUniqueID:(NSData *)uniqueID {
++ (NSPredicate *)predicateWithUniqueUUIDData:(NSData *)uniqueUUIDData {
     return nil;
 }
 
@@ -29,20 +29,20 @@
     return nil;
 }
 
-@synthesize uniqueID = _uniqueID;
+@synthesize uniqueUUIDData = _uniqueUUIDData;
 @synthesize entityName = _entityName;
-@synthesize modifyDate = _modifyDate;
+@synthesize modificationDate = _modificationDate;
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    [aCoder encodeObject:_uniqueID forKey:AS_uniqueIDKey];
-    [aCoder encodeObject:_modifyDate forKey:AS_modifyDateKey];
+    [aCoder encodeObject:_uniqueUUIDData forKey:AS_uniqueUUIDDataKey];
+    [aCoder encodeObject:_modificationDate forKey:AS_modificationDateKey];
     [aCoder encodeObject:_entityName forKey:AS_entityNameKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
-        _uniqueID = [aDecoder decodeObjectForKey:AS_uniqueIDKey];
-        _modifyDate = [aDecoder decodeObjectForKey:AS_modifyDateKey];
+        _uniqueUUIDData = [aDecoder decodeObjectForKey:AS_uniqueUUIDDataKey];
+        _modificationDate = [aDecoder decodeObjectForKey:AS_modificationDateKey];
         _entityName = [aDecoder decodeObjectForKey:AS_entityNameKey];
     }
     return self;
@@ -50,16 +50,16 @@
 
 - (NSString *)UUIDString {
     if (!uuidString) {
-        uuidString = [NSUUID uuidWithData:self.uniqueID].UUIDString;
+        uuidString = [NSUUID uuidWithData:self.uniqueUUIDData].UUIDString;
     }
     return uuidString;
 }
 
 - (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj {
     if (self = [super init]) {
-        _uniqueID = descriptionObj.uniqueID;
+        _uniqueUUIDData = descriptionObj.uniqueUUIDData;
         _entityName = [[descriptionObj class] entityName];
-        _modifyDate = [descriptionObj modifyDate];
+        _modificationDate = [descriptionObj modificationDate];
     }
     return self;
 }

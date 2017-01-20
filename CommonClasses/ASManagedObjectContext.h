@@ -21,8 +21,8 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 - (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL;
 - (instancetype)initWithStoreURL:(NSURL *)storeURL;
-- (void)objectByUniqueID:(NSData *)uniqueID entityName:(NSString *)entityName fetch:(FetchObject)fetch;
-//    - (void)objectByUniqueID:(NSData *)uniqueID entityName:(NSString *)entityName fetch:(void (^)(__kindof NSManagedObject <ASynchronizableObject> *object))fetch;
+- (void)objectByuniqueUUIDData:(NSData *)uniqueUUIDData entityName:(NSString *)entityName fetch:(FetchObject)fetch;
+//    - (void)objectByuniqueUUIDData:(NSData *)uniqueUUIDData entityName:(NSString *)entityName fetch:(void (^)(__kindof NSManagedObject <ASynchronizableObject> *object))fetch;
 
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;

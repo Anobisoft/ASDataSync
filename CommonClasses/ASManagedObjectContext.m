@@ -82,8 +82,8 @@
     NSString *entityClassName = [[NSEntityDescription entityForName:recievedObject.entityName inManagedObjectContext:self] managedObjectClassName];
     if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableObject)]) {
         NSManagedObject <ASynchronizableObject> *synchronizableObject = (NSManagedObject <ASynchronizableObject> *)object;
-        synchronizableObject.uniqueID = recievedObject.uniqueID;
-        synchronizableObject.modifyDate = recievedObject.modifyDate;
+        synchronizableObject.uniqueUUIDData = recievedObject.uniqueUUIDData;
+        synchronizableObject.modificationDate = recievedObject.modificationDate;
         synchronizableObject.keyedProperties = recievedObject.keyedProperties;
     } else {
         @throw [self.class incompatibleEntityExceptionWithEntityName:recievedObject.entityName entityClassName:entityClassName];
@@ -91,13 +91,13 @@
     return object;
 }
 
-- (NSManagedObject <ASynchronizableObject> *)objectByUniqueID:(NSData *)uniqueID entityName:(NSString *)entityName {
+- (NSManagedObject <ASynchronizableObject> *)objectByuniqueUUIDData:(NSData *)uniqueUUIDData entityName:(NSString *)entityName {
     NSManagedObject <ASynchronizableObject> *resultObject = nil;
     NSString *entityClassName = [[NSEntityDescription entityForName:entityName inManagedObjectContext:self] managedObjectClassName];
     if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableObject)]) {
         Class <ASynchronizableObject> entityClass = NSClassFromString(entityClassName);
         NSArray <NSManagedObject *> *objects = [self selectFrom:entityName
-                                                          where:[entityClass predicateWithUniqueID:uniqueID]];
+                                                          where:[entityClass predicateWithUniqueUUIDData:uniqueUUIDData]];
         if (objects.count == 1) {
             resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
         } else if (objects.count) {
@@ -116,11 +116,11 @@
     return resultObject;
 }
 
-- (void)objectByUniqueID:(NSData *)uniqueID entityName:(NSString *)entityName fetch:(FetchObject)fetch {
+- (void)objectByuniqueUUIDData:(NSData *)uniqueUUIDData entityName:(NSString *)entityName fetch:(FetchObject)fetch {
     [self performBlock:^{
         NSManagedObject <ASynchronizableObject> *object;
         @try {
-            object = [self objectByUniqueID:uniqueID entityName:entityName];
+            object = [self objectByuniqueUUIDData:uniqueUUIDData entityName:entityName];
         } @catch (NSException *exception) {
             NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
         } @finally {
@@ -130,7 +130,7 @@
 }
 
 - (NSManagedObject <ASynchronizableObject> *)objectByDescription:(ASerializableDescription *)descriptionObj {
-    return [self objectByUniqueID:descriptionObj.uniqueID entityName:descriptionObj.entityName];
+    return [self objectByuniqueUUIDData:descriptionObj.uniqueUUIDData entityName:descriptionObj.entityName];
 }
 
 - (void)mergeWithRecievedContext:(ASerializableContext *)recievedContext {
@@ -148,9 +148,9 @@
             @try {
                 NSManagedObject <ASynchronizableObject> *synchronizableObject = [self objectByDescription:recievedObject];
                 if (synchronizableObject) {
-                    if ([recievedObject.modifyDate compare:synchronizableObject.modifyDate] != NSOrderedAscending) {
+                    if ([recievedObject.modificationDate compare:synchronizableObject.modificationDate] != NSOrderedAscending) {
                         synchronizableObject.keyedProperties = recievedObject.keyedProperties;
-                        synchronizableObject.modifyDate = recievedObject.modifyDate;
+                        synchronizableObject.modificationDate = recievedObject.modificationDate;
                     } else {
                         #ifdef DEBUG
                         NSLog(@"[WARNING] %s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString);
@@ -368,8 +368,8 @@
         NSString *entityClassName = [[NSEntityDescription entityForName:entityName inManagedObjectContext:self] managedObjectClassName];
         if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableDescription)]) {
             NSManagedObject <ASynchronizableDescription> *synchronizableObject = (NSManagedObject <ASynchronizableDescription> *)object;
-            synchronizableObject.uniqueID = [[NSUUID UUID] data];
-            synchronizableObject.modifyDate = [NSDate date];
+            synchronizableObject.uniqueUUIDData = [[NSUUID UUID] data];
+            synchronizableObject.modificationDate = [NSDate date];
         }
         fetch(object);
     }];

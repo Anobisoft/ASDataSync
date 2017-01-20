@@ -28,7 +28,6 @@
 
 - (void)setKeyedProperties:(NSDictionary<NSString *,id<NSCoding>> *)keyedProperties {
     _keyedProperties = keyedProperties;
-    self.modifyDate = [NSDate date];
     if (self.delegate) {
         [self.delegate updateObject:self];
     }

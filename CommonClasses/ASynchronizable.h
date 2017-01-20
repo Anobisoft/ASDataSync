@@ -19,10 +19,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableDescription <NSObject>
 @required
-@property (nullable, nonatomic, retain) NSData *uniqueID;
-@property (nullable, nonatomic, copy) NSDate *modifyDate;
+@property (nullable, nonatomic, retain) NSData *uniqueUUIDData;
+@property (nullable, nonatomic, copy) NSDate *modificationDate;
 + (NSString *)entityName;
-+ (NSPredicate *)predicateWithUniqueID:(NSData *)uniqueID;
++ (NSPredicate *)predicateWithUniqueUUIDData:(NSData *)uniqueUUIDData;
 @optional
 @property (nullable, nonatomic, retain) NSString *UUIDString;
 @end
