@@ -29,21 +29,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableObject <ASynchronizableDescription>
 @property (nonnull, nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
-@optional
-@property (nullable, nonatomic, weak) id <ASynchronizableObjectDelegate> delegate;
 @end
 
 @protocol ASynchronizableRelatableObject <ASynchronizableObject>
 @required
-- (NSDictionary <NSString *, NSSet <id<ASynchronizableObject>> *> *)relatedObjectsByRelationKey;
-- (void)setRelation:(NSString *)relationKey toObject:(id<ASynchronizableObject>)object;
-@optional
-- (void)clearRelationsToSetRecieved;
+- (NSDictionary <NSString *, id<ASynchronizableObject>> *)relatedObjectByRelationKey;
+- (void)replaceRelation:(NSString *)relationKey toObject:(nullable id<ASynchronizableObject>)object;
 @end
 
-@protocol ASynchronizableObjectDelegate <NSObject>
+@protocol ASynchronizableMultiRelatableObject <ASynchronizableObject>
 @required
-- (void)updateObject:(id <ASynchronizableObject>)object;
+- (NSDictionary <NSString *, NSSet <id<ASynchronizableObject>> *> *)relatedObjectSetByRelationKey;
+- (void)replaceRelation:(NSString *)relationKey toObjectSet:(NSSet <id<ASynchronizableObject>> *)objectSet;
 @end
 
 @protocol ASynchronizableContextDelegate <NSObject>
@@ -54,9 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASynchronizableContext <NSObject>
 @required
 - (void)commit;
-- (void)rollback;
-@optional
+- (void)rollbackCompletion:(nullable void (^)(void))completion;
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -10,6 +10,12 @@
 
 #import "ASerializableObject.h"
 
+@interface ASerializableDescription(protected)
+
+- (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
+
+@end
+
 @implementation ASerializableObject
 
 @synthesize keyedProperties = _keyedProperties;
@@ -24,13 +30,6 @@
         _keyedProperties = [aDecoder decodeObjectForKey:AS_keyedPropertiesKey];
     }
     return self;
-}
-
-- (void)setKeyedProperties:(NSDictionary<NSString *,id<NSCoding>> *)keyedProperties {
-    _keyedProperties = keyedProperties;
-    if (self.delegate) {
-        [self.delegate updateObject:self];
-    }
 }
 
 - (instancetype)initWithSynchronizableObject:(id <ASynchronizableObject>)object {

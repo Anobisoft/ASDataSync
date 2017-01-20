@@ -17,7 +17,6 @@
 @property (nonatomic, strong) NSString *entityName;
 
 + (instancetype)instantiateWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
-- (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
 
 - (NSString *)UUIDString;
 

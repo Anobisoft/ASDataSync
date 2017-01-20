@@ -9,16 +9,14 @@
 #ifndef ASerializableContext_h
 #define ASerializableContext_h
 
-#import "ASerializableObject.h"
-#import "ASerializableRelation.h"
+#import "ASerializableRelatableObject.h"
 #import "ASynchronizable.h"
 
 @interface ASerializableContext : NSObject <NSCoding>
 
 @property (nonatomic, strong) NSString *identifier;
-@property (nonatomic, strong) NSSet <ASerializableObject *> *updatedObjects;
+@property (nonatomic, strong) NSSet <ASerializableRelatableObject *> *updatedObjects;
 @property (nonatomic, strong) NSSet <ASerializableDescription *> *deletedObjects;
-@property (nonatomic, strong) NSSet <ASerializableRelation *> *relations;
 
 + (instancetype)instantiateWithSynchronizableContext:(id <ASynchronizableContext>)context;
 

@@ -27,7 +27,7 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
 - (void)performAndSave:(void (^)(void))block;
-- (void)save;
+- (void)saveAndReloadData;
 
 - (id)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;
@@ -49,7 +49,7 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 - (void)selectFrom:(NSString *)entity where:(nullable NSPredicate *)clause orderBy:(nullable NSArray <NSSortDescriptor *> *)sortDescriptors fetch:(FetchArray)fetch;
 - (void)selectFrom:(NSString *)entity where:(nullable NSPredicate *)clause orderBy:(nullable NSArray <NSSortDescriptor *> *)sortDescriptors limit:(NSUInteger)limit fetch:(FetchArray)fetch;
 
-- (void)rollbackCompletion:(void (^)(void))completion;
+- (void)rollbackCompletion:(nullable void (^)(void))completion;
 
 NS_ASSUME_NONNULL_END
 

@@ -15,10 +15,7 @@
 
 @interface ASerializableObject : ASerializableDescription <ASynchronizableObject>
 
-@property (nonatomic, weak) id <ASynchronizableObjectDelegate> delegate;
-
 + (instancetype)instantiateWithSynchronizableObject:(id <ASynchronizableObject>)object;
-
 
 @end
 

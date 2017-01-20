@@ -18,7 +18,6 @@
 
 @protocol ASynchronizableContextPrivate <ASynchronizableContext>
 @required
-@property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
 
 @property (nonatomic, strong, readonly) NSString *identifier;
 @property (nonatomic, strong, readonly) NSSet <id <ASynchronizableObject>> *updatedObjects;

@@ -39,10 +39,6 @@
 		CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39BE1DC1DF550047B3A8 /* ASerializableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */; };
 		CE6C39BF1DC1DF550047B3A8 /* ASerializableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */; };
-		CE6C39C01DC1DF550047B3A8 /* ASerializableRelation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A01DC1DF550047B3A8 /* ASerializableRelation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39C11DC1DF550047B3A8 /* ASerializableRelation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A01DC1DF550047B3A8 /* ASerializableRelation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39C21DC1DF550047B3A8 /* ASerializableRelation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39A11DC1DF550047B3A8 /* ASerializableRelation.m */; };
-		CE6C39C31DC1DF550047B3A8 /* ASerializableRelation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39A11DC1DF550047B3A8 /* ASerializableRelation.m */; };
 		CE6C39C41DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A21DC1DF550047B3A8 /* ASManagedObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39C51DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A21DC1DF550047B3A8 /* ASManagedObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39C61DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39A31DC1DF550047B3A8 /* ASManagedObjectContext.m */; };
@@ -67,6 +63,10 @@
 		CE9D88441E31D930007158BE /* NSUUID+NSData.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88411E31D930007158BE /* NSUUID+NSData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88421E31D930007158BE /* NSUUID+NSData.m */; };
 		CE9D88461E31D930007158BE /* NSUUID+NSData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88421E31D930007158BE /* NSUUID+NSData.m */; };
+		CE9D884E1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */; };
+		CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */; };
+		CE9D88501E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */; };
+		CE9D88511E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,8 +84,6 @@
 		CE6C399D1DC1DF550047B3A8 /* ASerializableDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASerializableDescription.m; sourceTree = "<group>"; };
 		CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASerializableObject.h; sourceTree = "<group>"; };
 		CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASerializableObject.m; sourceTree = "<group>"; };
-		CE6C39A01DC1DF550047B3A8 /* ASerializableRelation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASerializableRelation.h; sourceTree = "<group>"; };
-		CE6C39A11DC1DF550047B3A8 /* ASerializableRelation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASerializableRelation.m; sourceTree = "<group>"; };
 		CE6C39A21DC1DF550047B3A8 /* ASManagedObjectContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASManagedObjectContext.h; sourceTree = "<group>"; };
 		CE6C39A31DC1DF550047B3A8 /* ASManagedObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASManagedObjectContext.m; sourceTree = "<group>"; };
 		CE6C39A61DC1DF550047B3A8 /* ASWatchConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASWatchConnector.h; sourceTree = "<group>"; };
@@ -98,6 +96,8 @@
 		CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectContext+SQLike.m"; sourceTree = "<group>"; };
 		CE9D88411E31D930007158BE /* NSUUID+NSData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUUID+NSData.h"; sourceTree = "<group>"; };
 		CE9D88421E31D930007158BE /* NSUUID+NSData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUUID+NSData.m"; sourceTree = "<group>"; };
+		CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASerializableRelatableObject.h; sourceTree = "<group>"; };
+		CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASerializableRelatableObject.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,8 +166,8 @@
 				CE6C399D1DC1DF550047B3A8 /* ASerializableDescription.m */,
 				CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */,
 				CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */,
-				CE6C39A01DC1DF550047B3A8 /* ASerializableRelation.h */,
-				CE6C39A11DC1DF550047B3A8 /* ASerializableRelation.m */,
+				CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */,
+				CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */,
 				CE6C39A21DC1DF550047B3A8 /* ASManagedObjectContext.h */,
 				CE6C39A31DC1DF550047B3A8 /* ASManagedObjectContext.m */,
 				CE6C39A61DC1DF550047B3A8 /* ASWatchConnector.h */,
@@ -198,8 +198,8 @@
 				CE6C39D01DC1DF550047B3A8 /* ASynchronizable.h in Headers */,
 				CE6C39D21DC1DF550047B3A8 /* ASynchronizablePrivate.h in Headers */,
 				CE6C39B81DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
+				CE9D884E1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
 				CE6C39BC1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
-				CE6C39C01DC1DF550047B3A8 /* ASerializableRelation.h in Headers */,
 				CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
 				CE6C39D41DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
 				CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */,
@@ -218,8 +218,8 @@
 				CE6C39D11DC1DF550047B3A8 /* ASynchronizable.h in Headers */,
 				CE6C39D31DC1DF550047B3A8 /* ASynchronizablePrivate.h in Headers */,
 				CE6C39B91DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
+				CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
 				CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
-				CE6C39C11DC1DF550047B3A8 /* ASerializableRelation.h in Headers */,
 				CE6C39B51DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
 				CE6C39D51DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
 				CE9D88441E31D930007158BE /* NSUUID+NSData.h in Headers */,
@@ -350,8 +350,8 @@
 				CE6C39B61DC1DF550047B3A8 /* ASerializableContext.m in Sources */,
 				CE6C39BA1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */,
 				CE6C39B21DC1DF550047B3A8 /* ASDataSyncAgregator.m in Sources */,
+				CE9D88501E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */,
 				CE6C39CE1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */,
-				CE6C39C21DC1DF550047B3A8 /* ASerializableRelation.m in Sources */,
 				CE6C39C61DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,
 				CE6C39BE1DC1DF550047B3A8 /* ASerializableObject.m in Sources */,
 				CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */,
@@ -367,8 +367,8 @@
 				CE6C39B71DC1DF550047B3A8 /* ASerializableContext.m in Sources */,
 				CE6C39BB1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */,
 				CE6C39B31DC1DF550047B3A8 /* ASDataSyncAgregator.m in Sources */,
+				CE9D88511E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */,
 				CE6C39CF1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */,
-				CE6C39C31DC1DF550047B3A8 /* ASerializableRelation.m in Sources */,
 				CE6C39C71DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,
 				CE6C39BF1DC1DF550047B3A8 /* ASerializableObject.m in Sources */,
 				CE9D88461E31D930007158BE /* NSUUID+NSData.m in Sources */,

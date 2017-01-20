@@ -106,7 +106,7 @@
 
 - (void)rollbackAll {
     for (id<ASynchronizableContext> cc in contextSet) {
-        [cc rollback];
+        [cc rollbackCompletion:nil];
     }
 }
 
