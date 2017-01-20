@@ -229,7 +229,7 @@
                         NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
                     }
                 }
-                [synchronizableRelatableObject replaceRelation:relationKey toObjectSet:tmpSet.copy];
+                [synchronizableMultiRelatableObject replaceRelation:relationKey toObjectSet:tmpSet.copy];
             }
         }
         
