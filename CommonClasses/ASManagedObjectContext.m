@@ -10,10 +10,11 @@
 #import "ASerializableContext.h"
 #import "NSManagedObjectContext+SQLike.h"
 #import "ASynchronizablePrivate.h"
+#import "NSUUID+NSData.h"
 
 @interface ASManagedObjectContext()<ASynchronizableContextPrivate>
 @property (nonatomic, weak) id<ASDataSyncAgregator> agregator;
-//@property (nonatomic, strong) NSManagedObjectContext *remoteAsyncContext;
+
 @end
 
 @implementation ASManagedObjectContext {
@@ -101,7 +102,7 @@
             resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
         } else if (objects.count) {
             resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
-            @throw [NSException exceptionWithName:@"DataBaseIntegrityConstraintViolation"
+            @throw [NSException exceptionWithName:@"DataBase UNIQUE constraint violated"
                                            reason:[NSString stringWithFormat:@"Object count with UUID <%@>: %ld\n"
                                                    "Check your ASynchronizableDescription protocol implementation for Entity <%@>",
                                                    resultObject.UUIDString, (unsigned long)objects.count,
@@ -233,18 +234,28 @@
 
 - (void)saveContextAsync {
     [self performBlock:^{
-        NSError *error;
-        if ([self save:&error]) {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(reloadData)]) {
-                [self.delegate reloadData];
-            }
-            [self saveMainContext];
-        } else {
-            if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
-        }
+        [self saveAndReloadData];
     }];
 }
 
+- (void)saveAndReloadData {
+    NSError *error;
+    if ([self save:&error]) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(reloadData)]) {
+            [self.delegate reloadData];
+        }
+        [self saveMainContext];
+    } else {
+        if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
+    }
+}
+
+- (void)performAndSave:(void (^)(void))block {
+    [self performBlock:^{
+        block();
+        [self saveAndReloadData];
+    }];
+}
 
 - (void)commit {
     if ([self hasChanges]) {
@@ -261,7 +272,6 @@
     } else {
         [self mergeQueue];
     }
-    
 }
 
 - (void)mergeQueue {
@@ -282,7 +292,7 @@
 }
 
 
-#pragma mark initialization
+#pragma mark - initialization
 
 - (id)copy {
     return self;
@@ -343,7 +353,7 @@
     return self;
 }
 
-#pragma mark overload
+#pragma mark - overload
 
 - (void)deleteObject:(NSManagedObject *)object completion:(void (^)(void))completion {
     [self performBlock:^{
@@ -358,8 +368,7 @@
         NSString *entityClassName = [[NSEntityDescription entityForName:entityName inManagedObjectContext:self] managedObjectClassName];
         if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableDescription)]) {
             NSManagedObject <ASynchronizableDescription> *synchronizableObject = (NSManagedObject <ASynchronizableDescription> *)object;
-            NSUUID *uuid = [NSUUID UUID];
-            synchronizableObject.uniqueID = [NSKeyedArchiver archivedDataWithRootObject:uuid];
+            synchronizableObject.uniqueID = [[NSUUID UUID] data];
             synchronizableObject.modifyDate = [NSDate date];
         }
         fetch(object);

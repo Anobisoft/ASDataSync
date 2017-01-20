@@ -7,6 +7,7 @@
 //
 
 #import "ASerializableDescription.h"
+#import "NSUUID+NSData.h"
 
 #define AS_uniqueIDKey @"AS_uniqueID"
 #define AS_modifyDateKey @"AS_modifyDate"
@@ -49,7 +50,7 @@
 
 - (NSString *)UUIDString {
     if (!uuidString) {
-        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:self.uniqueID]).UUIDString;
+        uuidString = [NSUUID uuidWithData:self.uniqueID].UUIDString;
     }
     return uuidString;
 }

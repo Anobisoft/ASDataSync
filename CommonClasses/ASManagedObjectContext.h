@@ -26,10 +26,13 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
+- (void)performAndSave:(void (^)(void))block;
+- (void)save;
 
 - (id)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;
 - (id)mutableCopy NS_UNAVAILABLE;
+
 
 //Thread safe requests
 

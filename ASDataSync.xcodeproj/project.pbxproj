@@ -63,6 +63,10 @@
 		CE6C39D91DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39AC1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39DA1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */; };
 		CE6C39DB1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */; };
+		CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88411E31D930007158BE /* NSUUID+NSData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D88441E31D930007158BE /* NSUUID+NSData.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88411E31D930007158BE /* NSUUID+NSData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88421E31D930007158BE /* NSUUID+NSData.m */; };
+		CE9D88461E31D930007158BE /* NSUUID+NSData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88421E31D930007158BE /* NSUUID+NSData.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -92,6 +96,8 @@
 		CE6C39AB1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+ASDataSync.m"; sourceTree = "<group>"; };
 		CE6C39AC1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectContext+SQLike.h"; sourceTree = "<group>"; };
 		CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectContext+SQLike.m"; sourceTree = "<group>"; };
+		CE9D88411E31D930007158BE /* NSUUID+NSData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUUID+NSData.h"; sourceTree = "<group>"; };
+		CE9D88421E31D930007158BE /* NSUUID+NSData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUUID+NSData.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +178,8 @@
 				CE6C39AB1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m */,
 				CE6C39AC1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h */,
 				CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */,
+				CE9D88411E31D930007158BE /* NSUUID+NSData.h */,
+				CE9D88421E31D930007158BE /* NSUUID+NSData.m */,
 			);
 			path = CommonClasses;
 			sourceTree = "<group>";
@@ -194,6 +202,7 @@
 				CE6C39C01DC1DF550047B3A8 /* ASerializableRelation.h in Headers */,
 				CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
 				CE6C39D41DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
+				CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */,
 				CE6C39D81DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -213,6 +222,7 @@
 				CE6C39C11DC1DF550047B3A8 /* ASerializableRelation.h in Headers */,
 				CE6C39B51DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
 				CE6C39D51DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
+				CE9D88441E31D930007158BE /* NSUUID+NSData.h in Headers */,
 				CE6C39D91DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -344,6 +354,7 @@
 				CE6C39C21DC1DF550047B3A8 /* ASerializableRelation.m in Sources */,
 				CE6C39C61DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,
 				CE6C39BE1DC1DF550047B3A8 /* ASerializableObject.m in Sources */,
+				CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */,
 				CE6C39D61DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -360,6 +371,7 @@
 				CE6C39C31DC1DF550047B3A8 /* ASerializableRelation.m in Sources */,
 				CE6C39C71DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,
 				CE6C39BF1DC1DF550047B3A8 /* ASerializableObject.m in Sources */,
+				CE9D88461E31D930007158BE /* NSUUID+NSData.m in Sources */,
 				CE6C39D71DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

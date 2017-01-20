@@ -24,3 +24,4 @@ FOUNDATION_EXPORT const unsigned char ASDataSyncVersionString[];
 #import "ASWatchConnector.h"
 #import "NSManagedObject+ASDataSync.h"
 #import "NSManagedObjectContext+SQLike.h"
+#import "NSUUID+NSData.h"
