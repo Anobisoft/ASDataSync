@@ -38,18 +38,20 @@
         if ([object conformsToProtocol:@protocol(ASynchronizableRelatableObject)]) {
             id <ASynchronizableRelatableObject> relatableObject = (id <ASynchronizableRelatableObject>)object;
             NSMutableDictionary <NSString *, ASerializableDescription *> *tmpDict = [NSMutableDictionary new];
-            for (NSString *relationKey in [relatableObject relatedObjectByRelationKey].allKeys) {
-                [tmpDict setObject:[ASerializableDescription instantiateWithSynchronizableDescription:[relatableObject relatedObjectByRelationKey][relationKey]] forKey:relationKey];
+            NSDictionary <NSString *, id<ASynchronizableDescription>> *relatedDescriptionByRelationKey = [relatableObject relatedDescriptionByRelationKey];
+            for (NSString *relationKey in relatedDescriptionByRelationKey.allKeys) {
+                [tmpDict setObject:[ASerializableDescription instantiateWithSynchronizableDescription:relatedDescriptionByRelationKey[relationKey]] forKey:relationKey];
             }
             _descriptionByRelationKey = tmpDict.copy;
         }
         if ([object conformsToProtocol:@protocol(ASynchronizableMultiRelatableObject)]) {
-            id <ASynchronizableMultiRelatableObject> relatableObject = (id <ASynchronizableMultiRelatableObject>)object;
+            id <ASynchronizableMultiRelatableObject> multiRelatableObject = (id <ASynchronizableMultiRelatableObject>)object;
             NSMutableDictionary <NSString *, ASerializableDescription *> *tmpDict = [NSMutableDictionary new];
-            for (NSString *relationKey in [relatableObject relatedObjectSetByRelationKey].allKeys) {
+            NSDictionary <NSString *, NSSet <id<ASynchronizableDescription>> *> *relatedDescriptionSetByRelationKey = [multiRelatableObject relatedDescriptionSetByRelationKey];
+            for (NSString *relationKey in relatedDescriptionSetByRelationKey.allKeys) {
                 NSMutableSet <ASerializableDescription *> *innerSet = [NSMutableSet new];
-                for (id <ASynchronizableObject> relatedObject in [relatableObject relatedObjectSetByRelationKey][relationKey]) {
-                    [innerSet addObject:[ASerializableDescription instantiateWithSynchronizableDescription:relatedObject]];
+                for (id <ASynchronizableDescription> relatedDescription in relatedDescriptionSetByRelationKey[relationKey]) {
+                    [innerSet addObject:[ASerializableDescription instantiateWithSynchronizableDescription:relatedDescription]];
                 }
                 [tmpDict setObject:innerSet.copy forKey:relationKey];
             }
