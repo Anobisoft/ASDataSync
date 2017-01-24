@@ -8,7 +8,7 @@
 
 #import "NSUUID+NSData.h"
 
-@implementation NSUUID (NSData)
+@implementation NSUUID (ASDataSync)
 
 - (NSData *)data {
     uuid_t bytes;
@@ -16,10 +16,22 @@
     return [NSData dataWithBytes:bytes length:16];
 }
 
-+ (instancetype)uuidWithData:(NSData *)data {
++ (instancetype)UUIDWithData:(NSData *)data {
     uuid_t bytes;
     [data getBytes:bytes length:16];
     return [[self alloc] initWithUUIDBytes:bytes];
+}
+
+@end
+
+@implementation NSData (ASDataSync)
+
+- (NSUUID *)UUID {
+    return [NSUUID UUIDWithData:self];
+}
+
+- (NSString *)UUIDString {
+    return [NSUUID UUIDWithData:self].UUIDString;
 }
 
 @end

@@ -15,7 +15,7 @@
 @interface ASerializableContext : NSObject <NSCoding>
 
 @property (nonatomic, strong) NSString *identifier;
-@property (nonatomic, strong) NSSet <ASerializableRelatableObject *> *updatedObjects;
+@property (nonatomic, strong) NSSet <ASerializableObject *> *updatedObjects;
 @property (nonatomic, strong) NSSet <ASerializableDescription *> *deletedObjects;
 
 + (instancetype)instantiateWithSynchronizableContext:(id <ASynchronizableContext>)context;

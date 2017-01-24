@@ -15,19 +15,19 @@
     return [[self alloc] init];
 }
 
-+ (NSString *)entityName {
+- (NSString *)entityName {
     return nil;
 }
 
-+ (NSPredicate *)predicateWithUniqueUUIDData:(NSData *)uniqueUUIDData {
++ (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData {
     return nil;
 }
 
-- (NSData *)uniqueUUIDData {
+- (NSData *)uniqueData {
     return nil;
 }
 
-- (void)setUniqueUUIDData:(NSData *)uniqueUUIDData {
+- (void)setUniqueData:(NSData *)uniqueData {
     
 }
 

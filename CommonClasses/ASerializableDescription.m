@@ -9,7 +9,7 @@
 #import "ASerializableDescription.h"
 #import "NSUUID+NSData.h"
 
-#define AS_uniqueUUIDDataKey @"AS_uniqueUUIDData"
+#define AS_uniqueDataKey @"AS_uniqueData"
 #define AS_modificationDateKey @"AS_modificationDate"
 #define AS_entityNameKey @"AS_entityName"
 
@@ -21,27 +21,19 @@
     NSString *uuidString;
 }
 
-+ (NSPredicate *)predicateWithUniqueUUIDData:(NSData *)uniqueUUIDData {
-    return nil;
-}
-
-+ (NSString *)entityName {
-    return nil;
-}
-
-@synthesize uniqueUUIDData = _uniqueUUIDData;
+@synthesize uniqueData = _uniqueData;
 @synthesize entityName = _entityName;
 @synthesize modificationDate = _modificationDate;
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    [aCoder encodeObject:_uniqueUUIDData forKey:AS_uniqueUUIDDataKey];
+    [aCoder encodeObject:_uniqueData forKey:AS_uniqueDataKey];
     [aCoder encodeObject:_modificationDate forKey:AS_modificationDateKey];
     [aCoder encodeObject:_entityName forKey:AS_entityNameKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
-        _uniqueUUIDData = [aDecoder decodeObjectForKey:AS_uniqueUUIDDataKey];
+        _uniqueData = [aDecoder decodeObjectForKey:AS_uniqueDataKey];
         _modificationDate = [aDecoder decodeObjectForKey:AS_modificationDateKey];
         _entityName = [aDecoder decodeObjectForKey:AS_entityNameKey];
     }
@@ -50,15 +42,15 @@
 
 - (NSString *)UUIDString {
     if (!uuidString) {
-        uuidString = [NSUUID uuidWithData:self.uniqueUUIDData].UUIDString;
+        uuidString = self.uniqueData.UUIDString;
     }
     return uuidString;
 }
 
 - (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj {
     if (self = [super init]) {
-        _uniqueUUIDData = descriptionObj.uniqueUUIDData;
-        _entityName = [[descriptionObj class] entityName];
+        _uniqueData = descriptionObj.uniqueData;
+        _entityName = [descriptionObj entityName];
         _modificationDate = [descriptionObj modificationDate];
     }
     return self;

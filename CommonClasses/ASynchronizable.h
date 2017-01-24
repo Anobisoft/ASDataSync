@@ -9,7 +9,6 @@
 @protocol ASynchronizableDescription;
 @protocol ASynchronizableObject;
 @protocol ASynchronizableRelatableObject;
-@protocol ASynchronizableObjectDelegate;
 
 #ifndef ASynchronizable_h
 #define ASynchronizable_h
@@ -19,11 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableDescription <NSObject>
 @required
-@property (nullable, nonatomic, retain) NSData *uniqueUUIDData;
+@property (nullable, nonatomic, retain) NSData *uniqueData;
 @property (nullable, nonatomic, copy) NSDate *modificationDate;
-+ (NSString *)entityName;
-+ (NSPredicate *)predicateWithUniqueUUIDData:(NSData *)uniqueUUIDData;
+- (NSString *)entityName;
 @optional
++ (NSString *)entityName;
++ (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData;
 @property (nullable, nonatomic, retain) NSString *UUIDString;
 @end
 
@@ -33,8 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableRelatableObject <ASynchronizableObject>
 @required
-- (NSDictionary <NSString *, id<ASynchronizableDescription>> *)relatedDescriptionByRelationKey;
-- (void)replaceRelation:(NSString *)relationKey toObject:(nullable id<ASynchronizableDescription>)object;
+    - (NSDictionary <NSString *, id<ASynchronizableDescription>> *)relatedDescriptionByRelationKey;
+    - (void)replaceRelation:(NSString *)relationKey toObject:(nullable id<ASynchronizableDescription>)object;
 @end
 
 @protocol ASynchronizableMultiRelatableObject <ASynchronizableObject>

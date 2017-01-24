@@ -8,9 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSUUID (NSData)
+@interface NSUUID (ASDataSync)
 
 - (NSData *)data;
-+ (instancetype)uuidWithData:(NSData *)data;
++ (instancetype)UUIDWithData:(NSData *)data;
+
+@end
+
+@interface NSData (ASDataSync)
+
+- (NSUUID *)UUID;
+- (NSString *)UUIDString;
 
 @end
