@@ -25,8 +25,6 @@
     NSString *name;
 }
 
-#pragma mark ASynchronizableContext
-
 @synthesize delegate = _delegate;
 
 - (NSString *)identifier {
@@ -54,12 +52,12 @@
     return result.copy;
 }
 
-- (NSSet <NSManagedObject<ASynchronizableObject> *> *)deletedObjects {
+- (NSSet <NSManagedObject<ASynchronizableDescription> *> *)deletedObjects {
     __block NSMutableSet <NSManagedObject<ASynchronizableObject> *> *result = [NSMutableSet new];
     [self performBlockAndWait:^{
         for (NSManagedObject *obj in super.deletedObjects) {
-            if ([obj conformsToProtocol:@protocol(ASynchronizableObject)]) {
-                [result addObject:(NSManagedObject<ASynchronizableObject> *)obj];
+            if ([obj conformsToProtocol:@protocol(ASynchronizableDescription)]) {
+                [result addObject:(NSManagedObject<ASynchronizableDescription> *)obj];
             }
         }
     }];
@@ -69,6 +67,12 @@
 - (void)setAgregator:(id<ASDataSyncAgregator>)agregator {
     _agregator = agregator;
 }
+
+#pragma mark - cloud support
+
+
+
+#pragma mark - accept recieved (serialized) objects
 
 + (NSException *)incompatibleEntityExceptionWithEntityName:(NSString *)entityName entityClassName:(NSString *)entityClassName {
     return [NSException exceptionWithName:@"IncompatibleEntity"
@@ -382,7 +386,7 @@
     return self;
 }
 
-#pragma mark - overload
+#pragma mark - thread safe queries
 
 - (void)deleteObject:(NSManagedObject *)object completion:(void (^)(void))completion {
     [self performBlock:^{

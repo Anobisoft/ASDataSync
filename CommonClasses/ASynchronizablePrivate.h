@@ -31,6 +31,7 @@
 @protocol ASDataSyncAgregator <NSObject>
 @required
 - (void)willCommitContext:(id <ASynchronizableContext>)context;
+@optional
 - (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASerializableContext *)context;
 @end
 

@@ -21,20 +21,18 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 - (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL;
 - (instancetype)initWithStoreURL:(NSURL *)storeURL;
-- (void)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName fetch:(FetchObject)fetch;
-//    - (void)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName fetch:(void (^)(__kindof NSManagedObject <ASynchronizableObject> *object))fetch;
+
 
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
-- (void)performAndSave:(void (^)(void))block;
-- (void)saveAndReloadData;
 
 - (id)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;
 - (id)mutableCopy NS_UNAVAILABLE;
 
-
 //Thread safe requests
+
+- (void)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName fetch:(FetchObject)fetch;
 
 - (void)insertTo:(NSString *)entityName fetch:(FetchObject)fetch;
 - (void)deleteObject:(NSManagedObject *)object completion:(void (^)(void))completion;

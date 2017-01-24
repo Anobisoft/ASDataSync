@@ -33,12 +33,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableRelatableObject <ASynchronizableObject>
 @required
-    - (NSDictionary <NSString *, id<ASynchronizableDescription>> *)relatedDescriptionByRelationKey;
-    - (void)replaceRelation:(NSString *)relationKey toObject:(nullable id<ASynchronizableDescription>)object;
++ (NSString *)entityNameForRelationKey:(NSString *)relationKey;
+- (NSDictionary <NSString *, id<ASynchronizableDescription>> *)relatedDescriptionByRelationKey;
+- (void)replaceRelation:(NSString *)relationKey toObject:(nullable id<ASynchronizableDescription>)object;
 @end
 
 @protocol ASynchronizableMultiRelatableObject <ASynchronizableObject>
 @required
++ (NSString *)entityNameForRelationKey:(NSString *)relationKey;
 - (NSDictionary <NSString *, NSSet <id<ASynchronizableDescription>> *> *)relatedDescriptionSetByRelationKey;
 - (void)replaceRelation:(NSString *)relationKey toObjectSet:(NSSet <id<ASynchronizableDescription>> *)objectSet;
 @end
