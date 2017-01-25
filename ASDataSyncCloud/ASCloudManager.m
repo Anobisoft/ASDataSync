@@ -10,6 +10,8 @@
 #import <CloudKit/CloudKit.h>
 #import "ASDeviceList.h"
 #import "ASCloudRecord.h"
+#import "ASPrivateProtocol.h"
+#import "NSUUID+NSData.h"
 
 typedef void (^FetchRecord)(__kindof ASCloudRecord *record);
 typedef void (^FetchRecordsArray)(NSArray <__kindof ASCloudRecord *> *records);
@@ -24,8 +26,9 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
 #define kASCloudManagerLastSyncDateForEntityDictionary @"ASCloudManagerLastSyncDateForEntityDictionary"
 #define kASCloudManagerObjectDeletionInfoRecordType @"DeleteQueue"
 
-@interface ASCloudManager()
+@interface ASCloudManager() <ASCloudContext, ASCloudDataAgregator>
     @property (nonatomic, strong, readonly) NSDictionary <NSString *, NSDate *> *lastSyncDateForEntity;
+
 @end
 
 @implementation ASCloudManager {
@@ -36,11 +39,8 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
     ASDeviceList *deviceList;
     NSMutableArray <CKRecord *> *recordsToSave;
     NSMutableArray <CKRecordID *> *recordIDsToDelete;
-}
-
-- (void)setContext:(id <ASynchronizableContext>)context {
-    syncContext = (id <ASynchronizableContextPrivate>)context;
-    [syncContext setAgregator:self];
+    NSMutableSet <id <ASCloudRelatableRecord>> *_updatedRecords;
+    NSMutableSet <id <ASCloudDescription>> *_deletionInfoRecords;
 }
 
 @synthesize lastSyncDateForEntity = _lastSyncDateForEntity;
@@ -61,6 +61,16 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
     _lastSyncDateForEntity = lastSyncDateForEntityMutable.copy;
     [[NSUserDefaults standardUserDefaults] setObject:_lastSyncDateForEntity forKey:kASCloudManagerLastSyncDateForEntityDictionary];
 }
+
+
+- (NSSet<id<ASCloudRelatableRecord>> *)updatedRecords {
+    return _updatedRecords.copy;
+}
+
+- (NSSet<id<ASCloudDescription>> *)deletionInfoRecords {
+    return _deletionInfoRecords.copy;
+}
+
 
 #pragma mark - initialization
 
@@ -99,11 +109,19 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
     return (state & requiredState) == requiredState;
 }
 
+- (void)initContainerWithIdentifier:(NSString *)identifier {
+    [self initContainerWithIdentifier:identifier entityMapping:nil];
+}
 
-
-- (void)initContainerWithIdentifier:(NSString *)identifier withMapping:(ASMapping *)mapping {
+- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(ASMapping *)mapping {
     container = [CKContainer containerWithIdentifier:identifier];
-    _mapping = mapping;
+    if (mapping) {
+        _mapping = mapping;
+    } else {
+
+#warning init mapping with model
+    }
+    
     [container accountStatusWithCompletionHandler:^(CKAccountStatus accountStatus, NSError * _Nullable error) {
         if (error) NSLog(@"%@", [error localizedDescription]);
         else {

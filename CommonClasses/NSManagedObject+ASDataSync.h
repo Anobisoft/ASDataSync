@@ -7,7 +7,7 @@
 //
 
 #import <CoreData/CoreData.h>
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 
 typedef void (^FetchArray)(NSArray <__kindof NSManagedObject *> *objects);
 

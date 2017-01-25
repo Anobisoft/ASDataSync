@@ -7,14 +7,15 @@
 //
 
 #import "ASWatchConnector.h"
-#import "ASerializableContext.h"
-#import "ASynchronizablePrivate.h"
-#import "ASDataSyncAgregator.h"
+#import "ASPrivateProtocol.h"
 
 #define AS_WC_targetKey @"AS_WC_target"
 #define AS_WC_dateKey @"AS_WC_date"
 #define AS_WC_contextDataKey @"AS_WC_contextData"
 
+@interface ASWatchConnector()<ASWatchConnector>
+
+@end
 
 @implementation ASWatchConnector {
     dispatch_semaphore_t sessionActivationSemaphore;

@@ -7,7 +7,7 @@
 //
 
 #import <CoreData/CoreData.h>
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 #import "NSManagedObject+ASDataSync.h"
 
 #define ASC ascending:YES
@@ -22,9 +22,13 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 - (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL;
 - (instancetype)initWithStoreURL:(NSURL *)storeURL;
 
+@property (nonatomic, weak, readonly) NSManagedObjectModel *model;
 
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
+
+- (void)enableCloudSynchronization;
+- (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;

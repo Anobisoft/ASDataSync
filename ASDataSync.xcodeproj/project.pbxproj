@@ -23,20 +23,20 @@
 /* Begin PBXBuildFile section */
 		CE6C394E1DC1DDF40047B3A8 /* ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C394C1DC1DDF40047B3A8 /* ASDataSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C398E1DC1DEB00047B3A8 /* ASDataSyncWatch.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C398C1DC1DEB00047B3A8 /* ASDataSyncWatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B01DC1DF550047B3A8 /* ASDataSyncAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataSyncAgregator.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B11DC1DF550047B3A8 /* ASDataSyncAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataSyncAgregator.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B21DC1DF550047B3A8 /* ASDataSyncAgregator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39991DC1DF550047B3A8 /* ASDataSyncAgregator.m */; };
-		CE6C39B31DC1DF550047B3A8 /* ASDataSyncAgregator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39991DC1DF550047B3A8 /* ASDataSyncAgregator.m */; };
-		CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B51DC1DF550047B3A8 /* ASerializableContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39B11DC1DF550047B3A8 /* ASDataAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39B21DC1DF550047B3A8 /* ASDataAgregator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39991DC1DF550047B3A8 /* ASDataAgregator.m */; };
+		CE6C39B31DC1DF550047B3A8 /* ASDataAgregator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39991DC1DF550047B3A8 /* ASDataAgregator.m */; };
+		CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CE6C39B51DC1DF550047B3A8 /* ASerializableContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE6C39B61DC1DF550047B3A8 /* ASerializableContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399B1DC1DF550047B3A8 /* ASerializableContext.m */; };
 		CE6C39B71DC1DF550047B3A8 /* ASerializableContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399B1DC1DF550047B3A8 /* ASerializableContext.m */; };
-		CE6C39B81DC1DF550047B3A8 /* ASerializableDescription.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B91DC1DF550047B3A8 /* ASerializableDescription.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39B81DC1DF550047B3A8 /* ASerializableDescription.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CE6C39B91DC1DF550047B3A8 /* ASerializableDescription.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE6C39BA1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399D1DC1DF550047B3A8 /* ASerializableDescription.m */; };
 		CE6C39BB1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399D1DC1DF550047B3A8 /* ASerializableDescription.m */; };
-		CE6C39BC1DC1DF550047B3A8 /* ASerializableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39BC1DC1DF550047B3A8 /* ASerializableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE6C39BE1DC1DF550047B3A8 /* ASerializableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */; };
 		CE6C39BF1DC1DF550047B3A8 /* ASerializableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */; };
 		CE6C39C41DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A21DC1DF550047B3A8 /* ASManagedObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -47,10 +47,10 @@
 		CE6C39CD1DC1DF550047B3A8 /* ASWatchConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A61DC1DF550047B3A8 /* ASWatchConnector.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39CE1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39A71DC1DF550047B3A8 /* ASWatchConnector.m */; };
 		CE6C39CF1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39A71DC1DF550047B3A8 /* ASWatchConnector.m */; };
-		CE6C39D01DC1DF550047B3A8 /* ASynchronizable.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A81DC1DF550047B3A8 /* ASynchronizable.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39D11DC1DF550047B3A8 /* ASynchronizable.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A81DC1DF550047B3A8 /* ASynchronizable.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39D21DC1DF550047B3A8 /* ASynchronizablePrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A91DC1DF550047B3A8 /* ASynchronizablePrivate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39D31DC1DF550047B3A8 /* ASynchronizablePrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A91DC1DF550047B3A8 /* ASynchronizablePrivate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39D01DC1DF550047B3A8 /* ASPublicProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A81DC1DF550047B3A8 /* ASPublicProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39D11DC1DF550047B3A8 /* ASPublicProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A81DC1DF550047B3A8 /* ASPublicProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39D21DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A91DC1DF550047B3A8 /* ASPrivateProtocol.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CE6C39D31DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39A91DC1DF550047B3A8 /* ASPrivateProtocol.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE6C39D41DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39AA1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39D51DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39AA1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C39D61DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39AB1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m */; };
@@ -63,24 +63,26 @@
 		CE9D88441E31D930007158BE /* NSUUID+NSData.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88411E31D930007158BE /* NSUUID+NSData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88421E31D930007158BE /* NSUUID+NSData.m */; };
 		CE9D88461E31D930007158BE /* NSUUID+NSData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88421E31D930007158BE /* NSUUID+NSData.m */; };
-		CE9D884E1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D884E1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE9D88501E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */; };
 		CE9D88511E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */; };
 		CE9D88541E35D791007158BE /* ASNull.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88521E35D791007158BE /* ASNull.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE9D88551E35D791007158BE /* ASNull.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88521E35D791007158BE /* ASNull.h */; };
-		CE9D88561E35D791007158BE /* ASNull.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASNull.m */; };
-		CE9D88571E35D791007158BE /* ASNull.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASNull.m */; };
+		CE9D88551E35D791007158BE /* ASNull.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88521E35D791007158BE /* ASNull.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D88561E35D791007158BE /* ASNull.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASNull.m */; settings = {COMPILER_FLAGS = "-Wno-protocol -Wno-objc-protocol-property-synthesis"; }; };
+		CE9D88571E35D791007158BE /* ASNull.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASNull.m */; settings = {COMPILER_FLAGS = "-Wno-protocol -Wno-objc-protocol-property-synthesis"; }; };
 		CE9D886A1E376A35007158BE /* ASCloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D885F1E376A35007158BE /* ASCloudManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9D886B1E376A35007158BE /* ASCloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88601E376A35007158BE /* ASCloudManager.m */; };
-		CE9D886C1E376A35007158BE /* ASCloudRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88611E376A35007158BE /* ASCloudRecord.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D886C1E376A35007158BE /* ASCloudRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88611E376A35007158BE /* ASCloudRecord.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE9D886D1E376A35007158BE /* ASCloudRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88621E376A35007158BE /* ASCloudRecord.m */; };
-		CE9D886E1E376A35007158BE /* ASDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88631E376A35007158BE /* ASDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D886E1E376A35007158BE /* ASDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88631E376A35007158BE /* ASDevice.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE9D886F1E376A35007158BE /* ASDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88641E376A35007158BE /* ASDevice.m */; };
-		CE9D88701E376A35007158BE /* ASDeviceList.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88651E376A35007158BE /* ASDeviceList.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE9D88701E376A35007158BE /* ASDeviceList.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88651E376A35007158BE /* ASDeviceList.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE9D88711E376A35007158BE /* ASDeviceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88661E376A35007158BE /* ASDeviceList.m */; };
 		CE9D88721E376A35007158BE /* ASMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88671E376A35007158BE /* ASMapping.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9D88731E376A35007158BE /* ASMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASMapping.m */; };
+		CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CEEF8D8F1E386F0000CC4B29 /* ASCloudReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,8 +92,8 @@
 		CE6C398A1DC1DEB00047B3A8 /* ASDataSyncWatch.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ASDataSyncWatch.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6C398C1DC1DEB00047B3A8 /* ASDataSyncWatch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASDataSyncWatch.h; sourceTree = "<group>"; };
 		CE6C398D1DC1DEB00047B3A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CE6C39981DC1DF550047B3A8 /* ASDataSyncAgregator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDataSyncAgregator.h; sourceTree = "<group>"; };
-		CE6C39991DC1DF550047B3A8 /* ASDataSyncAgregator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDataSyncAgregator.m; sourceTree = "<group>"; };
+		CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDataAgregator.h; sourceTree = "<group>"; };
+		CE6C39991DC1DF550047B3A8 /* ASDataAgregator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDataAgregator.m; sourceTree = "<group>"; };
 		CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASerializableContext.h; sourceTree = "<group>"; };
 		CE6C399B1DC1DF550047B3A8 /* ASerializableContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASerializableContext.m; sourceTree = "<group>"; };
 		CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASerializableDescription.h; sourceTree = "<group>"; };
@@ -102,8 +104,8 @@
 		CE6C39A31DC1DF550047B3A8 /* ASManagedObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASManagedObjectContext.m; sourceTree = "<group>"; };
 		CE6C39A61DC1DF550047B3A8 /* ASWatchConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASWatchConnector.h; sourceTree = "<group>"; };
 		CE6C39A71DC1DF550047B3A8 /* ASWatchConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASWatchConnector.m; sourceTree = "<group>"; };
-		CE6C39A81DC1DF550047B3A8 /* ASynchronizable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASynchronizable.h; sourceTree = "<group>"; };
-		CE6C39A91DC1DF550047B3A8 /* ASynchronizablePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASynchronizablePrivate.h; sourceTree = "<group>"; };
+		CE6C39A81DC1DF550047B3A8 /* ASPublicProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPublicProtocol.h; sourceTree = "<group>"; };
+		CE6C39A91DC1DF550047B3A8 /* ASPrivateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPrivateProtocol.h; sourceTree = "<group>"; };
 		CE6C39AA1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObject+ASDataSync.h"; sourceTree = "<group>"; };
 		CE6C39AB1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+ASDataSync.m"; sourceTree = "<group>"; };
 		CE6C39AC1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectContext+SQLike.h"; sourceTree = "<group>"; };
@@ -124,6 +126,8 @@
 		CE9D88661E376A35007158BE /* ASDeviceList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDeviceList.m; sourceTree = "<group>"; };
 		CE9D88671E376A35007158BE /* ASMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMapping.h; sourceTree = "<group>"; };
 		CE9D88681E376A35007158BE /* ASMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMapping.m; sourceTree = "<group>"; };
+		CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCloudReference.h; sourceTree = "<group>"; };
+		CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCloudReference.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,30 +189,18 @@
 		CE6C39971DC1DF550047B3A8 /* CommonClasses */ = {
 			isa = PBXGroup;
 			children = (
-				CE6C39981DC1DF550047B3A8 /* ASDataSyncAgregator.h */,
-				CE6C39991DC1DF550047B3A8 /* ASDataSyncAgregator.m */,
-				CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */,
-				CE6C399B1DC1DF550047B3A8 /* ASerializableContext.m */,
-				CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */,
-				CE6C399D1DC1DF550047B3A8 /* ASerializableDescription.m */,
-				CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */,
-				CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */,
-				CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */,
-				CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */,
+				CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */,
+				CE6C39991DC1DF550047B3A8 /* ASDataAgregator.m */,
 				CE6C39A21DC1DF550047B3A8 /* ASManagedObjectContext.h */,
 				CE6C39A31DC1DF550047B3A8 /* ASManagedObjectContext.m */,
 				CE6C39A61DC1DF550047B3A8 /* ASWatchConnector.h */,
 				CE6C39A71DC1DF550047B3A8 /* ASWatchConnector.m */,
-				CE6C39A81DC1DF550047B3A8 /* ASynchronizable.h */,
-				CE6C39A91DC1DF550047B3A8 /* ASynchronizablePrivate.h */,
+				CEEF8D901E387A8200CC4B29 /* ASerializable */,
+				CE6C39A81DC1DF550047B3A8 /* ASPublicProtocol.h */,
+				CE6C39A91DC1DF550047B3A8 /* ASPrivateProtocol.h */,
 				CE9D88521E35D791007158BE /* ASNull.h */,
 				CE9D88531E35D791007158BE /* ASNull.m */,
-				CE6C39AA1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h */,
-				CE6C39AB1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m */,
-				CE6C39AC1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h */,
-				CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */,
-				CE9D88411E31D930007158BE /* NSUUID+NSData.h */,
-				CE9D88421E31D930007158BE /* NSUUID+NSData.m */,
+				CEEF8D911E387B5500CC4B29 /* Categories */,
 			);
 			path = CommonClasses;
 			sourceTree = "<group>";
@@ -220,6 +212,8 @@
 				CE9D88601E376A35007158BE /* ASCloudManager.m */,
 				CE9D88611E376A35007158BE /* ASCloudRecord.h */,
 				CE9D88621E376A35007158BE /* ASCloudRecord.m */,
+				CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */,
+				CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */,
 				CE9D88631E376A35007158BE /* ASDevice.h */,
 				CE9D88641E376A35007158BE /* ASDevice.m */,
 				CE9D88651E376A35007158BE /* ASDeviceList.h */,
@@ -228,6 +222,34 @@
 				CE9D88681E376A35007158BE /* ASMapping.m */,
 			);
 			path = ASDataSyncCloud;
+			sourceTree = "<group>";
+		};
+		CEEF8D901E387A8200CC4B29 /* ASerializable */ = {
+			isa = PBXGroup;
+			children = (
+				CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */,
+				CE6C399B1DC1DF550047B3A8 /* ASerializableContext.m */,
+				CE6C399C1DC1DF550047B3A8 /* ASerializableDescription.h */,
+				CE6C399D1DC1DF550047B3A8 /* ASerializableDescription.m */,
+				CE6C399E1DC1DF550047B3A8 /* ASerializableObject.h */,
+				CE6C399F1DC1DF550047B3A8 /* ASerializableObject.m */,
+				CE9D884C1E31F7F4007158BE /* ASerializableRelatableObject.h */,
+				CE9D884D1E31F7F4007158BE /* ASerializableRelatableObject.m */,
+			);
+			name = ASerializable;
+			sourceTree = "<group>";
+		};
+		CEEF8D911E387B5500CC4B29 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				CE6C39AA1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h */,
+				CE6C39AB1DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m */,
+				CE6C39AC1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h */,
+				CE6C39AD1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m */,
+				CE9D88411E31D930007158BE /* NSUUID+NSData.h */,
+				CE9D88421E31D930007158BE /* NSUUID+NSData.m */,
+			);
+			name = Categories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,23 +261,24 @@
 			files = (
 				CE6C394E1DC1DDF40047B3A8 /* ASDataSync.h in Headers */,
 				CE6C39C41DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */,
-				CE6C39B01DC1DF550047B3A8 /* ASDataSyncAgregator.h in Headers */,
+				CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
+				CE9D886A1E376A35007158BE /* ASCloudManager.h in Headers */,
+				CE9D88721E376A35007158BE /* ASMapping.h in Headers */,
 				CE6C39CC1DC1DF550047B3A8 /* ASWatchConnector.h in Headers */,
-				CE6C39D01DC1DF550047B3A8 /* ASynchronizable.h in Headers */,
-				CE6C39D21DC1DF550047B3A8 /* ASynchronizablePrivate.h in Headers */,
+				CE6C39D01DC1DF550047B3A8 /* ASPublicProtocol.h in Headers */,
+				CE6C39D41DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
+				CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */,
+				CE6C39D81DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
+				CE6C39D21DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */,
 				CE6C39B81DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
 				CE6C39BC1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
 				CE9D884E1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
-				CE9D88721E376A35007158BE /* ASMapping.h in Headers */,
 				CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
-				CE9D88701E376A35007158BE /* ASDeviceList.h in Headers */,
-				CE6C39D41DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
-				CE9D886A1E376A35007158BE /* ASCloudManager.h in Headers */,
-				CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */,
-				CE9D886E1E376A35007158BE /* ASDevice.h in Headers */,
-				CE6C39D81DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
-				CE9D886C1E376A35007158BE /* ASCloudRecord.h in Headers */,
+				CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */,
 				CE9D88541E35D791007158BE /* ASNull.h in Headers */,
+				CE9D886E1E376A35007158BE /* ASDevice.h in Headers */,
+				CE9D88701E376A35007158BE /* ASDeviceList.h in Headers */,
+				CE9D886C1E376A35007158BE /* ASCloudRecord.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,18 +288,18 @@
 			files = (
 				CE6C398E1DC1DEB00047B3A8 /* ASDataSyncWatch.h in Headers */,
 				CE6C39C51DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */,
-				CE6C39B11DC1DF550047B3A8 /* ASDataSyncAgregator.h in Headers */,
+				CE6C39B11DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
 				CE6C39CD1DC1DF550047B3A8 /* ASWatchConnector.h in Headers */,
-				CE6C39D11DC1DF550047B3A8 /* ASynchronizable.h in Headers */,
-				CE6C39D31DC1DF550047B3A8 /* ASynchronizablePrivate.h in Headers */,
-				CE6C39B91DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
-				CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
-				CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
-				CE6C39B51DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
+				CE6C39D11DC1DF550047B3A8 /* ASPublicProtocol.h in Headers */,
 				CE6C39D51DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
 				CE9D88441E31D930007158BE /* NSUUID+NSData.h in Headers */,
 				CE6C39D91DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
 				CE9D88551E35D791007158BE /* ASNull.h in Headers */,
+				CE6C39D31DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */,
+				CE6C39B91DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
+				CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
+				CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
+				CE6C39B51DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,11 +429,12 @@
 				CE9D88561E35D791007158BE /* ASNull.m in Sources */,
 				CE6C39BA1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */,
 				CE9D88731E376A35007158BE /* ASMapping.m in Sources */,
-				CE6C39B21DC1DF550047B3A8 /* ASDataSyncAgregator.m in Sources */,
+				CE6C39B21DC1DF550047B3A8 /* ASDataAgregator.m in Sources */,
 				CE9D88711E376A35007158BE /* ASDeviceList.m in Sources */,
 				CE9D88501E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */,
 				CE6C39CE1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */,
 				CE9D886D1E376A35007158BE /* ASCloudRecord.m in Sources */,
+				CEEF8D8F1E386F0000CC4B29 /* ASCloudReference.m in Sources */,
 				CE6C39C61DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,
 				CE6C39BE1DC1DF550047B3A8 /* ASerializableObject.m in Sources */,
 				CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */,
@@ -426,7 +450,7 @@
 				CE6C39B71DC1DF550047B3A8 /* ASerializableContext.m in Sources */,
 				CE9D88571E35D791007158BE /* ASNull.m in Sources */,
 				CE6C39BB1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */,
-				CE6C39B31DC1DF550047B3A8 /* ASDataSyncAgregator.m in Sources */,
+				CE6C39B31DC1DF550047B3A8 /* ASDataAgregator.m in Sources */,
 				CE9D88511E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */,
 				CE6C39CF1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */,
 				CE6C39C71DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,

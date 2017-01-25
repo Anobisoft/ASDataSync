@@ -7,20 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ASDataSync/ASDataSync.h>
 #import "ASMapping.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ASCloudManager : NSObject <ASDataSyncAgregator>
+@interface ASCloudManager : NSObject
 
 @property (nullable, nonatomic, strong, readonly) ASMapping *mapping;
 
 + (instancetype)defaultManager;
-- (void)initContainerWithIdentifier:(NSString *)identifier withEntityMapping:(ASMapping *)mapping;
+- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(ASMapping *)mapping;
+- (void)initContainerWithIdentifier:(NSString *)identifier;
 - (BOOL)ready;
 
-- (void)setContext:(id <ASynchronizableContext>)context;
 - (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 
 @end

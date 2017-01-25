@@ -18,9 +18,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASynchronizableContextPrivate;
-@protocol ASDataSyncAgregator;
-
-
+@protocol ASDataAgregator;
 
 @interface ASWatchConnector : NSObject <WCSessionDelegate> {
     @protected BOOL sessionActivated;
@@ -28,12 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign, readonly) BOOL ready;
 @property (nonatomic, weak, nullable) id <ASWatchConnectorDelegate> delegate;
-@property (nonatomic, weak, nullable) id <ASDataSyncAgregator> agregator;
 
-- (void)recieverStart;
-- (void)recieverStop;
-
-- (BOOL)sendContext:(id<ASynchronizableContextPrivate>)context;
 
 + (instancetype)sharedInstance;
 

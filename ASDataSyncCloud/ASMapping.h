@@ -13,6 +13,8 @@
 + (instancetype)mappingWithSynchronizableEntities:(NSArray <NSString *> *)entities;
 + (instancetype)mappingWithRecordTypeKeyedByEntityNameDictionary:(NSDictionary <NSString *, NSString *> *)dictionary;
 
+- (void)mapWithRecordType:(NSString *)recordType entityName:(NSString *)entityName;
+
 @property (nonatomic, strong, readonly) NSDictionary <NSString *, NSString *> *map;
 @property (nonatomic, strong, readonly) NSDictionary <NSString *, NSString *> *reverseMap;
 

@@ -9,11 +9,12 @@
 #import "ASManagedObjectContext.h"
 #import "ASerializableContext.h"
 #import "NSManagedObjectContext+SQLike.h"
-#import "ASynchronizablePrivate.h"
+#import "ASPrivateProtocol.h"
 #import "NSUUID+NSData.h"
+#import "ASDataAgregator.h"
 
 @interface ASManagedObjectContext()<ASynchronizableContextPrivate>
-@property (nonatomic, weak) id<ASDataSyncAgregator> agregator;
+@property (nonatomic, weak) id<ASDataAgregator> agregator;
 
 @end
 
@@ -64,13 +65,23 @@
     return result.copy;
 }
 
-- (void)setAgregator:(id<ASDataSyncAgregator>)agregator {
+- (void)setAgregator:(id<ASDataAgregator>)agregator {
     _agregator = agregator;
+}
+
+- (NSManagedObjectModel *)model {
+    return self.persistentStoreCoordinator.managedObjectModel;
 }
 
 #pragma mark - cloud support
 
+- (void)enableCloudSynchronization {
+    [[ASDataAgregator defaultAgregator]
+}
 
+- (void)enableWatchSynchronization {
+    [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];
+}
 
 #pragma mark - accept recieved (serialized) objects
 
@@ -137,7 +148,7 @@
     return [self objectByUniqueData:descriptionObj.uniqueData entityName:descriptionObj.entityName];
 }
 
-- (void)mergeWithRecievedContext:(ASerializableContext *)recievedContext {
+- (void)performMergeWithRecievedContext:(ASerializableContext *)recievedContext {
     if ([self hasChanges]) {
         [recievedContextQueue addObject:recievedContext];
     } else {

@@ -10,7 +10,7 @@
 #define ASerializableContext_h
 
 #import "ASerializableRelatableObject.h"
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 
 @interface ASerializableContext : NSObject <NSCoding>
 

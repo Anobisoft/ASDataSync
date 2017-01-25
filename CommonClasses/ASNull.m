@@ -7,7 +7,7 @@
 //
 
 #import "ASNull.h"
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 
 @implementation ASNull
 
@@ -15,28 +15,28 @@
     return [[self alloc] init];
 }
 
-- (NSString *)entityName {
-    return nil;
-}
-
-+ (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData {
-    return nil;
-}
-
-- (NSData *)uniqueData {
-    return nil;
-}
-
-- (void)setUniqueData:(NSData *)uniqueData {
-    
-}
-
-- (NSDate *)modificationDate {
-    return nil;
-}
-
-- (void)setModificationDate:(NSDate *)modificationDate {
-    
-}
+//- (NSString *)entityName {
+//    return nil;
+//}
+//
+//+ (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData {
+//    return nil;
+//}
+//
+//- (NSData *)uniqueData {
+//    return nil;
+//}
+//
+//- (void)setUniqueData:(NSData *)uniqueData {
+//    
+//}
+//
+//- (NSDate *)modificationDate {
+//    return nil;
+//}
+//
+//- (void)setModificationDate:(NSDate *)modificationDate {
+//    
+//}
 
 @end

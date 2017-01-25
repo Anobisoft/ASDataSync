@@ -1,23 +1,21 @@
 //
-//  ASDataSyncAgregator.m
+//  ASDataAgregator.m
 //  ASDataSync
 //
 //  Created by Stanislav Pletnev on 11.06.16.
 //  Copyright © 2016 Anobisoft.com. All rights reserved.
 //
 
-#import "ASDataSyncAgregator.h"
-#import "ASWatchConnector.h"
-#import "ASynchronizable.h"
-#import "ASynchronizablePrivate.h"
-#import "ASerializableContext.h"
+#import "ASDataAgregator.h"
+#import "ASPrivateProtocol.h"
 
-@interface ASDataSyncAgregator()<ASDataSyncAgregator>
+@interface ASDataAgregator() <ASDataAgregator>
 
 @end
 
-@implementation ASDataSyncAgregator {
-    NSMutableSet <id<ASynchronizableContextPrivate>> *contextSet;
+@implementation ASDataAgregator {
+    NSMutableSet <id<ASynchronizableContextPrivate>> *watchContextSet;
+    id<ASynchronizableContextPrivate> *cloudContext;
 }
 
 + (instancetype)new {
@@ -44,40 +42,33 @@
 - (instancetype)initUniqueInstance {
     if (self = [super init]) {
         _watchConnector = ASWatchConnector.sharedInstance;
-        _watchConnector.agregator = self;
-        contextSet = [NSMutableSet new];
+        _watchConnector se self;
+        watchContextSet = [NSMutableSet new];
+        cloudContextSet = [NSMutableSet new];
 #warning reload "replication needed" status
     }
     return self;
-}
-
-- (void)recieverStart {
-    [_watchConnector recieverStart];
-}
-
-- (void)recieverStop {
-    [_watchConnector recieverStop];
 }
 
 - (void)willCommitContext:(id<ASynchronizableContextPrivate>)context {
     if (_watchConnector) {
         if (_watchConnector.ready) {
             if (![_watchConnector sendContext:context]) {
-#warning some error on sending context. throw error? try to send another way?
+#warning some error on sending context. throw exception? try to send another way?
+                [enqueue serializedcontext];
             }
         } else {
-            NSLog(@"[ERROR] %s : watchConnector is not ready", __PRETTY_FUNCTION__);
-#warning ERROR -> WARNING. Save status "replication needed".
+            NSLog(@"[WARNING] %s : watchConnector is not ready", __PRETTY_FUNCTION__);
+            
         }
     } else {
         //So don't tell me.. I've nothing to do.. 
     }
 }
 
-- (void)watchConnector:(ASWatchConnector *)connector statusChanged:(BOOL)ready {
+- (void)watchConnectorGetReady:(id<ASWatchConnector>)connector {
 #warning Start full replication if connector ready and replication needed.
 }
-
 
 - (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASerializableContext *)context {
 #ifdef DEBUG
@@ -92,22 +83,10 @@
    NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, context.identifier);
 }
 
-- (void)addSynchronizableContext:(id<ASynchronizableContextPrivate>)context {
-    [contextSet addObject:context];
-#warning Start full replication if connector ready and replication needed.
+- (void)addWatchSynchronizableContext:(id<ASynchronizableContextPrivate>)context {
+    [watchContextSet addObject:context];
     [context setAgregator:self];
-}
-
-- (void)commitAll {
-    for (id<ASynchronizableContext> cc in contextSet) {
-        [cc commit];
-    }
-}
-
-- (void)rollbackAll {
-    for (id<ASynchronizableContext> cc in contextSet) {
-        [cc rollbackCompletion:nil];
-    }
+    #warning Start full replication if connector ready and replication needed.
 }
 
 @end

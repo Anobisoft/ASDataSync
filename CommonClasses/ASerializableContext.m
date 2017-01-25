@@ -11,7 +11,7 @@
 #define AS_deletedObjectsKey @"AS_deletedObjects"
 
 #import "ASerializableContext.h"
-#import "ASynchronizablePrivate.h"
+#import "ASPrivateProtocol.h"
 
 @implementation ASerializableContext
 

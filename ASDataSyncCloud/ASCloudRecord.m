@@ -7,22 +7,13 @@
 //
 
 #import "ASCloudRecord.h"
+#import "NSUUID+NSData.h"
+#import "ASCloudReference.h"
 
 #define kASCloudRealModificationDate @"changeDate"
 
 @implementation CKRecordID(ASDataSync)
 
-+ (instancetype)recordIDWithUniqueData:(NSData *)uniqueData {
-    return [[super alloc] initWithRecordName:uniqueData.UUIDString];
-}
-
-+ (instancetype)recordIDWithRecordName:(NSString *)recordName {
-    return [[super alloc] initWithRecordName:recordName];
-}
-
-- (NSUUID *)UUID {
-    return [[NSUUID alloc] initWithUUIDString:self.recordName];
-}
 
 @end
 
@@ -69,11 +60,16 @@
     NSMutableDictionary *tmp_keyedMultiReferences = [NSMutableDictionary new];
     for (NSString *key in self.allKeys) {
         if ([self[key] isKindOfClass:[CKReference class]]) {
-            [tmp_keyedReferences setObject:self[key] forKey:key];
+            CKReference *ref = self[key];
+            [tmp_keyedReferences setObject:ref.recordID.UUID.data forKey:key];
             continue;
         }
         if ([self[key] isKindOfClass:[NSArray class]] && [((NSArray *)self[key]).firstObject isKindOfClass:[CKReference class]]) {
-            [tmp_keyedMultiReferences setObject:self[key] forKey:key];
+            NSMutableArray <NSData *> *refList = [NSMutableArray new];
+            for (CKReference *ref in (NSArray *)self[key]) {
+                [refList addObject:ref.recordID.UUID.data];
+            }
+            [tmp_keyedMultiReferences setObject:refList.copy forKey:key];
         }
         if (![key isEqualToString:kASCloudRealModificationDate]) {
             [tmp_keyedProperties setObject:self[key] forKey:key];
@@ -85,10 +81,6 @@
 }
 
 #pragma mark - setters
-
-- (void)setUniqueData:(NSData *)uniqueData {
-    NSLog(@"[ERROR] readonly property. Use +recordWithRecordType:recordID: method to get instance with uniqueData");
-}
 
 - (void)setModificationDate:(NSDate *)date {
     self[kASCloudRealModificationDate] = date;

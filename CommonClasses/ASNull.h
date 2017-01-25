@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 
 @interface ASNull : NSNull <ASynchronizableDescription>
 

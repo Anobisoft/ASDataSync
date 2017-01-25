@@ -1,5 +1,5 @@
 //
-//  ASynchronizable.h
+//  ASPublicProtocol.h
 //  ASDataSync
 //
 //  Created by Stanislav Pletnev on 11.06.16.
@@ -9,12 +9,23 @@
 @protocol ASynchronizableDescription;
 @protocol ASynchronizableObject;
 @protocol ASynchronizableRelatableObject;
+@protocol ASynchronizableMultiRelatableObject;
 
-#ifndef ASynchronizable_h
-#define ASynchronizable_h
+@protocol ASCloudReference;
+@protocol ASCloudDescription;
+@protocol ASCloudRecord;
+@protocol ASCloudRelatableRecord;
 
-#import "ASWatchConnector.h"
+@protocol ASynchronizableContextDelegate;
+@protocol ASynchronizableContext;
+
+#ifndef ASPublicProtocol_h
+#define ASPublicProtocol_h
+
 NS_ASSUME_NONNULL_BEGIN
+
+
+#pragma mark - Synchronizable
 
 @protocol ASynchronizableDescription <NSObject>
 @required
@@ -45,6 +56,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)replaceRelation:(NSString *)relationKey toObjectSet:(NSSet <id<ASynchronizableDescription>> *)objectSet;
 @end
 
+
+#pragma mark - Cloud
+
+@protocol ASCloudReference <NSObject>
+@required
+@property (nullable, nonatomic, retain) NSData *uniqueData;
+@end
+
+@protocol ASCloudDescription <ASCloudReference>
+@required
+@property (nullable, nonatomic, copy) NSDate *modificationDate;
+- (NSString *)recordType;
+@end
+
+@protocol ASCloudRecord <ASCloudDescription>
+@required
+@property (nonnull, nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
+@end
+
+@protocol ASCloudRelatableRecord <ASCloudRecord>
+@required
+@property (nonatomic, strong) NSDictionary <NSString *, id <ASCloudReference>> *keyedReferences;
+@property (nonatomic, strong) NSDictionary <NSString *, NSArray <id <ASCloudReference>> *> *keyedMultiReferences;
+@end
+
+
+#pragma mark - SynchronizableContext
+
 @protocol ASynchronizableContextDelegate <NSObject>
 @optional
 - (void)reloadData;
@@ -60,5 +99,5 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#endif /* ASynchronizable_h */
+#endif /* ASPublicProtocol_h */
 

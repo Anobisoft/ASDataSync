@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ASDataSync/ASDataSync.h>
+#import "ASerializableObject.h"
 
 @interface ASDevice : ASerializableObject
 

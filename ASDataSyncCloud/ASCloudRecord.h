@@ -7,23 +7,12 @@
 //
 
 #import <CloudKit/CloudKit.h>
+#import "ASPublicProtocol.h"
 
-@interface CKRecordID(ASDataSync)
+@class ASCloudReference;
 
-+ (instancetype)recordIDWithUniqueData:(NSData *)uniqueData;
-+ (instancetype)recordIDWithRecordName:(NSString *)recordName;
-- (NSUUID *)UUID;
+@interface ASCloudRecord : CKRecord <ASCloudRelatableRecord>
 
-@end
-
-@interface ASCloudRecord : CKRecord
-
-+ (instancetype)recordWithRecordType:(NSString *)recordType recordID:(CKRecordID *)recordID;
-
-@property (nonatomic, copy) NSData *uniqueData;
-@property (nonatomic, copy) NSDate *modificationDate;
-@property (nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
-@property (nonatomic, strong) NSDictionary <NSString *, CKReference *> *keyedReferences;
-@property (nonatomic, strong) NSDictionary <NSString *, NSArray <CKReference *> *> *keyedMultiReferences;
++ (instancetype)recordWithRecordType:(NSString *)recordType recordID:(ASCloudReference *)recordID;
 
 @end

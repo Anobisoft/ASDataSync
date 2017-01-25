@@ -7,6 +7,7 @@
 //
 
 #import "ASDevice.h"
+#import "NSUUID+NSData.h"
 
 @implementation ASDevice {
     NSString *uuidString;
@@ -22,7 +23,7 @@
 
 - (void)setUUIDString:(NSString *)UUIDString {
     uuidString = UUIDString;
-    self.uniqueData = [[[NSUUID alloc] initWithUUIDString:UUIDString] data];
+    self.uniqueData = [[NSUUID alloc] initWithUUIDString:UUIDString].data;
 }
 
 - (NSString *)UUIDString {
