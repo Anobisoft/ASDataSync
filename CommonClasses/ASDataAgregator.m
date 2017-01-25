@@ -61,7 +61,7 @@
 }
 
 - (void)willCommitContext:(id<ASynchronizableContextPrivate>)context {
-    if ([watchContextSet containsObject:context]) {
+    if ([watchContextSet containsObject:(id<ASWatchSynchronizableContext>)context]) {
         ASerializableContext *serializedContext = [ASerializableContext instantiateWithSynchronizableContext:context];
         if (_watchConnector) {
             if (_watchConnector.ready) {

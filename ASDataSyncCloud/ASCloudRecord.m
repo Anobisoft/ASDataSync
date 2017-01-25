@@ -19,12 +19,15 @@
 
 @implementation ASCloudDescription {
     NSString *_recordType;
+    NSData *_uniqueData;
 }
-
-@synthesize uniqueData = _uniqueData;
 
 - (NSString *)recordType {
     return _recordType;
+}
+
+- (NSData *)uniqueData {
+    return _uniqueData;
 }
 
 + (instancetype)instantiateWithRecordType:(NSString *)recordType uniqueData:(NSData *)uniqueData {

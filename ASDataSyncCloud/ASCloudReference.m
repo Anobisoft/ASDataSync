@@ -9,7 +9,7 @@
 #import "ASCloudReference.h"
 #import "NSUUID+NSData.h"
 
-@implementation CKRecordID
+@implementation CKRecordID(ASDataSync)
 
 - (NSUUID *)UUID {
     return [[NSUUID alloc] initWithUUIDString:self.recordName];
@@ -18,6 +18,10 @@
 @end
 
 @implementation ASCloudReference
+
+- (NSData *)uniqueData {
+    return [self UUID].data;
+}
 
 + (instancetype)referenceWithUniqueData:(NSData *)uniqueData {
     return [[super alloc] initWithRecordName:uniqueData.UUIDString];

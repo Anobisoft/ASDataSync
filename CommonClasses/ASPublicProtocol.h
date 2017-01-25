@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASCloudReference <NSObject>
 @required
-@property (nullable, nonatomic, retain) NSData *uniqueData;
+- (NSData *)uniqueData;
 @end
 
 @protocol ASCloudDescription <ASCloudReference>
