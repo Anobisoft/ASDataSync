@@ -8,14 +8,14 @@
 
 #import "ASManagedObjectContext.h"
 #import "ASerializableContext.h"
-#import "NSString+LogLevel.h"
 #import "NSManagedObjectContext+SQLike.h"
-#import "ASynchronizablePrivate.h"
-
+#import "ASPrivateProtocol.h"
+#import "NSUUID+NSData.h"
+#import "ASDataAgregator.h"
 
 @interface ASManagedObjectContext()<ASynchronizableContextPrivate>
-@property (nonatomic, weak) id<ASDataSyncAgregator> agregator;
-//@property (nonatomic, strong) NSManagedObjectContext *remoteAsyncContext;
+@property (nonatomic, weak) id<ASDataAgregator> agregator;
+
 @end
 
 @implementation ASManagedObjectContext {
@@ -25,8 +25,6 @@
     NSMutableArray <ASerializableContext *> *recievedContextQueue;
     NSString *name;
 }
-
-#pragma mark ASynchronizableContext
 
 @synthesize delegate = _delegate;
 
@@ -55,21 +53,37 @@
     return result.copy;
 }
 
-- (NSSet <NSManagedObject<ASynchronizableObject> *> *)deletedObjects {
+- (NSSet <NSManagedObject<ASynchronizableDescription> *> *)deletedObjects {
     __block NSMutableSet <NSManagedObject<ASynchronizableObject> *> *result = [NSMutableSet new];
     [self performBlockAndWait:^{
         for (NSManagedObject *obj in super.deletedObjects) {
-            if ([obj conformsToProtocol:@protocol(ASynchronizableObject)]) {
-                [result addObject:(NSManagedObject<ASynchronizableObject> *)obj];
+            if ([obj conformsToProtocol:@protocol(ASynchronizableDescription)]) {
+                [result addObject:(NSManagedObject<ASynchronizableDescription> *)obj];
             }
         }
     }];
     return result.copy;
 }
 
-- (void)setAgregator:(id<ASDataSyncAgregator>)agregator {
+- (void)setAgregator:(id<ASDataAgregator>)agregator {
     _agregator = agregator;
 }
+
+- (NSManagedObjectModel *)model {
+    return self.persistentStoreCoordinator.managedObjectModel;
+}
+
+#pragma mark - cloud support
+
+- (void)enableCloudSynchronization {
+    [[ASDataAgregator defaultAgregator]
+}
+
+- (void)enableWatchSynchronization {
+    [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];
+}
+
+#pragma mark - accept recieved (serialized) objects
 
 + (NSException *)incompatibleEntityExceptionWithEntityName:(NSString *)entityName entityClassName:(NSString *)entityClassName {
     return [NSException exceptionWithName:@"IncompatibleEntity"
@@ -83,8 +97,8 @@
     NSString *entityClassName = [[NSEntityDescription entityForName:recievedObject.entityName inManagedObjectContext:self] managedObjectClassName];
     if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableObject)]) {
         NSManagedObject <ASynchronizableObject> *synchronizableObject = (NSManagedObject <ASynchronizableObject> *)object;
-        synchronizableObject.uniqueID = recievedObject.uniqueID;
-        synchronizableObject.modifyDate = recievedObject.modifyDate;
+        synchronizableObject.uniqueData = recievedObject.uniqueData;
+        synchronizableObject.modificationDate = recievedObject.modificationDate;
         synchronizableObject.keyedProperties = recievedObject.keyedProperties;
     } else {
         @throw [self.class incompatibleEntityExceptionWithEntityName:recievedObject.entityName entityClassName:entityClassName];
@@ -92,20 +106,21 @@
     return object;
 }
 
-- (NSManagedObject <ASynchronizableObject> *)objectByUniqueID:(NSData *)uniqueID entityName:(NSString *)entityName {
+- (NSManagedObject <ASynchronizableObject> *)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName {
     NSManagedObject <ASynchronizableObject> *resultObject = nil;
     NSString *entityClassName = [[NSEntityDescription entityForName:entityName inManagedObjectContext:self] managedObjectClassName];
     if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableObject)]) {
         Class <ASynchronizableObject> entityClass = NSClassFromString(entityClassName);
         NSArray <NSManagedObject *> *objects = [self selectFrom:entityName
-                                                          where:[entityClass predicateWithUniqueID:uniqueID]];
+                                                          where:[entityClass predicateWithUniqueData:uniqueData]];
         if (objects.count == 1) {
             resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
         } else if (objects.count) {
-            @throw [NSException exceptionWithName:@"DataBaseIntegrityConstraintViolation"
+            resultObject = (NSManagedObject <ASynchronizableObject> *)objects[0];
+            @throw [NSException exceptionWithName:@"DataBase UNIQUE constraint violated"
                                            reason:[NSString stringWithFormat:@"Object count with UUID <%@>: %ld\n"
                                                    "Check your ASynchronizableDescription protocol implementation for Entity <%@>",
-                                                   objects[0].UUIDString, (unsigned long)objects.count,
+                                                   resultObject.UUIDString, (unsigned long)objects.count,
                                                    entityName
                                                    ]
                                          userInfo:nil];
@@ -116,13 +131,13 @@
     return resultObject;
 }
 
-- (void)objectByUniqueID:(NSData *)uniqueID entityName:(NSString *)entityName fetch:(FetchObject)fetch {
+- (void)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName fetch:(FetchObject)fetch {
     [self performBlock:^{
         NSManagedObject <ASynchronizableObject> *object;
         @try {
-            object = [self objectByUniqueID:uniqueID entityName:entityName];
+            object = [self objectByUniqueData:uniqueData entityName:entityName];
         } @catch (NSException *exception) {
-            [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+            NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
         } @finally {
             fetch(object);
         }
@@ -130,10 +145,10 @@
 }
 
 - (NSManagedObject <ASynchronizableObject> *)objectByDescription:(ASerializableDescription *)descriptionObj {
-    return [self objectByUniqueID:descriptionObj.uniqueID entityName:descriptionObj.entityName];
+    return [self objectByUniqueData:descriptionObj.uniqueData entityName:descriptionObj.entityName];
 }
 
-- (void)mergeWithRecievedContext:(ASerializableContext *)recievedContext {
+- (void)performMergeWithRecievedContext:(ASerializableContext *)recievedContext {
     if ([self hasChanges]) {
         [recievedContextQueue addObject:recievedContext];
     } else {
@@ -144,61 +159,92 @@
 
 - (void)enqueueMergeBlockWithRecievedContext:(ASerializableContext *)recievedContext {
     [self performBlock:^{
+        NSMutableArray <NSManagedObject <ASynchronizableRelatableObject> *> *recievedRelatableObjectArray = [NSMutableArray new];
+        NSMutableArray <NSDictionary <NSString *, ASerializableDescription *> *> *arrayOfDescriptionByRelationKey = [NSMutableArray new];
+        NSMutableArray <NSManagedObject <ASynchronizableMultiRelatableObject> *> *recievedMultiRelatableObjectArray = [NSMutableArray new];
+        NSMutableArray <NSDictionary <NSString *, NSSet <ASerializableDescription *> *> *> *arrayOfSetOfDescriptionsByRelationKey = [NSMutableArray new];
+        
         for (ASerializableObject *recievedObject in recievedContext.updatedObjects) {
             @try {
                 NSManagedObject <ASynchronizableObject> *synchronizableObject = [self objectByDescription:recievedObject];
                 if (synchronizableObject) {
-                    if ([recievedObject.modifyDate compare:synchronizableObject.modifyDate] != NSOrderedAscending) {
+                    if ([recievedObject.modificationDate compare:synchronizableObject.modificationDate] != NSOrderedAscending) {
                         synchronizableObject.keyedProperties = recievedObject.keyedProperties;
-                        synchronizableObject.modifyDate = recievedObject.modifyDate;
+                        synchronizableObject.modificationDate = recievedObject.modificationDate;
                     } else {
-                        #ifdef DEBUG
-                        [[NSString stringWithFormat:@"%s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString] logWarning];
-                        #endif
+                        NSLog(@"[WARNING] %s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString);
                     }
                 } else {
-                    [self insertRecievedObject:recievedObject];
+                    synchronizableObject = (NSManagedObject <ASynchronizableObject> *)[self insertRecievedObject:recievedObject];
                 }
+                //relations to buffer
+                if ([recievedObject isKindOfClass:[ASerializableRelatableObject class]]) {
+                    ASerializableRelatableObject *relatableObject = (ASerializableRelatableObject *)recievedObject;
+                    if (relatableObject.descriptionByRelationKey.count) {
+                        if ([synchronizableObject conformsToProtocol:@protocol(ASynchronizableRelatableObject)]) {
+                            [recievedRelatableObjectArray addObject:(NSManagedObject <ASynchronizableRelatableObject> *)synchronizableObject];
+                            [arrayOfDescriptionByRelationKey addObject:relatableObject.descriptionByRelationKey];
+                        } else {
+                            @throw [NSException exceptionWithName:@"Object does not conformsToProtocol ASynchronizableRelatableObject while descriptionByRelationKey is not empty"
+                                                           reason:[NSString stringWithFormat:@"Object UUID <%@> class <%@> ", recievedObject.UUIDString, NSStringFromClass(recievedObject.class)]
+                                                         userInfo:nil];
+                        }
+                    }
+                    if (relatableObject.setOfDescriptionsByRelationKey.count) {
+                        if ([synchronizableObject conformsToProtocol:@protocol(ASynchronizableMultiRelatableObject)]) {
+                            [recievedMultiRelatableObjectArray addObject:(NSManagedObject <ASynchronizableMultiRelatableObject> *)synchronizableObject];
+                            [arrayOfSetOfDescriptionsByRelationKey addObject:relatableObject.setOfDescriptionsByRelationKey];
+                        } else {
+                            @throw [NSException exceptionWithName:@"Object does not conformsToProtocol ASynchronizableMultiRelatableObject while setOfDescriptionsByRelationKey is not empty"
+                                                           reason:[NSString stringWithFormat:@"Object UUID <%@> class <%@> ", recievedObject.UUIDString, NSStringFromClass(recievedObject.class)]
+                                                         userInfo:nil];
+                        }
+                    }
+                }
+
             } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
             }
         }
         
-        for (ASerializableRelation *relation in recievedContext.relations) {
-            NSManagedObject <ASynchronizableObject> *object;
-            @try {
-                object = [self objectByDescription:relation.objectDescription];
-            } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
-            }
-            if ([object conformsToProtocol:@protocol(ASynchronizableRelatableObject)] && [object respondsToSelector:@selector(clearRelationsToSetRecieved)]) {
-                NSManagedObject <ASynchronizableRelatableObject> *relatableObject = (NSManagedObject <ASynchronizableRelatableObject> *)object;
-                NSManagedObject <ASynchronizableObject> *subject;
-                @try {
-                    subject = [self objectByDescription:relation.relatedDescription];
-                } @catch (NSException *exception) {
-                    [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+        //set relations after insert all objects
+        
+        for (NSUInteger index = 0; index < recievedRelatableObjectArray.count; index++) {
+            NSManagedObject <ASynchronizableRelatableObject> *synchronizableRelatableObject = recievedRelatableObjectArray[index];
+            NSDictionary <NSString *, ASerializableDescription *> *descriptionByRelationKey = arrayOfDescriptionByRelationKey[index];
+            for (NSString *relationKey in descriptionByRelationKey.allKeys) {
+                if ([descriptionByRelationKey[relationKey] isKindOfClass:[NSNull class]]) {
+                    [synchronizableRelatableObject replaceRelation:relationKey toObject:nil];
+                } else {
+                    @try {
+                        NSManagedObject <ASynchronizableObject> *synchronizableObject = [self objectByDescription:descriptionByRelationKey[relationKey]];
+                        [synchronizableRelatableObject replaceRelation:relationKey toObject:synchronizableObject];
+                    } @catch (NSException *exception) {
+                        NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
+                    }
                 }
-                if (subject) [relatableObject clearRelationsToSetRecieved];
             }
         }
         
-        for (ASerializableRelation *relation in recievedContext.relations) {
-            NSManagedObject <ASynchronizableObject> *object;
-            @try {
-                object = [self objectByDescription:relation.objectDescription];
-            } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
-            }
-            if ([object conformsToProtocol:@protocol(ASynchronizableRelatableObject)]) {
-                NSManagedObject <ASynchronizableRelatableObject> *relatableObject = (NSManagedObject <ASynchronizableRelatableObject> *)object;
-                NSManagedObject <ASynchronizableObject> *subject;
-                @try {
-                    subject = [self objectByDescription:relation.relatedDescription];
-                } @catch (NSException *exception) {
-                    [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+        for (NSUInteger index = 0; index < recievedRelatableObjectArray.count; index++) {
+            NSManagedObject <ASynchronizableMultiRelatableObject> *synchronizableMultiRelatableObject = recievedMultiRelatableObjectArray[index];
+            NSDictionary <NSString *, NSSet <ASerializableDescription *> *> *setOfDescriptionsByRelationKey = arrayOfSetOfDescriptionsByRelationKey[index];
+            for (NSString *relationKey in setOfDescriptionsByRelationKey.allKeys) {
+                NSSet <ASerializableDescription *> *setOfDescriptions = setOfDescriptionsByRelationKey[relationKey];
+                NSMutableSet *tmpSet = [NSMutableSet new];
+                for (ASerializableDescription *description in setOfDescriptions) {
+                    @try {
+                        NSManagedObject <ASynchronizableObject> *synchronizableObject = [self objectByDescription:description];
+                        if (synchronizableObject) {
+                            [tmpSet addObject:synchronizableObject];
+                        } else {
+                            @throw [NSException exceptionWithName:[NSString stringWithFormat:@"objectByDescription %@ not found", description] reason:@"WTF?!" userInfo:nil];
+                        }
+                    } @catch (NSException *exception) {
+                        NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
+                    }
                 }
-                if (subject) [relatableObject setRelation:relation.relationKey toObject:subject];
+                [synchronizableMultiRelatableObject replaceRelation:relationKey toObjectSet:tmpSet.copy];
             }
         }
         
@@ -208,12 +254,10 @@
                 if (synchronizableObject) {
                     [self deleteObject:synchronizableObject];
                 } else {
-                    #ifdef DEBUG
-                    [[NSString stringWithFormat:@"%s dequeue DELETE: object with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.UUIDString] logWarning];
-                    #endif
+                    NSLog(@"[WARNING] %s dequeue DELETE: object with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.UUIDString);
                 }
             } @catch (NSException *exception) {
-                [[NSString stringWithFormat:@"%s Exception: %@", __PRETTY_FUNCTION__, exception] logError];
+                NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
             }
         }
     }];
@@ -222,11 +266,11 @@
 - (void)saveMainContext {
     dispatch_async(dispatch_get_main_queue(), ^{
 #ifdef DEBUG
-        [[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] logError];
+        NSLog(@"[ERROR] %s", __PRETTY_FUNCTION__);
 #endif
         NSError *error;
         if (![mainContext save:&error]) {
-            if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+            if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         }
         
     });
@@ -234,18 +278,28 @@
 
 - (void)saveContextAsync {
     [self performBlock:^{
-        NSError *error;
-        if ([self save:&error]) {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(reloadData)]) {
-                [self.delegate reloadData];
-            }
-            [self saveMainContext];
-        } else {
-            if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
-        }
+        [self saveAndReloadData];
     }];
 }
 
+- (void)saveAndReloadData {
+    NSError *error;
+    if ([self save:&error]) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(reloadData)]) {
+            [self.delegate reloadData];
+        }
+        [self saveMainContext];
+    } else {
+        if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
+    }
+}
+
+- (void)performAndSave:(void (^)(void))block {
+    [self performBlock:^{
+        block();
+        [self saveAndReloadData];
+    }];
+}
 
 - (void)commit {
     if ([self hasChanges]) {
@@ -255,14 +309,13 @@
             if ([self save:&error]) {
                 [self saveMainContext];
             } else {
-                if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+                if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
             }
             [self mergeQueue];
         }];
     } else {
         [self mergeQueue];
     }
-    
 }
 
 - (void)mergeQueue {
@@ -283,7 +336,7 @@
 }
 
 
-#pragma mark initialization
+#pragma mark - initialization
 
 - (id)copy {
     return self;
@@ -336,7 +389,7 @@
         NSDictionary *autoMigration = @{ NSMigratePersistentStoresAutomaticallyOption : @(YES),
                                          NSInferMappingModelAutomaticallyOption : @(YES) };
         if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:autoMigration error:&error]) {
-            if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+            if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         }
         [mainContext setPersistentStoreCoordinator:persistentStoreCoordinator];
         self.parentContext = mainContext;
@@ -344,7 +397,7 @@
     return self;
 }
 
-#pragma mark overload
+#pragma mark - thread safe queries
 
 - (void)deleteObject:(NSManagedObject *)object completion:(void (^)(void))completion {
     [self performBlock:^{
@@ -359,9 +412,8 @@
         NSString *entityClassName = [[NSEntityDescription entityForName:entityName inManagedObjectContext:self] managedObjectClassName];
         if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASynchronizableDescription)]) {
             NSManagedObject <ASynchronizableDescription> *synchronizableObject = (NSManagedObject <ASynchronizableDescription> *)object;
-            NSUUID *uuid = [NSUUID UUID];
-            synchronizableObject.uniqueID = [NSKeyedArchiver archivedDataWithRootObject:uuid];
-            synchronizableObject.modifyDate = [NSDate date];
+            synchronizableObject.uniqueData = [[NSUUID UUID] data];
+            synchronizableObject.modificationDate = [NSDate date];
         }
         fetch(object);
     }];
@@ -403,7 +455,7 @@
         [request setFetchLimit:limit];
         NSError *error = nil;
         NSArray *entities = [self executeFetchRequest:request error:&error];
-        if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+        if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         fetch(entities);
     }];
 }

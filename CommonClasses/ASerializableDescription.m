@@ -7,9 +7,10 @@
 //
 
 #import "ASerializableDescription.h"
+#import "NSUUID+NSData.h"
 
-#define AS_uniqueIDKey @"AS_uniqueID"
-#define AS_modifyDateKey @"AS_modifyDate"
+#define AS_uniqueDataKey @"AS_uniqueData"
+#define AS_modificationDateKey @"AS_modificationDate"
 #define AS_entityNameKey @"AS_entityName"
 
 @interface ASerializableDescription()
@@ -20,24 +21,20 @@
     NSString *uuidString;
 }
 
-+ (NSPredicate *)predicateWithUniqueID:(NSData *)uniqueID {
-    return nil;
-}
-
-@synthesize uniqueID = _uniqueID;
+@synthesize uniqueData = _uniqueData;
 @synthesize entityName = _entityName;
-@synthesize modifyDate = _modifyDate;
+@synthesize modificationDate = _modificationDate;
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    [aCoder encodeObject:_uniqueID forKey:AS_uniqueIDKey];
-    [aCoder encodeObject:_modifyDate forKey:AS_modifyDateKey];
+    [aCoder encodeObject:_uniqueData forKey:AS_uniqueDataKey];
+    [aCoder encodeObject:_modificationDate forKey:AS_modificationDateKey];
     [aCoder encodeObject:_entityName forKey:AS_entityNameKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
-        _uniqueID = [aDecoder decodeObjectForKey:AS_uniqueIDKey];
-        _modifyDate = [aDecoder decodeObjectForKey:AS_modifyDateKey];
+        _uniqueData = [aDecoder decodeObjectForKey:AS_uniqueDataKey];
+        _modificationDate = [aDecoder decodeObjectForKey:AS_modificationDateKey];
         _entityName = [aDecoder decodeObjectForKey:AS_entityNameKey];
     }
     return self;
@@ -45,16 +42,16 @@
 
 - (NSString *)UUIDString {
     if (!uuidString) {
-        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:self.uniqueID]).UUIDString;
+        uuidString = self.uniqueData.UUIDString;
     }
     return uuidString;
 }
 
 - (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj {
     if (self = [super init]) {
-        _uniqueID = descriptionObj.uniqueID;
+        _uniqueData = descriptionObj.uniqueData;
         _entityName = [descriptionObj entityName];
-        _modifyDate = [descriptionObj modifyDate];
+        _modificationDate = [descriptionObj modificationDate];
     }
     return self;
 }

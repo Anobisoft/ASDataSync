@@ -9,10 +9,9 @@
 #define AS_identifierKey @"AS_identifier"
 #define AS_updatedObjectsKey @"AS_updatedObjects"
 #define AS_deletedObjectsKey @"AS_deletedObjects"
-#define AS_relationsKey @"AS_relations"
 
 #import "ASerializableContext.h"
-#import "ASynchronizablePrivate.h"
+#import "ASPrivateProtocol.h"
 
 @implementation ASerializableContext
 
@@ -20,7 +19,6 @@
     [aCoder encodeObject:_identifier forKey:AS_identifierKey];
     [aCoder encodeObject:_updatedObjects forKey:AS_updatedObjectsKey];
     [aCoder encodeObject:_deletedObjects forKey:AS_deletedObjectsKey];
-    [aCoder encodeObject:_relations forKey:AS_relationsKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
@@ -28,7 +26,6 @@
         _identifier = [aDecoder decodeObjectForKey:AS_identifierKey];
         _updatedObjects = [aDecoder decodeObjectForKey:AS_updatedObjectsKey];
         _deletedObjects = [aDecoder decodeObjectForKey:AS_deletedObjectsKey];
-        _relations = [aDecoder decodeObjectForKey:AS_relationsKey];
     }
     return self;
 }
@@ -43,32 +40,16 @@
 - (instancetype)initWithSynchronizableContext:(id <ASynchronizableContextPrivate>)context {
     if (self = [super init]) {
         _identifier = context.identifier;
+        NSDate *creationDate = [NSDate date];
         NSSet <id <ASynchronizableObject>>* updatedObjects = context.updatedObjects;
         if (updatedObjects.count) {
             NSMutableSet <ASerializableObject *> *tmpUSet = [NSMutableSet new];
-            NSMutableSet <ASerializableRelation *> *tmpRSet = [NSMutableSet new];
             for (id <ASynchronizableObject> obj in updatedObjects) {
-                [tmpUSet addObject:[ASerializableObject instantiateWithSynchronizableObject:obj]];
-                //relations
-                if ([obj conformsToProtocol:@protocol(ASynchronizableRelatableObject)]) {
-                    id <ASynchronizableRelatableObject> relatableObj = (id <ASynchronizableRelatableObject>)obj;
-                    NSDictionary<NSString *,NSSet<id<ASynchronizableObject>> *> *relatedObjectsByRelationKey = [relatableObj relatedObjectsByRelationKey];
-                    for (NSString *relationKey in relatedObjectsByRelationKey.allKeys) {
-                        NSSet<id<ASynchronizableObject>> *relatedObjects = [relatedObjectsByRelationKey objectForKey:relationKey];
-                        for (id<ASynchronizableObject> relatedObject in relatedObjects) {
-                            ASerializableRelation *relation = [ASerializableRelation instantiateWithSynchronizableDescription:relatableObj
-                                                                                                           relatedDescription:relatedObject relationKey:relationKey];
-                            [tmpRSet addObject:relation];
-                        }
-
-                    }
-                }
-                //brainfuck over... for now...
+                obj.modificationDate = creationDate;
+                [tmpUSet addObject:[ASerializableRelatableObject instantiateWithSynchronizableObject:obj]];
             }
-            _relations = tmpRSet.copy;
             _updatedObjects = tmpUSet.copy;
         } else {
-            _relations = nil;
             _updatedObjects = nil;
         }
         

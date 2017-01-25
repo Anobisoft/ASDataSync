@@ -7,7 +7,6 @@
 //
 
 #import "NSManagedObjectContext+SQLike.h"
-#import "NSString+LogLevel.h"
 
 @implementation NSManagedObjectContext (SQLike)
 
@@ -51,7 +50,7 @@
     [request setFetchLimit:limit];
     NSError *error = nil;
     NSArray *entities = [self executeFetchRequest:request error:&error];
-    if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+    if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
     return entities;
 }
 

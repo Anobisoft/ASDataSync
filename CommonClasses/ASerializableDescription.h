@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 
 #ifndef ASerializableDescription_h
 #define ASerializableDescription_h
@@ -17,7 +17,6 @@
 @property (nonatomic, strong) NSString *entityName;
 
 + (instancetype)instantiateWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
-- (instancetype)initWithSynchronizableDescription:(id <ASynchronizableDescription>)descriptionObj;
 
 - (NSString *)UUIDString;
 

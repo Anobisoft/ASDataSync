@@ -7,21 +7,14 @@
 //
 
 #import "NSManagedObject+ASDataSync.h"
-#import "NSString+LogLevel.h"
 
 @implementation NSManagedObject (ASDataSync)
 
-NSString *uuidString;
-
-- (NSString *)UUIDString {
-    if (!uuidString && [self conformsToProtocol:@protocol(ASynchronizableDescription)]) {
-        NSData *data = ((NSManagedObject <ASynchronizableDescription> *)self).uniqueID;
-        uuidString = ((NSUUID *)[NSKeyedUnarchiver unarchiveObjectWithData:data]).UUIDString;
-    }
-    return uuidString;
+- (NSString *)entityName {
+    return [NSString stringWithString:self.entity.name];
 }
 
-- (NSString *)entityName {
++ (NSString *)entityName {
     return [NSString stringWithString:self.entity.name];
 }
 
@@ -61,7 +54,7 @@ NSString *uuidString;
         [request setFetchLimit:limit];
         NSError *error = nil;
         NSArray *entities = [context executeFetchRequest:request error:&error];
-        if (error) [[NSString stringWithFormat:@"%s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo] logError];
+        if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         fetch(entities);
     }];
 }

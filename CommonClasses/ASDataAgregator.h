@@ -1,5 +1,5 @@
 //
-//  ASDataSyncAgregator.h
+//  ASDataAgregator.h
 //  ASDataSync
 //
 //  Created by Stanislav Pletnev on 11.06.16.
@@ -7,19 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASynchronizable.h"
+#import "ASPublicProtocol.h"
 #import "ASWatchConnector.h"
 
 
-@interface ASDataSyncAgregator : NSObject <ASWatchConnectorDelegate>
+@interface ASDataAgregator : NSObject
+
+- (void)addWatchSynchronizableContext:(id <ASynchronizableContext>)context;
+- (void)setPrivateCloudContext:(id <ASynchronizableContext>)context;
 
 @property (nonatomic, weak, readonly) ASWatchConnector *watchConnector;
-- (void)addSynchronizableContext:(id <ASynchronizableContext>)context;
-- (void)recieverStart;
-- (void)recieverStop;
-
-- (void)commitAll;
-- (void)rollbackAll;
 
 + (instancetype)defaultAgregator;
 

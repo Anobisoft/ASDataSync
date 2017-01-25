@@ -6,7 +6,7 @@
 //  Copyright © 2016 anobisoft. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+//#import <UIKit/UIKit.h>
 
 //! Project version number for ASDataSync.
 FOUNDATION_EXPORT double ASDataSyncVersionNumber;
@@ -18,7 +18,11 @@ FOUNDATION_EXPORT const unsigned char ASDataSyncVersionString[];
 
 
 #import "ASManagedObjectContext.h"
-#import "ASynchronizable.h"
-#import "ASDataSyncAgregator.h"
+#import "ASPublicProtocol.h"
+#import "ASDataAgregator.h"
+#import "ASCloudManager.h"
 #import "ASWatchConnector.h"
 #import "NSManagedObject+ASDataSync.h"
+#import "NSManagedObjectContext+SQLike.h"
+#import "NSUUID+NSData.h"
+#import "ASNull.h"
