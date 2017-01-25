@@ -9,6 +9,7 @@
 #import "ASDeviceList.h"
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
+#import "NSUUID+NSData.h"
 
 NSString* machine()
 {

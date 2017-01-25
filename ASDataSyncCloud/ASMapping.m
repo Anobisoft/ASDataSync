@@ -7,7 +7,6 @@
 //
 
 #import "ASMapping.h"
-#import "ASDevice.h"
 
 @implementation ASMapping {
     NSMutableDictionary *mutableMap;
@@ -18,15 +17,19 @@
     return [[super alloc] initWithArray:entities];
 }
 
-- (instancetype)initWithArray:(NSArray <NSString *> *)array {
+- (instancetype)init {
     if (self = [super init]) {
+        mutableReverseMap = [NSMutableDictionary new];
+    }
+    return self;
+}
+
+- (instancetype)initWithArray:(NSArray <NSString *> *)array {
+    if (self = [self init]) {
         mutableMap = [NSMutableDictionary new];
-        [mutableMap setValue:[ASDevice entityName] forKey:[ASDevice entityName]];
         for (NSString *entityName in array) {
             [mutableMap setObject:entityName forKey:entityName];
         }
-        mutableReverseMap = mutableMap;
-        _map = _reverseMap = mutableMap.copy;
     }
     return self;
 }
@@ -36,17 +39,41 @@
 }
 
 - (instancetype)initWithDictionary:(NSDictionary <NSString *, NSString *> *)dictionary {
-    if (self = [super init]) {
+    if (self = [self init]) {
         mutableMap = dictionary.mutableCopy;
-        [mutableMap setValue:[ASDevice entityName] forKey:[ASDevice entityName]];
-        _map = mutableMap.copy;
-        mutableReverseMap = [NSMutableDictionary new];
-        for (NSString *key in _map.allKeys) {
-            [mutableReverseMap setObject:key forKey:_map[key]];
-        }
-        _reverseMap = mutableReverseMap.copy;
     }
     return self;
+}
+
+
+- (NSDictionary<NSString *,NSString *> *)map {
+    return mutableMap.copy;
+}
+
+- (NSDictionary<NSString *,NSString *> *)reverseMap {
+    if (!mutableReverseMap) {
+        for (NSString *key in mutableMap.allKeys) {
+            [mutableReverseMap setObject:key forKey:mutableMap[key]];
+        }
+    }
+    return mutableReverseMap.copy;
+}
+
+- (id)mutableCopy {
+    return (ASMutableMapping *)self;
+}
+
+- (void)mapRecordType:(NSString *)recordType withEntityName:(NSString *)entityName {
+    mutableMap[entityName] = recordType;
+    mutableReverseMap[recordType] = entityName;
+}
+
+@end
+
+@implementation ASMutableMapping
+
+- (id)copy {
+    return (ASMapping *)self;
 }
 
 @end

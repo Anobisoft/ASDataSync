@@ -9,10 +9,13 @@
 #import <CloudKit/CloudKit.h>
 #import "ASPublicProtocol.h"
 
+@interface CKRecordID(ASDataSync)
+- (NSUUID *)UUID;
+@end
+
 @interface ASCloudReference : CKRecordID <ASCloudReference>
 
-+ (instancetype)recordIDWithUniqueData:(NSData *)uniqueData;
-+ (instancetype)recordIDWithRecordName:(NSString *)recordName;
-- (NSUUID *)UUID;
++ (instancetype)referenceWithUniqueData:(NSData *)uniqueData;
++ (instancetype)referenceWithRecordName:(NSString *)recordName;
 
 @end

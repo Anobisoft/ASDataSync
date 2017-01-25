@@ -22,6 +22,10 @@
     return [[self alloc] initWithUUIDBytes:bytes];
 }
 
++ (instancetype)UUIDWithUUIDString:(NSString *)UUIDString {
+    return [[self alloc] initWithUUIDString:UUIDString];
+}
+
 @end
 
 @implementation NSData (ASDataSync)

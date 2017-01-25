@@ -13,14 +13,15 @@
 #define AS_WC_dateKey @"AS_WC_date"
 #define AS_WC_contextDataKey @"AS_WC_contextData"
 
-@interface ASWatchConnector()<ASWatchConnector>
-
+@interface ASWatchConnector() <ASWatchConnector>
+@property (nonatomic, weak) id <ASWatchDataAgregator> agregator;
 @end
 
 @implementation ASWatchConnector {
     dispatch_semaphore_t sessionActivationSemaphore;
     NSTimer *logTimer;
     NSMutableArray <NSDictionary *> *userInfoQueue;
+
 }
 
 #pragma mark initalization and state
@@ -35,6 +36,10 @@
 
 - (id)mutableCopy {
     return self;
+}
+
+- (void)setAgregator:(id<ASWatchDataAgregator>)agregator {
+    self.agregator = agregator;
 }
 
 + (instancetype)sharedInstance {

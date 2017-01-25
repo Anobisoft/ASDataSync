@@ -14,5 +14,6 @@
 @interface ASCloudRecord : CKRecord <ASCloudRelatableRecord>
 
 + (instancetype)recordWithRecordType:(NSString *)recordType recordID:(ASCloudReference *)recordID;
++ (id <ASCloudDescription>)cloudDescriptionWithDeletionInfo:(ASCloudRecord *)cloudRecord;
 
 @end

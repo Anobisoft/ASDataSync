@@ -8,14 +8,25 @@
 
 #import "ASDataAgregator.h"
 #import "ASPrivateProtocol.h"
+#import "ASWatchConnector.h"
+#import "ASCloudManager.h"
 
-@interface ASDataAgregator() <ASDataAgregator>
-
+@interface ASDataAgregator() <ASWatchDataAgregator, ASContextDataAgregator>
+@property (nonatomic, weak) id<ASWatchConnector> watchConnector;
+@property (nonatomic, weak) id<ASCloudContext> cloudManager;
 @end
 
 @implementation ASDataAgregator {
-    NSMutableSet <id<ASynchronizableContextPrivate>> *watchContextSet;
-    id<ASynchronizableContextPrivate> *cloudContext;
+    NSMutableSet <id<ASWatchSynchronizableContext>> *watchContextSet;
+    id<ASCloudSynchronizableContext> cloudPrivateDBContext;
+    ASMutableMapping *autoMapping;
+}
+
+- (id<ASCloudContext>)cloudManager {
+    if (!_cloudManager) {
+        _cloudManager = (id<ASCloudContext>)[ASCloudManager defaultManager];
+    }
+    return _cloudManager;
 }
 
 + (instancetype)new {
@@ -41,28 +52,34 @@
 
 - (instancetype)initUniqueInstance {
     if (self = [super init]) {
-        _watchConnector = ASWatchConnector.sharedInstance;
-        _watchConnector se self;
+        self.watchConnector = ASWatchConnector.sharedInstance;
+        [self.watchConnector setAgregator:self];
         watchContextSet = [NSMutableSet new];
-        cloudContextSet = [NSMutableSet new];
 #warning reload "replication needed" status
     }
     return self;
 }
 
 - (void)willCommitContext:(id<ASynchronizableContextPrivate>)context {
-    if (_watchConnector) {
-        if (_watchConnector.ready) {
-            if (![_watchConnector sendContext:context]) {
+    if ([watchContextSet containsObject:context]) {
+        ASerializableContext *serializedContext = [ASerializableContext instantiateWithSynchronizableContext:context];
+        if (_watchConnector) {
+            if (_watchConnector.ready) {
+                if (![_watchConnector sendContext:serializedContext]) {
 #warning some error on sending context. throw exception? try to send another way?
-                [enqueue serializedcontext];
+                    //                [self enqueueSerializedContext:serializedContext];
+                }
+            } else {
+                NSLog(@"[WARNING] %s : watchConnector is not ready", __PRETTY_FUNCTION__);
             }
-        } else {
-            NSLog(@"[WARNING] %s : watchConnector is not ready", __PRETTY_FUNCTION__);
-            
         }
-    } else {
-        //So don't tell me.. I've nothing to do.. 
+    }
+    if (context == cloudPrivateDBContext) {
+        if (self.cloudManager.ready) {
+            [self.cloudManager willCommitContext:context];
+        } else {
+            NSLog(@"[ERROR] ASCloudManager is not ready. ");
+        }
     }
 }
 
@@ -74,19 +91,25 @@
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s : <%@>", __PRETTY_FUNCTION__, context.identifier);
 #endif
-    for (id<ASynchronizableContextPrivate> cc in contextSet) {
+    for (id<ASWatchSynchronizableContext> cc in watchContextSet) {
         if ([cc.identifier isEqualToString:context.identifier]) {
-            [cc mergeWithRecievedContext:context];
+            [cc performMergeWithRecievedContext:context];
             return ;
         }
     }
-   NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, context.identifier);
+    NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, context.identifier);
 }
 
-- (void)addWatchSynchronizableContext:(id<ASynchronizableContextPrivate>)context {
+- (void)addWatchSynchronizableContext:(id<ASWatchSynchronizableContext>)context {
     [watchContextSet addObject:context];
     [context setAgregator:self];
     #warning Start full replication if connector ready and replication needed.
+}
+
+- (void)setPrivateCloudContext:(id<ASCloudSynchronizableContext>)context {
+    cloudPrivateDBContext = context;
+    [context setAgregator:self];
+    [self.cloudManager setCloudSynchronizableContext:context];
 }
 
 @end

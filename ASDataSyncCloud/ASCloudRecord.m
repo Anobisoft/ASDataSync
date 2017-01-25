@@ -12,13 +12,41 @@
 
 #define kASCloudRealModificationDate @"changeDate"
 
-@implementation CKRecordID(ASDataSync)
+@interface ASCloudDescription : NSObject <ASCloudDescription>
 
+
+@end
+
+@implementation ASCloudDescription {
+    NSString *_recordType;
+}
+
+@synthesize uniqueData = _uniqueData;
+
+- (NSString *)recordType {
+    return _recordType;
+}
+
++ (instancetype)instantiateWithRecordType:(NSString *)recordType uniqueData:(NSData *)uniqueData {
+    return [[self alloc] initWithRecordType:recordType uniqueData:uniqueData];
+}
+
+- (instancetype)initWithRecordType:(NSString *)recordType uniqueData:(NSData *)uniqueData {
+    if (self = [super init]) {
+        _recordType = recordType;
+        _uniqueData = uniqueData;
+    }
+    return self;
+}
 
 @end
 
 @implementation ASCloudRecord {
 
+}
+
++ (id <ASCloudDescription>)cloudDescriptionWithDeletionInfo:(ASCloudRecord *)cloudRecord {
+    return [ASCloudDescription instantiateWithRecordType:cloudRecord[@"dq_recordType"] uniqueData:[NSUUID UUIDWithUUIDString:cloudRecord[@"dq_recordID"]].data];
 }
 
 @synthesize keyedProperties = _keyedProperties;
@@ -44,12 +72,12 @@
     return _keyedProperties;
 }
 
-- (NSDictionary <NSString *, CKReference *> *)keyedReferences {
+- (NSDictionary <NSString *, id <ASCloudReference>> *)keyedReferences {
     if (!_keyedReferences) [self splitData];
     return _keyedReferences;
 }
 
-- (NSDictionary <NSString *, NSArray<CKReference *> *> *)keyedMultiReferences {
+- (NSDictionary <NSString *, NSArray <id <ASCloudReference>> *> *)keyedMultiReferences {
     if (!_keyedMultiReferences) [self splitData];
     return _keyedMultiReferences;
 }
@@ -93,7 +121,9 @@
 }
 
 - (void)setKeyedReferences:(NSDictionary<NSString *, CKReference *> *)keyedReferences {
-    self[key] = keyedReferences;
+    for (NSString *key in keyedReferences.allKeys) {
+        self[key] = keyedReferences[key];
+    }
 }
 
 

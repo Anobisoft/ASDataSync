@@ -6,49 +6,55 @@
 //  Copyright © 2016 Anobisoft.com. All rights reserved.
 //
 
-@protocol ASDataAgregatorInteracting;
+
 @protocol ASynchronizableContextPrivate;
 @protocol ASCloudContext;
 @protocol ASWatchConnector;
+
 @protocol ASContextDataAgregator;
 @protocol ASWatchDataAgregator;
-@protocol ASCloudDataAgregator;
+@class ASMapping;
 
-#ifndef ASPrivateProtocol.h
-#define ASPrivateProtocol.h
+#ifndef ASPrivateProtocol_h
+#define ASPrivateProtocol_h
 
 #import "ASerializableContext.h"
 #import "ASPublicProtocol.h"
-
-@protocol ASDataAgregatorInteracting <NSObject>
-@required
-- (void)setAgregator:(id<ASDataAgregator>)agregator;
-@end
-
+#import "ASMapping.h"
 
 #pragma mark - ASynchronizableContextPrivate protocol
 
-@protocol ASynchronizableContextPrivate <ASynchronizableContext, ASDataAgregatorInteracting>
+@protocol ASynchronizableContextPrivate <ASynchronizableContext>
 @required
 
 @property (nonatomic, strong, readonly) NSString *identifier;
 @property (nonatomic, strong, readonly) NSSet <id <ASynchronizableObject>> *updatedObjects;
 @property (nonatomic, strong, readonly) NSSet <id <ASynchronizableDescription>> *deletedObjects;
 
-- (void)performMergeWithRecievedContext:(ASerializableContext *)recievedContext;
+- (void)setAgregator:(id<ASContextDataAgregator>)agregator;
 
 @end
 
+@protocol ASWatchSynchronizableContext <ASynchronizableContextPrivate>
+@required
+- (void)performMergeWithRecievedContext:(ASerializableContext *)recievedContext;
+@end
+
+@protocol ASCloudSynchronizableContext <ASynchronizableContextPrivate>
+@required
+- (void)performMergeWithCloudContext:(id <ASCloudContext>)cloudContext;
+- (ASMapping *)autoMapping;
+@end
 
 #pragma mark - ASCloudContext protocol
 
-@protocol ASCloudContext <ASDataAgregatorInteracting>
+@protocol ASCloudContext <ASContextDataAgregator>
 @required
 
 @property (nonatomic, strong, readonly) NSSet <id <ASCloudRelatableRecord>> *updatedRecords;
 @property (nonatomic, strong, readonly) NSSet <id <ASCloudDescription>> *deletionInfoRecords;
 
-- (void)updateWithSynchronizableContext:(id <ASynchronizableContext>)context;
+- (void)setCloudSynchronizableContext:(id <ASCloudSynchronizableContext>)context;
 - (BOOL)ready;
 
 @end
@@ -56,9 +62,10 @@
 
 #pragma mark - ASWatchConnector protocol
 
-@protocol ASWatchConnector <ASDataAgregatorInteracting>
+@protocol ASWatchConnector <NSObject>
 - (BOOL)sendContext:(ASerializableContext *)context;
 - (BOOL)ready;
+- (void)setAgregator:(id<ASWatchDataAgregator>)agregator;
 @end
 
 
@@ -75,10 +82,4 @@
 - (void)watchConnectorGetReady:(id <ASWatchConnector>)connector;
 @end
 
-@protocol ASCloudDataAgregator <NSObject>
-@required
-- (void)didRecievedCloudContext:(id <ASCloudContext>)cloudContext;
-- (void)cloudContextGetReady:(id <ASCloudContext>)cloudContext;
-@end
-
-#endif /* ASPrivateProtocol.h */
+#endif /* ASPrivateProtocol_h */

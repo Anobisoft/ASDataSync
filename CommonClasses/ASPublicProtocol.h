@@ -66,12 +66,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASCloudDescription <ASCloudReference>
 @required
-@property (nullable, nonatomic, copy) NSDate *modificationDate;
 - (NSString *)recordType;
 @end
 
 @protocol ASCloudRecord <ASCloudDescription>
 @required
+@property (nullable, nonatomic, copy) NSDate *modificationDate;
 @property (nonnull, nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
 @end
 
@@ -80,7 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSDictionary <NSString *, id <ASCloudReference>> *keyedReferences;
 @property (nonatomic, strong) NSDictionary <NSString *, NSArray <id <ASCloudReference>> *> *keyedMultiReferences;
 @end
-
 
 #pragma mark - SynchronizableContext
 

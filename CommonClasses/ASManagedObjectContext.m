@@ -13,8 +13,8 @@
 #import "NSUUID+NSData.h"
 #import "ASDataAgregator.h"
 
-@interface ASManagedObjectContext()<ASynchronizableContextPrivate>
-@property (nonatomic, weak) id<ASDataAgregator> agregator;
+@interface ASManagedObjectContext()<ASWatchSynchronizableContext, ASCloudSynchronizableContext>
+@property (nonatomic, weak) id<ASContextDataAgregator> agregator;
 
 @end
 
@@ -24,6 +24,7 @@
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSMutableArray <ASerializableContext *> *recievedContextQueue;
     NSString *name;
+    ASMutableMapping *mutableMapping;
 }
 
 @synthesize delegate = _delegate;
@@ -65,8 +66,8 @@
     return result.copy;
 }
 
-- (void)setAgregator:(id<ASDataAgregator>)agregator {
-    _agregator = agregator;
+- (void)setAgregator:(id<ASContextDataAgregator>)agregator {
+    self.agregator = agregator;
 }
 
 - (NSManagedObjectModel *)model {
@@ -76,11 +77,23 @@
 #pragma mark - cloud support
 
 - (void)enableCloudSynchronization {
-    [[ASDataAgregator defaultAgregator]
+    [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self];
 }
 
 - (void)enableWatchSynchronization {
     [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];
+}
+
+- (ASMapping *)autoMapping {
+    if (!mutableMapping) {
+        mutableMapping = [ASMutableMapping new];
+        for (NSEntityDescription *entity in self.model.entities) {
+            if ([NSClassFromString([entity managedObjectClassName]) conformsToProtocol:@protocol(ASynchronizableObject)]) {
+                [mutableMapping mapRecordType:entity.name withEntityName:entity.name];
+            }
+        }
+    }
+    return mutableMapping.copy;
 }
 
 #pragma mark - accept recieved (serialized) objects

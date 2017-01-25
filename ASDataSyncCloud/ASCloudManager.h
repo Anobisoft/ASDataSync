@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong, readonly) ASMapping *mapping;
 
 + (instancetype)defaultManager;
-- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(ASMapping *)mapping;
+- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(nullable ASMapping *)mapping;
 - (void)initContainerWithIdentifier:(NSString *)identifier;
 - (BOOL)ready;
 

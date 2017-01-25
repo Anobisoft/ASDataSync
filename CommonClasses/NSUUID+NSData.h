@@ -12,6 +12,7 @@
 
 - (NSData *)data;
 + (instancetype)UUIDWithData:(NSData *)data;
++ (instancetype)UUIDWithUUIDString:(NSString *)UUIDString;
 
 @end
 

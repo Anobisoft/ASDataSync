@@ -83,6 +83,7 @@
 		CE9D88731E376A35007158BE /* ASMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASMapping.m */; };
 		CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8D8F1E386F0000CC4B29 /* ASCloudReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */; };
+		CEEF8D961E38CAB200CC4B29 /* ASMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASMapping.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -452,6 +453,7 @@
 				CE6C39BB1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */,
 				CE6C39B31DC1DF550047B3A8 /* ASDataAgregator.m in Sources */,
 				CE9D88511E31F7F4007158BE /* ASerializableRelatableObject.m in Sources */,
+				CEEF8D961E38CAB200CC4B29 /* ASMapping.m in Sources */,
 				CE6C39CF1DC1DF550047B3A8 /* ASWatchConnector.m in Sources */,
 				CE6C39C71DC1DF550047B3A8 /* ASManagedObjectContext.m in Sources */,
 				CE6C39BF1DC1DF550047B3A8 /* ASerializableObject.m in Sources */,
