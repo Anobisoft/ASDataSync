@@ -13,7 +13,7 @@
 
 @interface ASDataAgregator() <ASWatchDataAgregator, ASContextDataAgregator>
 @property (nonatomic, weak) id<ASWatchConnector> watchConnector;
-@property (nonatomic, weak) id<ASCloudContext> cloudManager;
+@property (nonatomic, weak) id<ASCloudManager> cloudManager;
 @end
 
 @implementation ASDataAgregator {
@@ -22,9 +22,9 @@
     ASMutableMapping *autoMapping;
 }
 
-- (id<ASCloudContext>)cloudManager {
+- (id<ASCloudManager>)cloudManager {
     if (!_cloudManager) {
-        _cloudManager = (id<ASCloudContext>)[ASCloudManager defaultManager];
+        _cloudManager = (id<ASCloudManager>)[ASCloudManager defaultManager];
     }
     return _cloudManager;
 }
@@ -52,10 +52,10 @@
 
 - (instancetype)initUniqueInstance {
     if (self = [super init]) {
-        self.watchConnector = ASWatchConnector.sharedInstance;
+        self.watchConnector = (id<ASWatchConnector>)ASWatchConnector.sharedInstance;
         [self.watchConnector setAgregator:self];
         watchContextSet = [NSMutableSet new];
-#warning reload "replication needed" status
+#warning UNCOMPLETED reload "replication needed" status
     }
     return self;
 }
@@ -66,7 +66,7 @@
         if (_watchConnector) {
             if (_watchConnector.ready) {
                 if (![_watchConnector sendContext:serializedContext]) {
-#warning some error on sending context. throw exception? try to send another way?
+#warning UNCOMPLETED some error on sending context. throw exception? try to send another way?
                     //                [self enqueueSerializedContext:serializedContext];
                 }
             } else {
@@ -84,7 +84,7 @@
 }
 
 - (void)watchConnectorGetReady:(id<ASWatchConnector>)connector {
-#warning Start full replication if connector ready and replication needed.
+#warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
 - (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASerializableContext *)context {
@@ -103,7 +103,7 @@
 - (void)addWatchSynchronizableContext:(id<ASWatchSynchronizableContext>)context {
     [watchContextSet addObject:context];
     [context setAgregator:self];
-    #warning Start full replication if connector ready and replication needed.
+#warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
 - (void)setPrivateCloudContext:(id<ASCloudSynchronizableContext>)context {

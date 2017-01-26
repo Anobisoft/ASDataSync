@@ -48,14 +48,21 @@
 
 #pragma mark - ASCloudContext protocol
 
-@protocol ASCloudContext <ASContextDataAgregator>
+@protocol ASCloudManager <ASContextDataAgregator>
 @required
-
-@property (nonatomic, strong, readonly) NSSet <id <ASCloudRelatableRecord>> *updatedRecords;
-@property (nonatomic, strong, readonly) NSSet <id <ASCloudDescription>> *deletionInfoRecords;
+@property (nonatomic, strong, readonly) ASMapping *mapping;
 
 - (void)setCloudSynchronizableContext:(id <ASCloudSynchronizableContext>)context;
 - (BOOL)ready;
+
+@end
+
+@protocol ASCloudContext <NSObject>
+
++ (instancetype)contextWithUpdatedRecords:(NSSet <id <ASCloudRelatableRecord>> *)updatedRecords deletionInfoRecords:(NSSet <id <ASCloudDescription>> *)deletionInfoRecords;
+
+@property (nonatomic, strong, readonly) NSSet <id <ASCloudRelatableRecord>> *updatedRecords;
+@property (nonatomic, strong, readonly) NSSet <id <ASCloudDescription>> *deletionInfoRecords;
 
 @end
 
@@ -73,7 +80,7 @@
 
 @protocol ASContextDataAgregator <NSObject>
 @required
-- (void)willCommitContext:(id <ASynchronizableContext>)context;
+- (void)willCommitContext:(id <ASynchronizableContextPrivate>)context;
 @end
 
 @protocol ASWatchDataAgregator <NSObject>

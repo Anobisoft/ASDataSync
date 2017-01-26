@@ -13,8 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCloudManager : NSObject
 
-@property (nullable, nonatomic, strong, readonly) ASMapping *mapping;
-
 + (instancetype)defaultManager;
 - (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(nullable ASMapping *)mapping;
 - (void)initContainerWithIdentifier:(NSString *)identifier;

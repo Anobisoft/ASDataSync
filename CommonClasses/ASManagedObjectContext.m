@@ -13,6 +13,8 @@
 #import "NSUUID+NSData.h"
 #import "ASDataAgregator.h"
 
+//#import <UIKit/UIKit.h>
+
 @interface ASManagedObjectContext()<ASWatchSynchronizableContext, ASCloudSynchronizableContext>
 @property (nonatomic, weak) id<ASContextDataAgregator> agregator;
 
@@ -23,6 +25,7 @@
     NSManagedObjectModel *managedObjectModel;
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSMutableArray <ASerializableContext *> *recievedContextQueue;
+    NSMutableArray <id <ASCloudContext>> *cloudContextQueue;
     NSString *name;
     ASMutableMapping *mutableMapping;
 }
@@ -55,7 +58,7 @@
 }
 
 - (NSSet <NSManagedObject<ASynchronizableDescription> *> *)deletedObjects {
-    __block NSMutableSet <NSManagedObject<ASynchronizableObject> *> *result = [NSMutableSet new];
+    __block NSMutableSet <NSManagedObject<ASynchronizableDescription> *> *result = [NSMutableSet new];
     [self performBlockAndWait:^{
         for (NSManagedObject *obj in super.deletedObjects) {
             if ([obj conformsToProtocol:@protocol(ASynchronizableDescription)]) {
@@ -77,10 +80,12 @@
 #pragma mark - cloud support
 
 - (void)enableCloudSynchronization {
+    cloudContextQueue = [NSMutableArray new];
     [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self];
 }
 
 - (void)enableWatchSynchronization {
+    recievedContextQueue = [NSMutableArray new];
     [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];
 }
 
@@ -94,6 +99,19 @@
         }
     }
     return mutableMapping.copy;
+}
+
+- (void)performMergeWithCloudContext:(id<ASCloudContext>)cloudContext {
+    if (self.hasChanges) {
+        [cloudContextQueue addObject:cloudContext];
+    } else {
+        [self performMergeBlockWithCloudContext:cloudContext];
+        [self performSaveContextAndReloadData];
+    }
+}
+
+- (void)performMergeBlockWithCloudContext:(id<ASCloudContext>)cloudContext {
+#error ATATAT
 }
 
 #pragma mark - accept recieved (serialized) objects
@@ -165,12 +183,12 @@
     if ([self hasChanges]) {
         [recievedContextQueue addObject:recievedContext];
     } else {
-        [self enqueueMergeBlockWithRecievedContext:recievedContext];
-        [self saveContextAsync];
+        [self performMergeBlockWithRecievedContext:recievedContext];
+        [self performSaveContextAndReloadData];
     }
 }
 
-- (void)enqueueMergeBlockWithRecievedContext:(ASerializableContext *)recievedContext {
+- (void)performMergeBlockWithRecievedContext:(ASerializableContext *)recievedContext {
     [self performBlock:^{
         NSMutableArray <NSManagedObject <ASynchronizableRelatableObject> *> *recievedRelatableObjectArray = [NSMutableArray new];
         NSMutableArray <NSDictionary <NSString *, ASerializableDescription *> *> *arrayOfDescriptionByRelationKey = [NSMutableArray new];
@@ -289,7 +307,7 @@
     });
 }
 
-- (void)saveContextAsync {
+- (void)performSaveContextAndReloadData {
     [self performBlock:^{
         [self saveAndReloadData];
     }];
@@ -307,7 +325,7 @@
     }
 }
 
-- (void)performAndSave:(void (^)(void))block {
+- (void)performBlockWithSaveAndReloadData:(void (^)(void))block {
     [self performBlock:^{
         block();
         [self saveAndReloadData];
@@ -315,9 +333,9 @@
 }
 
 - (void)commit {
-    if ([self hasChanges]) {
-        if (self.agregator) [self.agregator willCommitContext:self];
+    if ([self hasChanges]) {        
         [self performBlock:^{
+            if (self.agregator) [self.agregator willCommitContext:self];
             NSError *error;
             if ([self save:&error]) {
                 [self saveMainContext];
@@ -332,13 +350,39 @@
 }
 
 - (void)mergeQueue {
+    [self mergeQueueCompletion:nil];
+}
+
+- (void)mergeQueueCompletion:(void (^)(void))completion {
+    dispatch_group_t waitGroup;
+    if (completion) waitGroup = dispatch_group_create();
+    
     if (recievedContextQueue.count) {
+        if (completion) dispatch_group_enter(waitGroup);
         for (int i = 0; i < recievedContextQueue.count; i++) {
-            [self enqueueMergeBlockWithRecievedContext:recievedContextQueue[i]];
+            [self performMergeBlockWithRecievedContext:recievedContextQueue[i]];
         }
-        [self saveContextAsync];
+        [self performSaveContextAndReloadData];
         [recievedContextQueue removeAllObjects];
+        if (completion) [self performBlock:^{
+            dispatch_group_leave(waitGroup);
+        }];
     }
+    if (cloudContextQueue.count) {
+        if (completion) dispatch_group_enter(waitGroup);
+        for (int i = 0; i < cloudContextQueue.count; i++) {
+            [self performMergeBlockWithCloudContext:cloudContextQueue[i]];
+        }
+        [self performSaveContextAndReloadData];
+        [cloudContextQueue removeAllObjects];
+        if (completion) [self performBlock:^{
+            dispatch_group_leave(waitGroup);
+        }];
+    }
+    if (completion) dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_group_wait(waitGroup, DISPATCH_TIME_FOREVER);
+        completion();
+    });
 }
 
 - (void)rollback {
@@ -387,7 +431,6 @@
 
 - (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(NSURL *)modelURL {
     if (self = [super initWithConcurrencyType:NSPrivateQueueConcurrencyType]) {
-        recievedContextQueue = [NSMutableArray new];
         mainContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
         NSString *idModelPart = @"DefaultModel ";
         if (modelURL) {
@@ -406,9 +449,19 @@
         }
         [mainContext setPersistentStoreCoordinator:persistentStoreCoordinator];
         self.parentContext = mainContext;
+        
+//        [[NSNotificationCenter defaultCenter] addObserver:self
+//                                                 selector:@selector(appWillTerminate:)
+//                                                     name:UIApplicationWillResignActiveNotification
+//                                                   object:nil];
     }
     return self;
 }
+
+//- (void)appWillTerminate:(NSNotification *)note {
+//    [self rollbackAndWait];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//}
 
 #pragma mark - thread safe queries
 
@@ -480,6 +533,24 @@
     }];
     [self mergeQueue];
 }
+
+- (void)rollbackAndWait {
+    __block BOOL waiting = YES;
+    NSCondition *waitingCondition = [NSCondition new];
+    [self performBlock:^{
+        [super rollback];
+    }];
+    [self mergeQueueCompletion:^{
+        waiting = NO;
+        [waitingCondition signal];
+    }];
+    [waitingCondition lock];
+    while (waiting) {
+        [waitingCondition wait];
+    }
+}
+
+
 
 
 

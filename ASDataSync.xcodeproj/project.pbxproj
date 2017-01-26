@@ -23,8 +23,8 @@
 /* Begin PBXBuildFile section */
 		CE6C394E1DC1DDF40047B3A8 /* ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C394C1DC1DDF40047B3A8 /* ASDataSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6C398E1DC1DEB00047B3A8 /* ASDataSyncWatch.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C398C1DC1DEB00047B3A8 /* ASDataSyncWatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE6C39B11DC1DF550047B3A8 /* ASDataAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CE6C39B11DC1DF550047B3A8 /* ASDataAgregator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C39981DC1DF550047B3A8 /* ASDataAgregator.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE6C39B21DC1DF550047B3A8 /* ASDataAgregator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39991DC1DF550047B3A8 /* ASDataAgregator.m */; };
 		CE6C39B31DC1DF550047B3A8 /* ASDataAgregator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C39991DC1DF550047B3A8 /* ASDataAgregator.m */; };
 		CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6C399A1DC1DF550047B3A8 /* ASerializableContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -84,6 +84,8 @@
 		CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8D8F1E386F0000CC4B29 /* ASCloudReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */; };
 		CEEF8D961E38CAB200CC4B29 /* ASMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASMapping.m */; };
+		CEEF8D991E3A2A5700CC4B29 /* ASCloudContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D971E3A2A5700CC4B29 /* ASCloudContext.h */; };
+		CEEF8D9A1E3A2A5700CC4B29 /* ASCloudContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D981E3A2A5700CC4B29 /* ASCloudContext.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -129,6 +131,8 @@
 		CE9D88681E376A35007158BE /* ASMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMapping.m; sourceTree = "<group>"; };
 		CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCloudReference.h; sourceTree = "<group>"; };
 		CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCloudReference.m; sourceTree = "<group>"; };
+		CEEF8D971E3A2A5700CC4B29 /* ASCloudContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCloudContext.h; sourceTree = "<group>"; };
+		CEEF8D981E3A2A5700CC4B29 /* ASCloudContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCloudContext.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +215,8 @@
 			children = (
 				CE9D885F1E376A35007158BE /* ASCloudManager.h */,
 				CE9D88601E376A35007158BE /* ASCloudManager.m */,
+				CEEF8D971E3A2A5700CC4B29 /* ASCloudContext.h */,
+				CEEF8D981E3A2A5700CC4B29 /* ASCloudContext.m */,
 				CE9D88611E376A35007158BE /* ASCloudRecord.h */,
 				CE9D88621E376A35007158BE /* ASCloudRecord.m */,
 				CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */,
@@ -262,7 +268,6 @@
 			files = (
 				CE6C394E1DC1DDF40047B3A8 /* ASDataSync.h in Headers */,
 				CE6C39C41DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */,
-				CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
 				CE9D886A1E376A35007158BE /* ASCloudManager.h in Headers */,
 				CE9D88721E376A35007158BE /* ASMapping.h in Headers */,
 				CE6C39CC1DC1DF550047B3A8 /* ASWatchConnector.h in Headers */,
@@ -271,9 +276,11 @@
 				CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */,
 				CE6C39D81DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
 				CE6C39D21DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */,
+				CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
 				CE6C39B81DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
 				CE6C39BC1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
 				CE9D884E1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
+				CEEF8D991E3A2A5700CC4B29 /* ASCloudContext.h in Headers */,
 				CE6C39B41DC1DF550047B3A8 /* ASerializableContext.h in Headers */,
 				CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */,
 				CE9D88541E35D791007158BE /* ASNull.h in Headers */,
@@ -289,7 +296,6 @@
 			files = (
 				CE6C398E1DC1DEB00047B3A8 /* ASDataSyncWatch.h in Headers */,
 				CE6C39C51DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */,
-				CE6C39B11DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
 				CE6C39CD1DC1DF550047B3A8 /* ASWatchConnector.h in Headers */,
 				CE6C39D11DC1DF550047B3A8 /* ASPublicProtocol.h in Headers */,
 				CE6C39D51DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
@@ -297,6 +303,7 @@
 				CE6C39D91DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
 				CE9D88551E35D791007158BE /* ASNull.h in Headers */,
 				CE6C39D31DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */,
+				CE6C39B11DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
 				CE6C39B91DC1DF550047B3A8 /* ASerializableDescription.h in Headers */,
 				CE6C39BD1DC1DF550047B3A8 /* ASerializableObject.h in Headers */,
 				CE9D884F1E31F7F4007158BE /* ASerializableRelatableObject.h in Headers */,
@@ -426,6 +433,7 @@
 				CE6C39DA1DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.m in Sources */,
 				CE9D886B1E376A35007158BE /* ASCloudManager.m in Sources */,
 				CE6C39B61DC1DF550047B3A8 /* ASerializableContext.m in Sources */,
+				CEEF8D9A1E3A2A5700CC4B29 /* ASCloudContext.m in Sources */,
 				CE9D886F1E376A35007158BE /* ASDevice.m in Sources */,
 				CE9D88561E35D791007158BE /* ASNull.m in Sources */,
 				CE6C39BA1DC1DF550047B3A8 /* ASerializableDescription.m in Sources */,

@@ -9,8 +9,10 @@
 #import "ASCloudRecord.h"
 #import "NSUUID+NSData.h"
 #import "ASCloudReference.h"
+#import "ASMapping.h"
 
 #define kASCloudRealModificationDate @"changeDate"
+
 
 @interface ASCloudDescription : NSObject <ASCloudDescription>
 
@@ -58,6 +60,10 @@
 
 + (instancetype)recordWithRecordType:(NSString *)recordType recordID:(CKRecordID *)recordID {
     return [[super alloc] initWithRecordType:recordType recordID:recordID];
+}
+
++ (instancetype)recordWithRecordType:(NSString *)recordType {
+    return [[super alloc] initWithRecordType:recordType];
 }
 
 #pragma mark - getters
