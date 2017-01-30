@@ -9,12 +9,19 @@
 #import <CloudKit/CloudKit.h>
 #import "ASPublicProtocol.h"
 
-@class ASCloudReference, ASMapping;
+@class ASCloudID, ASCloudMapping;
 
-@interface ASCloudRecord : CKRecord <ASCloudRelatableRecord>
+@interface ASCloudRecord : CKRecord <ASMappedObject>
 
-+ (instancetype)recordWithRecordType:(NSString *)recordType recordID:(ASCloudReference *)recordID;
++ (instancetype)recordWithRecordType:(NSString *)recordType recordID:(ASCloudID *)recordID;
 + (instancetype)recordWithRecordType:(NSString *)recordType;
-+ (id <ASCloudDescription>)cloudDescriptionWithDeletionInfo:(ASCloudRecord *)cloudRecord;
+
+- (id <ASDescription>)descriptionOfDeletedObjectWithMapping:(ASCloudMapping *)mapping;
+- (id <ASMappedObject>)mappedObjectWithMapping:(ASCloudMapping *)mapping;
+
+- (void)setModificationDate:(NSDate *)date;
+- (void)setKeyedDataProperties:(NSDictionary <NSString *, id <NSSecureCoding>> *)keyedDataProperties;
+- (void)replaceRelation:(NSString *)relationKey toReference:(id<ASReference>)reference;
+- (void)replaceRelation:(NSString *)relationKey toSetOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
 
 @end

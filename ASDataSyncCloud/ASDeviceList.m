@@ -118,7 +118,7 @@ static NSString *thisDeviceVersion;
 }
 
 - (void)updateThisDeviceInfo {
-    thisDevice.keyedProperties = @{ @"name" : [[UIDevice currentDevice] name],
+    thisDevice.keyedDataProperties = @{ @"name" : [[UIDevice currentDevice] name],
                                     @"model" : [[UIDevice currentDevice] model],
                                     @"version" : thisDeviceVersion,
                                     @"system" : [NSString stringWithFormat:@"%@ %@", [[UIDevice currentDevice] systemName], [[UIDevice currentDevice] systemVersion]],
@@ -141,14 +141,14 @@ static NSString *thisDeviceVersion;
     return mutableStore.allValues;
 }
 
+- (ASDevice *)deviceForUniqueID:(NSData *)uniqueID {
+    return [mutableStore objectForKey:uniqueID];
+}
+
 #pragma mark - Overload
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len {
-    return [mutableStore countByEnumeratingWithState:state objects:buffer count:len];
-}
-
-- (ASDevice *)deviceForUniqueID:(NSData *)uniqueID {
-    return [mutableStore objectForKey:uniqueID];
+    return [mutableStore.allValues countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (NSEnumerator *)objectEnumerator {

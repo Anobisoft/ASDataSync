@@ -7,14 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASMapping.h"
+#import "ASCloudMapping.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCloudManager : NSObject
 
 + (instancetype)defaultManager;
-- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(nullable ASMapping *)mapping;
+- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(nullable ASCloudMapping *)mapping;
 - (void)initContainerWithIdentifier:(NSString *)identifier;
 - (BOOL)ready;
 

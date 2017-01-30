@@ -17,15 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
-@interface ASManagedObjectContext : NSManagedObjectContext <ASynchronizableContext>
+@interface ASManagedObjectContext : NSManagedObjectContext <ASDataSyncContext>
 
 - (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL;
 - (instancetype)initWithStoreURL:(NSURL *)storeURL;
 
-@property (nonatomic, weak, readonly) NSManagedObjectModel *model;
+- (NSManagedObjectModel *)model;
 
 + (instancetype)defaultContext;
-@property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
+@property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
 
 - (void)enableCloudSynchronization;
 - (void)enableWatchSynchronization;

@@ -7,85 +7,69 @@
 //
 
 
-@protocol ASynchronizableContextPrivate;
-@protocol ASCloudContext;
+@protocol ASRepresentableTransaction;
+@protocol ASDataSyncContextPrivate;
+@protocol ASCloudManager;
 @protocol ASWatchConnector;
 
-@protocol ASContextDataAgregator;
-@protocol ASWatchDataAgregator;
-@class ASMapping;
+@protocol ASTransactionsAgregator;
+@protocol ASWatchTransactionsAgregator;
+
+@class ASCloudMapping;
 
 #ifndef ASPrivateProtocol_h
 #define ASPrivateProtocol_h
 
-#import "ASerializableContext.h"
 #import "ASPublicProtocol.h"
-#import "ASMapping.h"
+#import "ASCloudMapping.h"
 
-#pragma mark - ASynchronizableContextPrivate protocol
+#pragma mark - ASDataSyncContextPrivate protocol
 
-@protocol ASynchronizableContextPrivate <ASynchronizableContext>
+@protocol ASRepresentableTransaction <NSObject>
 @required
 
-@property (nonatomic, strong, readonly) NSString *identifier;
-@property (nonatomic, strong, readonly) NSSet <id <ASynchronizableObject>> *updatedObjects;
-@property (nonatomic, strong, readonly) NSSet <id <ASynchronizableDescription>> *deletedObjects;
-
-- (void)setAgregator:(id<ASContextDataAgregator>)agregator;
+- (NSString *)contextIdentifier;
+- (NSSet <id <ASMappedObject>> *)updatedObjects;
+- (NSSet <id <ASDescription>> *)deletedObjects;
 
 @end
 
-@protocol ASWatchSynchronizableContext <ASynchronizableContextPrivate>
+@protocol ASDataSyncContextPrivate <ASRepresentableTransaction>
 @required
-- (void)performMergeWithRecievedContext:(ASerializableContext *)recievedContext;
+- (void)performMergeWithTransaction:(id <ASRepresentableTransaction>)transaction;
+- (void)setAgregator:(id<ASTransactionsAgregator>)agregator;
 @end
 
-@protocol ASCloudSynchronizableContext <ASynchronizableContextPrivate>
+#pragma mark - ASCloudManager protocol
+
+@protocol ASCloudManager <ASTransactionsAgregator>
 @required
-- (void)performMergeWithCloudContext:(id <ASCloudContext>)cloudContext;
-- (ASMapping *)autoMapping;
-@end
+@property (nonatomic, strong, readonly) ASCloudMapping *mapping;
 
-#pragma mark - ASCloudContext protocol
-
-@protocol ASCloudManager <ASContextDataAgregator>
-@required
-@property (nonatomic, strong, readonly) ASMapping *mapping;
-
-- (void)setCloudSynchronizableContext:(id <ASCloudSynchronizableContext>)context;
+- (void)setDataSyncContext:(id <ASDataSyncContextPrivate>)context;
 - (BOOL)ready;
 
 @end
-
-@protocol ASCloudContext <NSObject>
-
-+ (instancetype)contextWithUpdatedRecords:(NSSet <id <ASCloudRelatableRecord>> *)updatedRecords deletionInfoRecords:(NSSet <id <ASCloudDescription>> *)deletionInfoRecords;
-
-@property (nonatomic, strong, readonly) NSSet <id <ASCloudRelatableRecord>> *updatedRecords;
-@property (nonatomic, strong, readonly) NSSet <id <ASCloudDescription>> *deletionInfoRecords;
-
-@end
-
 
 #pragma mark - ASWatchConnector protocol
 
 @protocol ASWatchConnector <NSObject>
-- (BOOL)sendContext:(ASerializableContext *)context;
+- (void)sendTransaction:(id <ASRepresentableTransaction, NSSecureCoding>)transaction;
 - (BOOL)ready;
-- (void)setAgregator:(id<ASWatchDataAgregator>)agregator;
+- (void)setAgregator:(id<ASWatchTransactionsAgregator>)agregator;
 @end
 
 
 #pragma mark - ASDataAgregator protocol
 
-@protocol ASContextDataAgregator <NSObject>
+@protocol ASTransactionsAgregator <NSObject>
 @required
-- (void)willCommitContext:(id <ASynchronizableContextPrivate>)context;
+- (void)willCommitTransaction:(id <ASRepresentableTransaction>)transaction;
 @end
 
-@protocol ASWatchDataAgregator <NSObject>
+@protocol ASWatchTransactionsAgregator <NSObject>
 @required
-- (void)watchConnector:(id <ASWatchConnector>)connector didRecieveContext:(ASerializableContext *)context;
+- (void)watchConnector:(id <ASWatchConnector>)connector didRecieveTransaction:(id <ASRepresentableTransaction>)transaction;
 - (void)watchConnectorGetReady:(id <ASWatchConnector>)connector;
 @end
 

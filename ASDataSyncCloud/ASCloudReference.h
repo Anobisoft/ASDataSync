@@ -13,9 +13,16 @@
 - (NSUUID *)UUID;
 @end
 
-@interface ASCloudReference : CKRecordID <ASCloudReference>
+@interface ASCloudID : CKRecordID <ASReference>
+
++ (instancetype)cloudIDWithUniqueData:(NSData *)uniqueData;
++ (instancetype)cloudIDWithUUIDString:(NSString *)UUIDString;
+
+@end
+
+@interface ASCloudReference : CKReference <ASReference>
 
 + (instancetype)referenceWithUniqueData:(NSData *)uniqueData;
-+ (instancetype)referenceWithRecordName:(NSString *)recordName;
++ (instancetype)referenceWithUUIDString:(NSString *)UUIDString;
 
 @end

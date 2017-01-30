@@ -9,12 +9,12 @@
 #import "ASWatchConnector.h"
 #import "ASPrivateProtocol.h"
 
-#define AS_WC_targetKey @"AS_WC_target"
-#define AS_WC_dateKey @"AS_WC_date"
-#define AS_WC_contextDataKey @"AS_WC_contextData"
+#define ASDataSync_WC_targetKey @"ASDataSync_WC_target"
+#define ASDataSync_WC_dateKey @"ASDataSync_WC_date"
+#define ASDataSync_WC_contextDataKey @"ASDataSync_WC_contextData"
 
 @interface ASWatchConnector() <ASWatchConnector>
-@property (nonatomic, weak) id <ASWatchDataAgregator> agregator;
+@property (nonatomic, weak) id <ASWatchTransactionsAgregator> agregator;
 @end
 
 @implementation ASWatchConnector {
@@ -38,7 +38,7 @@
     return self;
 }
 
-- (void)setAgregator:(id<ASWatchDataAgregator>)agregator {
+- (void)setAgregator:(id<ASWatchTransactionsAgregator>)agregator {
     self.agregator = agregator;
 }
 
@@ -162,14 +162,14 @@
 
 #pragma mark data send and recieve
 
-- (BOOL)sendContext:(id <ASynchronizableContext>)context {
+- (BOOL)sendContext:(id <ASDataSyncContext>)context {
     if (context) {
-        ASerializableContext *contextSerializable = [ASerializableContext instantiateWithSynchronizableContext:context];
+        ASTransactionRepresentation *contextSerializable = [ASTransactionRepresentation instantiateWithSynchronizableContext:context];
         if (contextSerializable) {
             NSData *contextData = [NSKeyedArchiver archivedDataWithRootObject:contextSerializable];
-            NSDictionary *userInfo = @{ AS_WC_targetKey : NSStringFromClass(self.class),
-                                        AS_WC_contextDataKey : contextData,
-                                        AS_WC_dateKey : [NSDate date] };
+            NSDictionary *userInfo = @{ ASDataSync_WC_targetKey : NSStringFromClass(self.class),
+                                        ASDataSync_WC_contextDataKey : contextData,
+                                        ASDataSync_WC_dateKey : [NSDate date] };
             if (self.ready) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [WCSession.defaultSession transferUserInfo:userInfo];
@@ -227,13 +227,13 @@
     #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
     #endif
-    if ([[userInfo objectForKey:AS_WC_targetKey] isEqualToString:NSStringFromClass(self.class)]) {
+    if ([[userInfo objectForKey:ASDataSync_WC_targetKey] isEqualToString:NSStringFromClass(self.class)]) {
         #ifdef DEBUG
-        NSLog(@"[DEBUG] Send date: %@", [userInfo objectForKey:AS_WC_dateKey]);
+        NSLog(@"[DEBUG] Send date: %@", [userInfo objectForKey:ASDataSync_WC_dateKey]);
         #endif
-        NSData *contextData = [userInfo objectForKey:AS_WC_contextDataKey];
+        NSData *contextData = [userInfo objectForKey:ASDataSync_WC_contextDataKey];
         if (contextData) {
-            ASerializableContext *context = [NSKeyedUnarchiver unarchiveObjectWithData:contextData];
+            ASTransactionRepresentation *context = [NSKeyedUnarchiver unarchiveObjectWithData:contextData];
             if (self.agregator) {
                 if ([self.agregator respondsToSelector:@selector(watchConnector:didRecieveContext:)]) {
                     [self.agregator watchConnector:self didRecieveContext:context];

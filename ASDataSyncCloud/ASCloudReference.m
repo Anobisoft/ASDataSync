@@ -17,20 +17,48 @@
 
 @end
 
-@implementation ASCloudReference
-
-- (NSData *)uniqueData {
-    return [self UUID].data;
+@implementation ASCloudID {
+    NSUUID *uuid;
 }
 
-+ (instancetype)referenceWithUniqueData:(NSData *)uniqueData {
+- (NSData *)uniqueData {
+    if (!uuid) uuid = self.UUID;
+    return uuid.data;
+}
+
+- (NSString *)UUIDString {
+    return self.recordName;
+}
+
++ (instancetype)cloudIDWithUniqueData:(NSData *)uniqueData {
     return [[super alloc] initWithRecordName:uniqueData.UUIDString];
 }
 
-+ (instancetype)referenceWithRecordName:(NSString *)recordName {
-    return [[super alloc] initWithRecordName:recordName];
++ (instancetype)cloudIDWithUUIDString:(NSString *)UUIDString {
+    return [[super alloc] initWithRecordName:UUIDString];
 }
 
+@end
 
+@implementation ASCloudReference {
+    NSUUID *uuid;
+}
+
+- (NSData *)uniqueData {
+    if (!uuid) uuid = self.recordID.UUID;
+    return uuid.data;
+}
+
+- (NSString *)UUIDString {
+    return self.recordID.recordName;
+}
+
++ (instancetype)referenceWithUniqueData:(NSData *)uniqueData {
+    return [[super alloc] initWithRecordID:[ASCloudID cloudIDWithUniqueData:uniqueData] action:nil];
+}
+
++ (instancetype)referenceWithUUIDString:(NSString *)UUIDString {
+    return [[super alloc] initWithRecordID:[ASCloudID cloudIDWithRecordName:UUIDString] action:nil];
+}
 
 @end

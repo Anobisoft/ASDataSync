@@ -6,18 +6,11 @@
 //  Copyright © 2016 Anobisoft.com. All rights reserved.
 //
 
-@protocol ASynchronizableDescription;
-@protocol ASynchronizableObject;
-@protocol ASynchronizableRelatableObject;
-@protocol ASynchronizableMultiRelatableObject;
-
-@protocol ASCloudReference;
-@protocol ASCloudDescription;
-@protocol ASCloudRecord;
-@protocol ASCloudRelatableRecord;
-
-@protocol ASynchronizableContextDelegate;
-@protocol ASynchronizableContext;
+@protocol ASManagedObject;
+@protocol ASReference, ASMutableReference, ASDescription, ASMutableDescription, ASFindableEntity;
+@protocol ASMappedObject, ASMutableMappedObject;
+@protocol ASRelatable, ASRelatableToOne, ASMutableRelatableToOne, ASRelatableToMany, ASMutableRelatableToMany;
+@protocol ASDataSyncContext, ASDataSyncContextDelegate, ASDataSyncSearchableContext;
 
 #ifndef ASPublicProtocol_h
 #define ASPublicProtocol_h
@@ -27,73 +20,94 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Synchronizable
 
-@protocol ASynchronizableDescription <NSObject>
-@required
-@property (nullable, nonatomic, retain) NSData *uniqueData;
-@property (nullable, nonatomic, copy) NSDate *modificationDate;
-- (NSString *)entityName;
-@optional
-+ (NSString *)entityName;
-+ (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData;
-@property (nullable, nonatomic, retain) NSString *UUIDString;
-@end
-
-@protocol ASynchronizableObject <ASynchronizableDescription>
-@property (nonnull, nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
-@end
-
-@protocol ASynchronizableRelatableObject <ASynchronizableObject>
-@required
-+ (NSString *)entityNameForRelationKey:(NSString *)relationKey;
-- (NSDictionary <NSString *, id<ASynchronizableDescription>> *)relatedDescriptionByRelationKey;
-- (void)replaceRelation:(NSString *)relationKey toObject:(nullable id<ASynchronizableDescription>)object;
-@end
-
-@protocol ASynchronizableMultiRelatableObject <ASynchronizableObject>
-@required
-+ (NSString *)entityNameForRelationKey:(NSString *)relationKey;
-- (NSDictionary <NSString *, NSSet <id<ASynchronizableDescription>> *> *)relatedDescriptionSetByRelationKey;
-- (void)replaceRelation:(NSString *)relationKey toObjectSet:(NSSet <id<ASynchronizableDescription>> *)objectSet;
+@protocol ASManagedObject <ASMutableMappedObject, ASMutableReference, ASFindableEntity>
 @end
 
 
-#pragma mark - Cloud
-
-@protocol ASCloudReference <NSObject>
+@protocol ASReference <NSObject>
 @required
 - (NSData *)uniqueData;
+@optional
+- (NSString *)UUIDString;
 @end
 
-@protocol ASCloudDescription <ASCloudReference>
+@protocol ASMutableReference <ASReference>
 @required
-- (NSString *)recordType;
+- (void)setUniqueData:(NSData *)uniqueData;
+@optional
+- (void)setUUIDString:(NSString *)UUIDString;
+@end;
+
+@protocol ASDescription <ASReference>
+@required
+- (NSString *)entityName;
+@optional
++ (NSString *)recordType;
++ (NSString *)entityName;
 @end
 
-@protocol ASCloudRecord <ASCloudDescription>
-@required
-@property (nullable, nonatomic, copy) NSDate *modificationDate;
-@property (nonnull, nonatomic, strong) NSDictionary <NSString *, id <NSCoding>> *keyedProperties;
+@protocol ASMutableDescription <ASDescription, ASMutableReference>
 @end
 
-@protocol ASCloudRelatableRecord <ASCloudRecord>
+@protocol ASFindableEntity <NSObject>
 @required
-@property (nonatomic, strong) NSDictionary <NSString *, id <ASCloudReference>> *keyedReferences;
-@property (nonatomic, strong) NSDictionary <NSString *, NSArray <id <ASCloudReference>> *> *keyedMultiReferences;
++ (NSString *)entityName;
++ (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData;
+@end
+
+@protocol ASMappedObject <ASDescription>
+- (NSDate *)modificationDate;
+- (NSDictionary <NSString *, id <NSSecureCoding>> *)keyedDataProperties;
+@end
+
+@protocol ASMutableMappedObject <ASMappedObject>
+- (void)setModificationDate:(NSDate *)modificationDate;
+- (void)setKeyedDataProperties:(NSDictionary <NSString *, id <NSCoding>> *)keyedDataProperties;
+@end
+
+#pragma mark - Relationships
+
+@protocol ASRelatable
+@required
++ (NSDictionary <NSString *, NSString *> *)entityNameByRelationKey;
+@end
+
+@protocol ASRelatableToOne <ASRelatable>
+@required
+- (NSDictionary <NSString *, id<ASReference>> *)keyedReferences;
+@end
+
+@protocol ASMutableRelatableToOne <ASRelatableToOne>
+@required
+- (void)replaceRelation:(NSString *)relationKey toReference:(id<ASReference>)reference;
+@end
+
+@protocol ASRelatableToMany <ASRelatable>
+@required
+- (NSDictionary <NSString *, NSSet <id<ASReference>> *> *)keyedSetOfReferences;
+@end
+
+@protocol ASMutableRelatableToMany <ASRelatableToMany>
+@required
+- (void)replaceRelation:(NSString *)relationKey toSetOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
 @end
 
 #pragma mark - SynchronizableContext
 
-@protocol ASynchronizableContextDelegate <NSObject>
+@protocol ASDataSyncContext <NSObject>
+@required
+- (void)commit;
+- (void)rollbackCompletion:(nullable void (^)(void))completion;
+@property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
+@end
+
+@protocol ASDataSyncContextDelegate <NSObject>
 @optional
 - (void)reloadData;
 @end
 
-@protocol ASynchronizableContext <NSObject>
-@required
-- (void)commit;
-- (void)rollbackCompletion:(nullable void (^)(void))completion;
-@property (nonatomic, weak) id <ASynchronizableContextDelegate> delegate;
-
+@protocol ASDataSyncSearchableContext <NSObject>
+- (id <ASReference>)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName;
 @end
 
 NS_ASSUME_NONNULL_END

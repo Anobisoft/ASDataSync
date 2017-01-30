@@ -8,33 +8,44 @@
 
 #import "ASDevice.h"
 #import "NSUUID+NSData.h"
+#import "ASCloudRecord.h"
+
+@interface ASDevice()
+
+@end
 
 @implementation ASDevice {
-    NSString *uuidString;
+
 }
 
-+ (NSString *)entityName {
-    return @"Device";
++ (instancetype)deviceWithMappedObject:(id <ASMappedObject>)mappedObject {
+    return [[self alloc] initWithMappedObject:mappedObject];
+}
+
+- (instancetype)initWithMappedObject:(id <ASMappedObject>)mappedObject {
+    if (self = [super init]) {
+        self.uniqueData = mappedObject.uniqueData;
+        self.modificationDate = mappedObject.modificationDate;
+        self.keyedDataProperties = mappedObject.keyedDataProperties;
+    }
+    return self;
 }
 
 - (NSString *)entityName {
     return [self.class entityName];
 }
 
-- (void)setUUIDString:(NSString *)UUIDString {
-    uuidString = UUIDString;
-    self.uniqueData = [[NSUUID alloc] initWithUUIDString:UUIDString].data;
++ (NSString *)entityName {
+    return @"Device";
 }
 
-- (NSString *)UUIDString {
-    if (!uuidString) {
-        uuidString = self.uniqueData.UUIDString;
-    }
-    return uuidString;
+- (void)setKeyedDataProperties:(NSDictionary<NSString *,id<NSCoding>> *)keyedDataProperties {
+    self.keyedDataProperties = keyedDataProperties;
 }
 
-//- (NSString *)entityName {
-//    return [self.class entityName];
-//}
+- (void)setModificationDate:(NSDate *)modificationDate {
+    self.modificationDate = modificationDate;
+}
+
 
 @end

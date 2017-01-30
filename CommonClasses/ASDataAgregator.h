@@ -11,10 +11,8 @@
 
 @interface ASDataAgregator : NSObject
 
-- (void)addWatchSynchronizableContext:(id <ASynchronizableContext>)context;
-- (void)setPrivateCloudContext:(id <ASynchronizableContext>)context;
-
-
+- (void)addWatchSynchronizableContext:(id <ASDataSyncContextPrivate>)context;
+- (void)setPrivateCloudContext:(id <ASDataSyncContextPrivate>)context;
 
 + (instancetype)defaultAgregator;
 

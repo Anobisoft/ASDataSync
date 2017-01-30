@@ -1,5 +1,5 @@
 //
-//  ASMapping.h
+//  ASCloudMapping.h
 //  ASDataSyncCloud
 //
 //  Created by Stanislav Pletnev on 2017-01-18
@@ -8,21 +8,22 @@
 
 #import <Foundation/Foundation.h>
 
-@class ASMutableMapping;
+#ifndef ASCloudMapping_h
+#define ASCloudMapping_h
 
-@interface ASMapping : NSObject
+@interface ASCloudMapping : NSObject
 
 + (instancetype)mappingWithSynchronizableEntities:(NSArray <NSString *> *)entities;
 + (instancetype)mappingWithRecordTypeKeyedByEntityNameDictionary:(NSDictionary <NSString *, NSString *> *)dictionary;
 
-@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSString *> *map;
-@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSString *> *reverseMap;
+- (NSDictionary <NSString *, NSString *> *)map; //recordType keyed by entityName
+- (NSDictionary <NSString *, NSString *> *)reverseMap; //entityName keyed by recordType
+- (NSSet <NSString *> *)synchronizableEntities; //all nonmaped cloud-synchronizable entities
 
-@end
-
-
-@interface ASMutableMapping : ASMapping
-
+//mutable
 - (void)mapRecordType:(NSString *)recordType withEntityName:(NSString *)entityName;
+- (void)registerSynchronizableEntity:(NSString *)entityName;
 
 @end
+
+#endif

@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASerializableObject.h"
+#import "ASObjectRepresentation.h"
 
-@interface ASDevice : ASerializableObject
+@interface ASDevice : ASObjectRepresentation
 
++ (instancetype)deviceWithMappedObject:(id <ASMappedObject>)mappedObject;
 
 @end

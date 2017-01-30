@@ -10,16 +10,17 @@
 #import "ASPrivateProtocol.h"
 #import "ASWatchConnector.h"
 #import "ASCloudManager.h"
+#import "ASTransactionRepresentation.h"
 
-@interface ASDataAgregator() <ASWatchDataAgregator, ASContextDataAgregator>
+@interface ASDataAgregator() <ASWatchTransactionsAgregator, ASTransactionsAgregator>
 @property (nonatomic, weak) id<ASWatchConnector> watchConnector;
 @property (nonatomic, weak) id<ASCloudManager> cloudManager;
 @end
 
 @implementation ASDataAgregator {
-    NSMutableSet <id<ASWatchSynchronizableContext>> *watchContextSet;
-    id<ASCloudSynchronizableContext> cloudPrivateDBContext;
-    ASMutableMapping *autoMapping;
+    NSMutableSet <id<ASDataSyncContextPrivate>> *watchContextSet;
+    id<ASDataSyncContextPrivate> privateCloudContext;
+    ASCloudMapping *autoMapping;
 }
 
 - (id<ASCloudManager>)cloudManager {
@@ -60,23 +61,20 @@
     return self;
 }
 
-- (void)willCommitContext:(id<ASynchronizableContextPrivate>)context {
-    if ([watchContextSet containsObject:(id<ASWatchSynchronizableContext>)context]) {
-        ASerializableContext *serializedContext = [ASerializableContext instantiateWithSynchronizableContext:context];
+- (void)willCommitTransaction:(id <ASRepresentableTransaction>)transaction {
+    if ([watchContextSet containsObject:transaction]) {
+        ASTransactionRepresentation *transactionRepresentation = [ASTransactionRepresentation instantiateWithRepresentableTransaction:transaction];
         if (_watchConnector) {
             if (_watchConnector.ready) {
-                if (![_watchConnector sendContext:serializedContext]) {
-#warning UNCOMPLETED some error on sending context. throw exception? try to send another way?
-                    //                [self enqueueSerializedContext:serializedContext];
-                }
+                [_watchConnector sendTransaction:transactionRepresentation];
             } else {
                 NSLog(@"[WARNING] %s : watchConnector is not ready", __PRETTY_FUNCTION__);
             }
         }
     }
-    if (context == cloudPrivateDBContext) {
+    if (context == privateCloudContext) {
         if (self.cloudManager.ready) {
-            [self.cloudManager willCommitContext:context];
+            [self.cloudManager willCommitTransaction:transaction];
         } else {
             NSLog(@"[ERROR] ASCloudManager is not ready. ");
         }
@@ -87,7 +85,7 @@
 #warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
-- (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASerializableContext *)context {
+- (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASTransactionRepresentation *)context {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s : <%@>", __PRETTY_FUNCTION__, context.identifier);
 #endif
@@ -106,10 +104,10 @@
 #warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
-- (void)setPrivateCloudContext:(id<ASCloudSynchronizableContext>)context {
+- (void)setPrivateCloudContext:(id<ASDataSyncContextPrivate>)context {
     cloudPrivateDBContext = context;
     [context setAgregator:self];
-    [self.cloudManager setCloudSynchronizableContext:context];
+    [self.cloudManager setDataSyncContext:context];
 }
 
 @end
