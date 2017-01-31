@@ -80,12 +80,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASMutableRelatableToOne <ASRelatableToOne>
 @required
-- (void)replaceRelation:(NSString *)relationKey toReference:(id<ASReference>)reference;
+- (void)replaceRelation:(NSString *)relationKey toReference:(NSObject <ASReference> *)reference;
 @end
 
 @protocol ASRelatableToMany <ASRelatable>
 @required
-- (NSDictionary <NSString *, NSSet <id<ASReference>> *> *)keyedSetsOfReferences;
+- (NSDictionary <NSString *, NSSet <NSObject <ASReference> *> *> *)keyedSetsOfReferences;
 @end
 
 @protocol ASMutableRelatableToMany <ASRelatableToMany>

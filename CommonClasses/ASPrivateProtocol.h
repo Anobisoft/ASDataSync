@@ -29,8 +29,8 @@
 @required
 
 - (NSString *)contextIdentifier;
-- (NSSet <id <ASMappedObject>> *)updatedObjects;
-- (NSSet <id <ASDescription>> *)deletedObjects;
+- (NSSet <NSObject <ASMappedObject> *> *)updatedObjects;
+- (NSSet <NSObject <ASDescription> *> *)deletedObjects;
 
 @end
 
@@ -54,9 +54,9 @@
 #pragma mark - ASWatchConnector protocol
 
 @protocol ASWatchConnector <NSObject>
-- (void)sendTransaction:(id <ASRepresentableTransaction, NSCoding>)transaction;
-- (BOOL)ready;
 - (void)setAgregator:(id<ASWatchTransactionsAgregator>)agregator;
+- (BOOL)ready;
+- (void)sendTransaction:(id <ASRepresentableTransaction, NSCoding>)transaction;
 @end
 
 

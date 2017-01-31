@@ -84,7 +84,7 @@
 		CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D8C1E386F0000CC4B29 /* ASCloudReference.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8D8F1E386F0000CC4B29 /* ASCloudReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D8D1E386F0000CC4B29 /* ASCloudReference.m */; };
 		CEEF8D961E38CAB200CC4B29 /* ASCloudMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASCloudMapping.m */; };
-		CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D971E3A2A5700CC4B29 /* ASCloudTransaction.h */; };
+		CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D971E3A2A5700CC4B29 /* ASCloudTransaction.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8D9A1E3A2A5700CC4B29 /* ASCloudTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D981E3A2A5700CC4B29 /* ASCloudTransaction.m */; };
 /* End PBXBuildFile section */
 
@@ -280,12 +280,12 @@
 				CE6C39B81DC1DF550047B3A8 /* ASDescriptionRepresentation.h in Headers */,
 				CE6C39BC1DC1DF550047B3A8 /* ASObjectRepresentation.h in Headers */,
 				CE9D884E1E31F7F4007158BE /* ASRelatableObjectRepresentation.h in Headers */,
-				CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */,
 				CE6C39B41DC1DF550047B3A8 /* ASTransactionRepresentation.h in Headers */,
 				CEEF8D8E1E386F0000CC4B29 /* ASCloudReference.h in Headers */,
 				CE9D88541E35D791007158BE /* ASReference.h in Headers */,
 				CE9D886E1E376A35007158BE /* ASDevice.h in Headers */,
 				CE9D88701E376A35007158BE /* ASDeviceList.h in Headers */,
+				CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */,
 				CE9D886C1E376A35007158BE /* ASCloudRecord.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

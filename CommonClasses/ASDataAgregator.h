@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASPrivateProtocol.h"
+#import "ASPublicProtocol.h"
 
 @interface ASDataAgregator : NSObject
 
-- (void)addWatchSynchronizableContext:(id <ASDataSyncContextPrivate>)context;
-- (void)setPrivateCloudContext:(id <ASDataSyncContextPrivate>)context;
+- (void)addWatchSynchronizableContext:(id <ASDataSyncContext>)context;
+- (void)setPrivateCloudContext:(id <ASDataSyncContext>)context;
 
 + (instancetype)defaultAgregator;
 
