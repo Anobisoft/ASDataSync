@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASPublicProtocol.h"
+#import "ASPrivateProtocol.h"
 
 @interface ASDataAgregator : NSObject
 

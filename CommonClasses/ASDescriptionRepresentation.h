@@ -16,6 +16,8 @@
 
 + (instancetype)instantiateWithDescription:(id <ASDescription>)description;
 
+@property (nonatomic, strong, readonly) NSString *entityName;
+
 @end
 
 #endif

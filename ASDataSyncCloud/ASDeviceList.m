@@ -53,7 +53,7 @@ static NSString *thisDeviceVersion;
         mutableStore = [NSMutableDictionary new];
         
         thisDevice = [ASDevice new];
-        thisDevice.uniqueData = [UIDevice currentDevice].identifierForVendor.data;
+        thisDevice.UUID = [UIDevice currentDevice].identifierForVendor;
         thisDeviceVersion = [
         @{
           @"iPod5,1"    : @"iPod Touch 5",

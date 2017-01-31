@@ -201,9 +201,9 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     }
 }
 
-- (void)willCommitContext:(id<ASDataSyncContextPrivate>)context {
-    NSSet <id <ASMappedObject>> *updatedObjects = context.updatedObjects;
-    NSSet <id <ASDescription>> *deletedObjects = context.deletedObjects;
+- (void)willCommitTransaction:(id<ASRepresentableTransaction>)transaction {
+    NSSet <id <ASMappedObject>> *updatedObjects = transaction.updatedObjects;
+    NSSet <id <ASDescription>> *deletedObjects = transaction.deletedObjects;
     for (id <ASMappedObject> mappedObject in updatedObjects) {
         [self enqueueUpdateWithMappedObject:mappedObject];
     }
@@ -232,10 +232,8 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     [self getAllRecordsOfEntityName:[ASDevice entityName] fetch:^(NSArray<__kindof ASCloudRecord *> *records) {
         if (records) {
             for (ASCloudRecord *record in records) {
-                ASDevice *device = [ASDevice new];
-                device.UUIDString = record.recordID.recordName;
+                ASDevice *device = [ASDevice deviceWithMappedObject:record];
                 NSLog(@"[DEBUG] create device.UUIDString %@", device.UUIDString);
-                device.keyedDataProperties = record.keyedDataProperties;
                 [deviceList addDevice:device];
             }
             state |= ASCloudStateDevicesReloaded;

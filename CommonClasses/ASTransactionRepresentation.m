@@ -13,11 +13,15 @@
 #import "ASTransactionRepresentation.h"
 #import "ASPrivateProtocol.h"
 
-@implementation ASTransactionRepresentation {
-    NSString *_contextIdentifier;
-    NSSet *_updatedObjects;
-    NSSet *_deletedObjects;
-}
+@interface ASTransactionRepresentation()
+
+@property (nonatomic, strong, readonly) NSSet <id <ASMappedObject>> *updatedObjects;
+@property (nonatomic, strong, readonly) NSSet <id <ASDescription>> *deletedObjects;
+@property (nonatomic, strong, readonly) NSString *contextIdentifier;
+
+@end
+
+@implementation ASTransactionRepresentation
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:_contextIdentifier forKey:ASDataSync_contextIdentifierKey];
@@ -41,10 +45,13 @@
     return self;
 }
 
++ (instancetype)instantiateWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction {
+    return [[self alloc] initWithRepresentableTransaction:transaction];
+}
+
 - (instancetype)initWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction {
     if (self = [super init]) {
         _contextIdentifier = transaction.contextIdentifier;
-        NSDate *creationDate = [NSDate date];
         NSSet <id <ASMappedObject>>* updatedObjects = transaction.updatedObjects;
         if (updatedObjects.count) {
             NSMutableSet <ASRelatableObjectRepresentation *> *tmpUSet = [NSMutableSet new];
@@ -69,10 +76,5 @@
     }
     return (_deletedObjects || _updatedObjects) ? self : nil;
 }
-
-+ (instancetype)instantiateWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction {
-    return [[self alloc] initWithRepresentableTransaction:transaction];
-}
-
 
 @end

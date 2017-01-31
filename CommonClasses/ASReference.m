@@ -13,7 +13,6 @@
 #define ASDataSync_uniqueDataKey @"ASDataSync_uniqueData"
 
 @implementation ASReference {
-    NSData *_uniqueData;
     NSString *uuidString;
 }
 
@@ -41,10 +40,6 @@
         _uniqueData = reference.uniqueData;
     }
     return self;
-}
-
-- (NSData *)uniqueData {
-    return _uniqueData;
 }
 
 - (NSString *)UUIDString {

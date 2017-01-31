@@ -6,8 +6,8 @@
 //  Copyright © 2017 anobisoft. All rights reserved.
 //
 
-#define ASDataSync_keyedReferences @"ASDataSync_descriptionsByRelationKey"
-#define ASDataSync_keyedReferenceSets @"ASDataSync_keyedReferenceSets"
+#define ASDataSync_keyedReferences @"ASDataSync_keyedReferences"
+#define ASDataSync_keyedSetsOfReferences @"ASDataSync_keyedSetsOfReferences"
 
 #import "ASRelatableObjectRepresentation.h"
 
@@ -19,16 +19,20 @@
 
 @implementation ASRelatableObjectRepresentation
 
++ (NSDictionary<NSString *,NSString *> *)entityNameByRelationKey {
+    return nil;
+}
+
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
     [aCoder encodeObject:self.keyedReferences forKey:ASDataSync_keyedReferences];
-    [aCoder encodeObject:self.keyedReferenceSets forKey:ASDataSync_keyedReferenceSets];
+    [aCoder encodeObject:self.keyedSetsOfReferences forKey:ASDataSync_keyedSetsOfReferences];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
         _keyedReferences = [aDecoder decodeObjectForKey:ASDataSync_keyedReferences];
-        _keyedReferenceSets = [aDecoder decodeObjectForKey:ASDataSync_keyedReferenceSets];
+        _keyedSetsOfReferences = [aDecoder decodeObjectForKey:ASDataSync_keyedSetsOfReferences];
     }
     return self;
 }
@@ -38,7 +42,7 @@
         if ([object conformsToProtocol:@protocol(ASRelatableToOne)]) {
             id <ASRelatableToOne> relatableToOneObject = (id <ASRelatableToOne>)object;
             NSMutableDictionary <NSString *, ASReference *> *tmpDict = [NSMutableDictionary new];
-            NSDictionary <NSString *, id<ASReference>> *keyedReferences = relatableObject.keyedReferences;
+            NSDictionary <NSString *, id<ASReference>> *keyedReferences = relatableToOneObject.keyedReferences;
             for (NSString *relationKey in keyedReferences.allKeys) {
                 [tmpDict setObject:[ASReference instantiateWithReference:keyedReferences[relationKey]] forKey:relationKey];
             }
@@ -47,15 +51,15 @@
         if ([object conformsToProtocol:@protocol(ASRelatableToMany)]) {
             id <ASRelatableToMany> relatableToManyObject = (id <ASRelatableToMany>)object;
             NSMutableDictionary <NSString *, NSSet <ASReference *> *> *tmpDict = [NSMutableDictionary new];
-            NSDictionary <NSString *, NSSet <id<ASReference>> *> *keyedSetOfReferences = relatableToManyObject.keyedSetOfReferences;
-            for (NSString *relationKey in keyedSetOfReferences.allKeys) {
+            NSDictionary <NSString *, NSSet <id<ASReference>> *> *keyedSetsOfReferences = relatableToManyObject.keyedSetsOfReferences;
+            for (NSString *relationKey in keyedSetsOfReferences.allKeys) {
                 NSMutableSet <ASReference *> *innerSet = [NSMutableSet new];
-                for (id <ASReference> reference in keyedSetOfReferences[relationKey]) {
+                for (id <ASReference> reference in keyedSetsOfReferences[relationKey]) {
                     [innerSet addObject:[ASReference instantiateWithReference:reference]];
                 }
                 [tmpDict setObject:innerSet.copy forKey:relationKey];
             }
-            _keyedReferenceSets = tmpDict.copy;
+            _keyedSetsOfReferences = tmpDict.copy;
         }
     }
     return self;

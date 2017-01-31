@@ -15,8 +15,8 @@
 
 //#import <UIKit/UIKit.h>
 
-@interface ASManagedObjectContext()<ASWatchSynchronizableContext, ASCloudSynchronizableContext>
-@property (nonatomic, weak) id<ASContextDataAgregator> agregator;
+@interface ASManagedObjectContext() <ASDataSyncContextPrivate>
+@property (nonatomic, weak) id<ASTransactionsAgregator> agregator;
 
 @end
 
@@ -27,7 +27,6 @@
     NSMutableArray <id <ASRepresentableTransaction>> *recievedTransactionsQueue;
     NSString *name;
     ASCloudMapping *selfAutoMapping;
-    ASCloudMapping *extenalMapping;
 }
 
 @synthesize delegate = _delegate;
@@ -40,12 +39,12 @@
     name = [NSString stringWithFormat:@"%@ %@", NSStringFromClass(self.class), identifier];
 }
 
-- (NSSet <NSManagedObject<ASMapped> *> *)updatedObjects {
-    __block NSMutableSet <NSManagedObject<ASMapped> *> *result = [NSMutableSet new];;
+- (NSSet <NSManagedObject<ASMappedObject> *> *)updatedObjects {
+    __block NSMutableSet <NSManagedObject<ASMappedObject> *> *result = [NSMutableSet new];;
     [self performBlockAndWait:^{
         for (NSManagedObject *obj in super.insertedObjects) {
-            if ([obj conformsToProtocol:@protocol(ASMapped)]) {
-                [result addObject:(NSManagedObject<ASMapped> *)obj];
+            if ([obj conformsToProtocol:@protocol(ASMappedObject)]) {
+                [result addObject:(NSManagedObject<ASMappedObject> *)obj];
             }
         }
         for (NSManagedObject *obj in super.updatedObjects) {
@@ -69,7 +68,7 @@
     return result.copy;
 }
 
-- (void)setAgregator:(id<ASContextDataAgregator>)agregator {
+- (void)setAgregator:(id<ASTransactionsAgregator>)agregator {
     self.agregator = agregator;
 }
 
@@ -80,23 +79,22 @@
 #pragma mark - cloud support
 
 - (void)enableCloudSynchronization {
-    cloudContextQueue = [NSMutableArray new];
     [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self];
 }
-
-- (void)setCloudMapping:(ASCloudMapping *)cloudMapping {
-    extenalMapping = cloudMapping;
-}
-
 
 - (ASCloudMapping *)autoMapping {
     if (!selfAutoMapping) {
         selfAutoMapping = [ASCloudMapping new];
         for (NSEntityDescription *entity in self.model.entities) {
-            Class *class = NSClassFromString([entity managedObjectClassName]);
+            Class class = NSClassFromString([entity managedObjectClassName]);
             if ([class conformsToProtocol:@protocol(ASMappedObject)]) {
                 if ([class respondsToSelector:@selector(recordType)]) {
-                    
+                    Class <ASMappedObject> mappedObjectClass = class;
+                    NSString *recordType = [mappedObjectClass recordType];
+                    if (![recordType isEqualToString:entity.name]) {
+                        [selfAutoMapping mapRecordType:recordType withEntityName:entity.name];
+                        continue;
+                    }
                 }
                 [selfAutoMapping registerSynchronizableEntity:entity.name];
             }
@@ -112,55 +110,54 @@
     [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];
 }
 
-+ (NSException *)incompatibleEntityExceptionWithEntityName:(NSString *)entityName entityClassName:(NSString *)entityClassName {
-    return [NSException exceptionWithName:@"IncompatibleEntity"
-                                   reason:[NSString stringWithFormat:@"Entity <%@> class <%@> not conformsToProtocol ASMappedObject",
-                                           entityName, entityClassName]
++ (NSException *)incompatibleEntityExceptionWithEntityName:(NSString *)entityName entityClassName:(NSString *)entityClassName protocol:(Protocol *)protocol {
+    return [NSException exceptionWithName:@"Incompatible entity class implementation"
+                                   reason:[NSString stringWithFormat:@"Entity <%@> class <%@> not conformsToProtocol <%@>",
+                                           entityName, entityClassName, NSStringFromProtocol(protocol)]
                                  userInfo:nil];
 }
 
 - (NSManagedObject *)insertSynchronizableObject:(id <ASMappedObject>)recievedObject {
     NSManagedObject *object = [self insertTo:recievedObject.entityName];
     NSString *entityClassName = [[NSEntityDescription entityForName:recievedObject.entityName inManagedObjectContext:self] managedObjectClassName];
-    if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASMappedObject)]) {
-        NSManagedObject <ASMappedObject> *synchronizableObject = (NSManagedObject <ASMappedObject> *)object;
+    if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASManagedObject)]) {
+        NSManagedObject <ASManagedObject> *synchronizableObject = (NSManagedObject <ASManagedObject> *)object;
         synchronizableObject.uniqueData = recievedObject.uniqueData;
         synchronizableObject.modificationDate = recievedObject.modificationDate;
         synchronizableObject.keyedDataProperties = recievedObject.keyedDataProperties;
     } else {
-        @throw [self.class incompatibleEntityExceptionWithEntityName:recievedObject.entityName entityClassName:entityClassName];
+        @throw [self.class incompatibleEntityExceptionWithEntityName:recievedObject.entityName entityClassName:entityClassName protocol:@protocol(ASManagedObject)];
     }
     return object;
 }
 
-- (NSManagedObject <ASReference> *)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName {
-    NSManagedObject <ASMappedObject> *resultObject = nil;
+- (NSManagedObject <ASFindableReference> *)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName {
+    NSManagedObject <ASFindableReference> *resultObject = nil;
     NSString *entityClassName = [[NSEntityDescription entityForName:entityName inManagedObjectContext:self] managedObjectClassName];
-    if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASMappedObject)]) {
-        Class <ASMappedObject> entityClass = NSClassFromString(entityClassName);
-        NSArray <NSManagedObject *> *objects = [self selectFrom:entityName
-                                                          where:[entityClass predicateWithUniqueData:uniqueData]];
+    if ([NSClassFromString(entityClassName) conformsToProtocol:@protocol(ASFindableReference)]) {
+        Class <ASFindableReference> entityClass = NSClassFromString(entityClassName);
+        NSArray <NSManagedObject <ASFindableReference> *> *objects = [self selectFrom:entityName
+                                                                                where:[entityClass predicateWithUniqueData:uniqueData]];
         if (objects.count == 1) {
-            resultObject = (NSManagedObject <ASMappedObject> *)objects[0];
+            resultObject = (NSManagedObject <ASFindableReference> *)objects.firstObject;
         } else if (objects.count) {
-            resultObject = (NSManagedObject <ASMappedObject> *)objects[0];
+            resultObject = (NSManagedObject <ASFindableReference> *)objects.firstObject;
             @throw [NSException exceptionWithName:@"DataBase UNIQUE constraint violated"
                                            reason:[NSString stringWithFormat:@"Object count with UUID <%@>: %ld\n"
-                                                   "Check your ASDescription protocol implementation for Entity <%@>",
+                                                   "Check your ASFindableReference protocol implementation for Entity <%@>",
                                                    resultObject.UUIDString, (unsigned long)objects.count,
-                                                   entityName
-                                                   ]
+                                                   entityName]
                                          userInfo:nil];
         }
     } else {
-        @throw [self.class incompatibleEntityExceptionWithEntityName:entityName entityClassName:entityClassName];
+        @throw [self.class incompatibleEntityExceptionWithEntityName:entityName entityClassName:entityClassName protocol:@protocol(ASFindableReference)];
     }
     return resultObject;
 }
 
-- (void)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName fetch:(void (^)(NSManagedObject <ASReference> *object))fetch {
+- (void)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName fetch:(void (^)(NSManagedObject <ASFindableReference> *object))fetch {
     [self performBlock:^{
-        NSManagedObject <ASReference> *object;
+        NSManagedObject <ASFindableReference> *object;
         @try {
             object = [self objectByUniqueData:uniqueData entityName:entityName];
         } @catch (NSException *exception) {
@@ -171,41 +168,46 @@
     }];
 }
 
-- (NSManagedObject <ASMappedObject> *)objectByDescription:(ASerializableDescription *)descriptionObj {
-    return [self objectByUniqueData:descriptionObj.uniqueData entityName:descriptionObj.entityName];
+- (NSManagedObject <ASFindableReference> *)objectByDescription:(id <ASDescription>)description {
+    return [self objectByUniqueData:description.uniqueData entityName:description.entityName];
 }
 
-- (void)performMergeWithRecievedContext:(ASTransactionRepresentation *)recievedContext {
+- (void)performMergeWithTransaction:(id<ASRepresentableTransaction>)transaction {
     if ([self hasChanges]) {
-        [recievedTransactionsQueue addObject:recievedContext];
+        [recievedTransactionsQueue addObject:transaction];
     } else {
-        [self performMergeBlockWithRecievedContext:recievedContext];
+        [self performMergeBlockWithTransaction:transaction];
         [self performSaveContextAndReloadData];
     }
 }
 
-- (void)performMergeBlockWithRecievedContext:(ASTransactionRepresentation *)recievedContext {
+- (void)performMergeBlockWithTransaction:(id<ASRepresentableTransaction>)transaction {
     [self performBlock:^{
-        NSMutableArray <NSManagedObject <ASynchronizableRelatableObject> *> *recievedRelatableObjectArray = [NSMutableArray new];
-        NSMutableArray <NSDictionary <NSString *, ASerializableDescription *> *> *arrayOfDescriptionByRelationKey = [NSMutableArray new];
-        NSMutableArray <NSManagedObject <ASynchronizableMultiRelatableObject> *> *recievedMultiRelatableObjectArray = [NSMutableArray new];
-        NSMutableArray <NSDictionary <NSString *, NSSet <ASerializableDescription *> *> *> *arrayOfSetOfDescriptionsByRelationKey = [NSMutableArray new];
+//        NSMutableArray <NSManagedObject <ASynchronizableRelatableObject> *> *recievedRelatableObjectArray = [NSMutableArray new];
+//        NSMutableArray <NSDictionary <NSString *, ASerializableDescription *> *> *arrayOfDescriptionByRelationKey = [NSMutableArray new];
+//        NSMutableArray <NSManagedObject <ASynchronizableMultiRelatableObject> *> *recievedMultiRelatableObjectArray = [NSMutableArray new];
+//        NSMutableArray <NSDictionary <NSString *, NSSet <id <ASDescription> *> *> *arrayOfSetOfDescriptionsByRelationKey = [NSMutableArray new];
         
-        for (ASerializableObject *recievedObject in recievedContext.updatedObjects) {
+        for (id <ASMappedObject>recievedObject in transaction.updatedObjects) {
             @try {
-                NSManagedObject <ASMappedObject> *synchronizableObject = [self objectByDescription:recievedObject];
-                if (synchronizableObject) {
-                    if ([recievedObject.modificationDate compare:synchronizableObject.modificationDate] != NSOrderedAscending) {
-                        synchronizableObject.keyedDataProperties = recievedObject.keyedDataProperties;
-                        synchronizableObject.modificationDate = recievedObject.modificationDate;
-                    } else {
-                        NSLog(@"[WARNING] %s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString);
+                NSManagedObject <ASFindableReference> *foundObject = [self objectByDescription:recievedObject];
+                NSManagedObject <ASManagedObject> *namagedObject;
+                if (foundObject) {
+                    if ([foundObject.class conformsToProtocol:@protocol(ASMutableMappedObject)]) {
+                        NSManagedObject <ASMutableMappedObject> *mutableObject = (NSManagedObject <ASMutableMappedObject> *)foundObject;
+                        if ([mutableObject.modificationDate compare:recievedObject.modificationDate] == NSOrderedAscending) {
+                            mutableObject.modificationDate = recievedObject.modificationDate;
+                            mutableObject.keyedDataProperties = recievedObject.keyedDataProperties;
+                        } else {
+                            NSLog(@"[WARNING] %s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedObject.UUIDString);
+                        }
                     }
                 } else {
-                    synchronizableObject = (NSManagedObject <ASMappedObject> *)[self insertSynchronizableObject:recievedObject];
+                    foundObject = [self insertSynchronizableObject:recievedObject];
                 }
+
                 //relations to buffer
-                if ([recievedObject isKindOfClass:[ASerializableRelatableObject class]]) {
+                if ([recievedObject isKindOfClass:[ASRelatableObjectRepresentation class]]) {
                     ASerializableRelatableObject *relatableObject = (ASerializableRelatableObject *)recievedObject;
                     if (relatableObject.descriptionByRelationKey.count) {
                         if ([synchronizableObject conformsToProtocol:@protocol(ASynchronizableRelatableObject)]) {

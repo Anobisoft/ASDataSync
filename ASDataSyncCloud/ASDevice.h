@@ -9,8 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "ASObjectRepresentation.h"
 
-@interface ASDevice : ASObjectRepresentation
+@interface ASDevice : ASObjectRepresentation <ASMutableMappedObject, ASMutableReference>
 
 + (instancetype)deviceWithMappedObject:(id <ASMappedObject>)mappedObject;
+
+- (void)setUUID:(NSUUID *)UUID;
 
 @end

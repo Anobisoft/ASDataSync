@@ -16,9 +16,7 @@
 
 @end
 
-@implementation ASDescriptionRepresentation {
-    NSString *_entityName;
-}
+@implementation ASDescriptionRepresentation
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
@@ -32,20 +30,19 @@
     return self;
 }
 
-
-- (instancetype)initWithDescription:(id <ASDescription>)description {
-    if (self = [super initWithReference:description]) {
-        _entityName = description.entityName;
-    }
-    return self;
-}
-
 + (instancetype)instantiateWithDescription:(id <ASDescription>)description {
     return [[self alloc] initWithDescription:description];
 }
 
-- (NSString *)entityName {
-    return _entityName;
+- (instancetype)initWithDescription:(id <ASDescription>)description {
+    if (self = [super initWithReference:description]) {
+        @try {
+            _entityName = description.entityName;
+        } @catch (NSException *exception) {
+            NSLog(@"%@", exception);
+        }
+    }
+    return self;
 }
 
 @end

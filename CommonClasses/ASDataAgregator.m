@@ -62,7 +62,7 @@
 }
 
 - (void)willCommitTransaction:(id <ASRepresentableTransaction>)transaction {
-    if ([watchContextSet containsObject:transaction]) {
+    if ([watchContextSet containsObject:(id <ASDataSyncContextPrivate>)transaction]) {
         ASTransactionRepresentation *transactionRepresentation = [ASTransactionRepresentation instantiateWithRepresentableTransaction:transaction];
         if (_watchConnector) {
             if (_watchConnector.ready) {
@@ -72,7 +72,7 @@
             }
         }
     }
-    if (context == privateCloudContext) {
+    if (transaction == privateCloudContext) {
         if (self.cloudManager.ready) {
             [self.cloudManager willCommitTransaction:transaction];
         } else {
@@ -85,27 +85,27 @@
 #warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
-- (void)watchConnector:(ASWatchConnector *)connector didRecieveContext:(ASTransactionRepresentation *)context {
+- (void)watchConnector:(ASWatchConnector *)connector didRecieveTransaction:(id<ASRepresentableTransaction>)transaction {
 #ifdef DEBUG
-    NSLog(@"[DEBUG] %s : <%@>", __PRETTY_FUNCTION__, context.identifier);
+    NSLog(@"[DEBUG] %s : <%@>", __PRETTY_FUNCTION__, transaction.contextIdentifier);
 #endif
-    for (id<ASWatchSynchronizableContext> cc in watchContextSet) {
-        if ([cc.identifier isEqualToString:context.identifier]) {
-            [cc performMergeWithRecievedContext:context];
+    for (id<ASDataSyncContextPrivate> cc in watchContextSet) {
+        if ([cc.contextIdentifier isEqualToString:transaction.contextIdentifier]) {
+            [cc performMergeWithTransaction:transaction];
             return ;
         }
     }
-    NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, context.identifier);
+    NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, transaction.contextIdentifier);
 }
 
-- (void)addWatchSynchronizableContext:(id<ASWatchSynchronizableContext>)context {
+- (void)addWatchSynchronizableContext:(id<ASDataSyncContextPrivate>)context {
     [watchContextSet addObject:context];
     [context setAgregator:self];
 #warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
 - (void)setPrivateCloudContext:(id<ASDataSyncContextPrivate>)context {
-    cloudPrivateDBContext = context;
+    privateCloudContext = context;
     [context setAgregator:self];
     [self.cloudManager setDataSyncContext:context];
 }

@@ -17,9 +17,7 @@
 
 @end
 
-@implementation ASObjectRepresentation {
-
-}
+@implementation ASObjectRepresentation
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
@@ -35,16 +33,16 @@
     return self;
 }
 
++ (instancetype)instantiateWithMappedObject:(id <ASMappedObject>)object {
+    return [[self alloc] initWithMappedObject:object];
+}
+
 - (instancetype)initWithMappedObject:(id <ASMappedObject>)object {
     if (self = [super initWithDescription:object]) {
         _modificationDate = object.modificationDate;
         _keyedDataProperties = object.keyedDataProperties;
     }
     return self;
-}
-
-+ (instancetype)instantiateWithMappedObject:(id <ASMappedObject>)object {
-    return [[self alloc] initWithMappedObject:object];
 }
 
 @end

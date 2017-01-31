@@ -11,7 +11,7 @@
 
 #define ASDataSync_WC_targetKey @"ASDataSync_WC_target"
 #define ASDataSync_WC_dateKey @"ASDataSync_WC_date"
-#define ASDataSync_WC_contextDataKey @"ASDataSync_WC_contextData"
+#define ASDataSync_WC_transactionDataKey @"ASDataSync_WC_transactionData"
 
 @interface ASWatchConnector() <ASWatchConnector>
 @property (nonatomic, weak) id <ASWatchTransactionsAgregator> agregator;
@@ -162,38 +162,31 @@
 
 #pragma mark data send and recieve
 
-- (BOOL)sendContext:(id <ASDataSyncContext>)context {
-    if (context) {
-        ASTransactionRepresentation *contextSerializable = [ASTransactionRepresentation instantiateWithSynchronizableContext:context];
-        if (contextSerializable) {
-            NSData *contextData = [NSKeyedArchiver archivedDataWithRootObject:contextSerializable];
-            NSDictionary *userInfo = @{ ASDataSync_WC_targetKey : NSStringFromClass(self.class),
-                                        ASDataSync_WC_contextDataKey : contextData,
-                                        ASDataSync_WC_dateKey : [NSDate date] };
-            if (self.ready) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [WCSession.defaultSession transferUserInfo:userInfo];
-                });
+- (void)sendTransaction:(id <ASRepresentableTransaction, NSCoding>)transaction; {
+    if (transaction) {
+        NSData *transactionData = [NSKeyedArchiver archivedDataWithRootObject:transaction];
+        NSDictionary *userInfo = @{ ASDataSync_WC_targetKey : NSStringFromClass(self.class),
+                                    ASDataSync_WC_transactionDataKey : transactionData,
+                                    ASDataSync_WC_dateKey : [NSDate date] };
+        if (self.ready) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [WCSession.defaultSession transferUserInfo:userInfo];
+            });
 #ifdef DEBUG
-                NSLog(@"[DEBUG] %s context <%@> sended", __PRETTY_FUNCTION__, contextSerializable.identifier);
+            NSLog(@"[DEBUG] %s context <%@> sended", __PRETTY_FUNCTION__, transaction.contextIdentifier);
 #endif
-            } else {
-                [self enqueueUserInfo:userInfo];
-#if TARGET_OS_IOS
-                NSLog(@"[ERROR] %@ not ready: %@, %@", self.class,
-                      WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
-                      WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed");
-#else
-                NSLog(@"[ERROR] %@ not ready: WCSession has not activated", self.class);
-#endif
-            }
         } else {
-            NSLog(@"[NOTICE] %s empty context, skipped", __PRETTY_FUNCTION__);
+            [self enqueueUserInfo:userInfo];
+#if TARGET_OS_IOS
+            NSLog(@"[ERROR] %@ not ready: %@, %@", self.class,
+                  WCSession.defaultSession.paired ? @"Watch paired" : @"Watch not paired",
+                  WCSession.defaultSession.watchAppInstalled ? @"WatchApp installed" : @"WatchApp not installed");
+#else
+            NSLog(@"[ERROR] %@ not ready: WCSession has not activated", self.class);
+#endif
         }
-        return true;
     } else {
-        NSLog(@"[NOTICE] %s context is nil", __PRETTY_FUNCTION__);
-        return false;
+        NSLog(@"[NOTICE] %s empty context, skipped", __PRETTY_FUNCTION__);
     }
 }
 
@@ -231,12 +224,12 @@
         #ifdef DEBUG
         NSLog(@"[DEBUG] Send date: %@", [userInfo objectForKey:ASDataSync_WC_dateKey]);
         #endif
-        NSData *contextData = [userInfo objectForKey:ASDataSync_WC_contextDataKey];
+        NSData *contextData = [userInfo objectForKey:ASDataSync_WC_transactionDataKey];
         if (contextData) {
-            ASTransactionRepresentation *context = [NSKeyedUnarchiver unarchiveObjectWithData:contextData];
+            id<ASRepresentableTransaction> transactionRepresentation = [NSKeyedUnarchiver unarchiveObjectWithData:contextData];
             if (self.agregator) {
-                if ([self.agregator respondsToSelector:@selector(watchConnector:didRecieveContext:)]) {
-                    [self.agregator watchConnector:self didRecieveContext:context];
+                if ([self.agregator respondsToSelector:@selector(watchConnector:didRecieveTransaction:)]) {
+                    [self.agregator watchConnector:self didRecieveTransaction:transactionRepresentation];
                 } else {
                    NSLog(@"[ERROR] %s %@ agregator not respods to @selector(watchConnector:didRecieveContext:)", __PRETTY_FUNCTION__, self.class);
                 }

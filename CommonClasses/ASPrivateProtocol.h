@@ -54,7 +54,7 @@
 #pragma mark - ASWatchConnector protocol
 
 @protocol ASWatchConnector <NSObject>
-- (void)sendTransaction:(id <ASRepresentableTransaction, NSSecureCoding>)transaction;
+- (void)sendTransaction:(id <ASRepresentableTransaction, NSCoding>)transaction;
 - (BOOL)ready;
 - (void)setAgregator:(id<ASWatchTransactionsAgregator>)agregator;
 @end

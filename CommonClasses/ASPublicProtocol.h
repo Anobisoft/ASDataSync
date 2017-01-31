@@ -7,7 +7,7 @@
 //
 
 @protocol ASManagedObject;
-@protocol ASReference, ASMutableReference, ASDescription, ASMutableDescription, ASFindableEntity;
+@protocol ASReference, ASMutableReference, ASDescription, ASMutableDescription, ASFindableReference;
 @protocol ASMappedObject, ASMutableMappedObject;
 @protocol ASRelatable, ASRelatableToOne, ASMutableRelatableToOne, ASRelatableToMany, ASMutableRelatableToMany;
 @protocol ASDataSyncContext, ASDataSyncContextDelegate, ASDataSyncSearchableContext;
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Synchronizable
 
-@protocol ASManagedObject <ASMutableMappedObject, ASMutableReference, ASFindableEntity>
+@protocol ASManagedObject <ASMutableMappedObject, ASMutableReference, ASFindableReference>
 @end
 
 
@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setUniqueData:(NSData *)uniqueData;
 @optional
 - (void)setUUIDString:(NSString *)UUIDString;
+- (void)setUUID:(NSUUID *)UUID;
 @end;
 
 @protocol ASDescription <ASReference>
@@ -49,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASMutableDescription <ASDescription, ASMutableReference>
 @end
 
-@protocol ASFindableEntity <NSObject>
+@protocol ASFindableReference <ASReference>
 @required
 + (NSString *)entityName;
 + (NSPredicate *)predicateWithUniqueData:(NSData *)uniqueData;
@@ -57,12 +58,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASMappedObject <ASDescription>
 - (NSDate *)modificationDate;
-- (NSDictionary <NSString *, id <NSSecureCoding>> *)keyedDataProperties;
+- (NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties;
 @end
 
 @protocol ASMutableMappedObject <ASMappedObject>
 - (void)setModificationDate:(NSDate *)modificationDate;
-- (void)setKeyedDataProperties:(NSDictionary <NSString *, id <NSCoding>> *)keyedDataProperties;
+- (void)setKeyedDataProperties:(NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties;
 @end
 
 #pragma mark - Relationships
@@ -84,12 +85,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASRelatableToMany <ASRelatable>
 @required
-- (NSDictionary <NSString *, NSSet <id<ASReference>> *> *)keyedSetOfReferences;
+- (NSDictionary <NSString *, NSSet <id<ASReference>> *> *)keyedSetsOfReferences;
 @end
 
 @protocol ASMutableRelatableToMany <ASRelatableToMany>
 @required
-- (void)replaceRelation:(NSString *)relationKey toSetOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
+- (void)replaceRelation:(NSString *)relationKey toSetsOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
 @end
 
 #pragma mark - SynchronizableContext
@@ -107,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @protocol ASDataSyncSearchableContext <NSObject>
-- (id <ASReference>)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName;
+- (id <ASFindableReference>)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName;
 @end
 
 NS_ASSUME_NONNULL_END

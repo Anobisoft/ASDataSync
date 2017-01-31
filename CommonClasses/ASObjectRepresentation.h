@@ -16,8 +16,8 @@
 
 + (instancetype)instantiateWithMappedObject:(id <ASMappedObject>)object;
 
-@property (nonatomic, strong) NSDate *_modificationDate;
-@property (nonatomic, strong) NSDictionary <NSString *, id <NSSecureCoding>> *_keyedDataProperties;
+@property (nonatomic, strong, readonly) NSDate *modificationDate;
+@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSObject <NSCoding> *> *keyedDataProperties;
 
 @end
 

@@ -12,7 +12,7 @@
 #import "ASRelatableObjectRepresentation.h"
 #import "ASPrivateProtocol.h"
 
-@interface ASTransactionRepresentation : NSObject <ASRepresentableTransaction, NSSecureCoding>
+@interface ASTransactionRepresentation : NSObject <ASRepresentableTransaction, NSCoding>
 
 + (instancetype)instantiateWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction;
 

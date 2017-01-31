@@ -55,22 +55,36 @@
 
 #pragma mark - ASCloudRecordRepresentation
 
-@interface ASCloudRecordRepresentation : ASCloudDescriptionRepresentation <ASMappedObject>
+@interface ASCloudRecordRepresentation : ASCloudDescriptionRepresentation <ASMappedObject, ASRelatableToOne, ASRelatableToMany>
 
 
 @end
 
 @implementation ASCloudRecordRepresentation {
     NSDate *_modificationDate;
-    NSDictionary <NSString *, id <NSSecureCoding>> *_keyedDataProperties;
+    NSDictionary <NSString *, NSObject <NSCoding> *> *_keyedDataProperties;
+    NSDictionary <NSString *, id<ASReference>> *_keyedReferences;
+    NSDictionary <NSString *, NSSet <id<ASReference>> *> *_keyedSetsOfReferences;
+}
+
++ (NSDictionary<NSString *,NSString *> *)entityNameByRelationKey {
+    return nil;
 }
 
 - (NSDate *)modificationDate {
-    return _modificationDate
+    return _modificationDate;
 }
 
-- (NSDictionary <NSString *, id <NSSecureCoding>> *)keyedDataProperties {
+- (NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties {
     return _keyedDataProperties;
+}
+
+- (NSDictionary <NSString *, id<ASReference>> *)keyedReferences {
+    return _keyedReferences;
+}
+
+- (NSDictionary <NSString *, NSSet <id<ASReference>> *> *)keyedSetsOfReferences {
+    return _keyedSetsOfReferences;
 }
 
 + (instancetype)instantiateWithCloudRecord:(ASCloudRecord *)cloudRecord mapping:(ASCloudMapping *)mapping {
@@ -80,44 +94,40 @@
 - (instancetype)initWithCloudRecord:(ASCloudRecord *)cloudRecord mapping:(ASCloudMapping *)mapping {
     if (self = [super initWithRecordType:cloudRecord.recordType uniqueData:cloudRecord.uniqueData mapping:mapping]) {
         _modificationDate = cloudRecord.modificationDate;
-        NSMutableDictionary <NSString *, id <NSSecureCoding>> *tmp_keyedDataProperties = [NSMutableDictionary new];
-        NSMutableDictionary <NSString *, ASCloudReference *> *tmp_keyedReferences;
+        NSMutableDictionary <NSString *, NSObject <NSCoding> *> *tmp_keyedDataProperties = [NSMutableDictionary new];
         NSMutableDictionary <NSString *, ASCloudReference *> *tmp_keyedReferences = [NSMutableDictionary new];
-        NSMutableDictionary *tmp_keyedMultiReferences = [NSMutableDictionary new];
-        for (NSString *key in self.allKeys) {
-            if ([self[key] isKindOfClass:[CKReference class]]) {
-                CKReference *ref = self[key];
-                [tmp_keyedReferences setObject:ref.recordID.UUID.data forKey:key];
+        NSMutableDictionary <NSString *, NSSet <ASCloudReference *> *> *tmp_keyedSetsOfReferences = [NSMutableDictionary new];
+        for (NSString *key in cloudRecord.allKeys) {
+            if ([cloudRecord[key] isKindOfClass:[CKReference class]]) {
+                ASCloudReference *reference = cloudRecord[key];
+                [tmp_keyedReferences setObject:reference forKey:key];
                 continue;
             }
-            if ([self[key] isKindOfClass:[NSArray class]] && [((NSArray *)self[key]).firstObject isKindOfClass:[CKReference class]]) {
-                NSMutableArray <NSData *> *refList = [NSMutableArray new];
-                for (CKReference *ref in (NSArray *)self[key]) {
-                    [refList addObject:ref.recordID.UUID.data];
+            if ([cloudRecord[key] isKindOfClass:[NSArray class]] && [((NSArray *)cloudRecord[key]).firstObject isKindOfClass:[CKReference class]]) {
+                NSMutableSet <ASCloudReference *> *refList = [NSMutableSet new];
+                for (ASCloudReference *reference in (NSArray *)cloudRecord[key]) {
+                    [refList addObject:reference];
                 }
-                [tmp_keyedMultiReferences setObject:refList.copy forKey:key];
+                [tmp_keyedSetsOfReferences setObject:refList.copy forKey:key];
             }
             if (![key isEqualToString:kASCloudRealModificationDate]) {
-                [tmp_keyedDataProperties setObject:self[key] forKey:key];
+                [tmp_keyedDataProperties setObject:cloudRecord[key] forKey:key];
             }
         }
         _keyedDataProperties = tmp_keyedDataProperties.copy;
+        _keyedReferences = tmp_keyedReferences.copy;
+        _keyedSetsOfReferences = tmp_keyedSetsOfReferences.copy;
     }
     return self;
-}
-
-- (void)splitData {
-
 }
 
 @end
 
 
-
 #pragma mark - ASCloudRecord
 
 @implementation ASCloudRecord {
-
+    NSDictionary *keyedProperties;
 }
 
 - (id <ASDescription>)descriptionOfDeletedObjectWithMapping:(ASCloudMapping *)mapping {
@@ -152,28 +162,37 @@
     return nil;
 }
 
+- (NSDictionary<NSString *, NSObject <NSCoding> *> *)keyedDataProperties {
+    if (!keyedProperties) {
+        NSMutableDictionary *tmp = [NSMutableDictionary new];
+        for (NSString *key in self.allKeys) {
+            [tmp setObject:self[key] forKey:key];
+        }
+        keyedProperties = tmp.copy;
+    }
+    return keyedProperties;
+}
+
 #pragma mark - setters
 
 - (void)setModificationDate:(NSDate *)date {
     self[kASCloudRealModificationDate] = date;
 }
 
-- (void)setKeyedDataProperties:(NSDictionary <NSString *, id <NSSecureCoding>> *)keyedDataProperties {
+- (void)setKeyedDataProperties:(NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties {
     for (NSString *key in keyedDataProperties.allKeys) {
-        self[key] = [keyedDataProperties[key] isKindOfClass:[NSNull class]] ? nil : keyedDataProperties[key];
+        self[key] = [keyedDataProperties[key] isKindOfClass:[NSNull class]] ? nil : (__kindof id <CKRecordValue>)keyedDataProperties[key];
     }
 }
 
 - (void)replaceRelation:(NSString *)relationKey toReference:(id<ASReference>)reference {
-    CKReference *ckreference = [[CKReference alloc] initWithRecordID:[ASCloudReference referenceWithUniqueData:reference.uniqueData] action:nil];
-    self[relationKey] = ckreference;
+    self[relationKey] = [ASCloudReference referenceWithUniqueData:reference.uniqueData];
 }
 
-- (void)replaceRelation:(NSString *)relationKey toSetOfReferences:(NSSet <id<ASReference>> *)setOfReferences {
+- (void)replaceRelation:(NSString *)relationKey toSetsOfReferences:(NSSet <id<ASReference>> *)setOfReferences {
     NSMutableArray *tmpArray = [NSMutableArray new];
     for (id<ASReference> reference in setOfReferences) {
-        CKReference *ckreference = [[CKReference alloc] initWithRecordID:[ASCloudReference referenceWithUniqueData:reference.uniqueData] action:nil];
-        [tmpArray addObject:ckreference];
+        [tmpArray addObject:[ASCloudReference referenceWithUniqueData:reference.uniqueData]];
     }
     self[relationKey] = tmpArray.copy;
 }

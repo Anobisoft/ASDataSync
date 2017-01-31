@@ -20,8 +20,8 @@
 - (id <ASMappedObject>)mappedObjectWithMapping:(ASCloudMapping *)mapping;
 
 - (void)setModificationDate:(NSDate *)date;
-- (void)setKeyedDataProperties:(NSDictionary <NSString *, id <NSSecureCoding>> *)keyedDataProperties;
+- (void)setKeyedDataProperties:(NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties;
 - (void)replaceRelation:(NSString *)relationKey toReference:(id<ASReference>)reference;
-- (void)replaceRelation:(NSString *)relationKey toSetOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
+- (void)replaceRelation:(NSString *)relationKey toSetsOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
 
 @end

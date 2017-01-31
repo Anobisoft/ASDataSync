@@ -10,25 +10,43 @@
 #import "NSUUID+NSData.h"
 #import "ASCloudRecord.h"
 
-@interface ASDevice()
+@interface ASObjectRepresentation(protected)
+
+- (instancetype)initWithMappedObject:(id <ASMappedObject>)object;
 
 @end
 
-@implementation ASDevice {
+@implementation ASDevice
 
-}
+@synthesize uniqueData = _uniqueData;
+@synthesize modificationDate = _modificationDate;
+@synthesize keyedDataProperties = _keyedDataProperties;
 
 + (instancetype)deviceWithMappedObject:(id <ASMappedObject>)mappedObject {
     return [[self alloc] initWithMappedObject:mappedObject];
 }
 
 - (instancetype)initWithMappedObject:(id <ASMappedObject>)mappedObject {
-    if (self = [super init]) {
-        self.uniqueData = mappedObject.uniqueData;
-        self.modificationDate = mappedObject.modificationDate;
-        self.keyedDataProperties = mappedObject.keyedDataProperties;
+    if (self = [super initWithMappedObject:mappedObject]) {
+        
     }
     return self;
+}
+
+- (void)setUUID:(NSUUID *)UUID {
+    _uniqueData = UUID.data;
+}
+
+- (void)setUniqueData:(NSData *)uniqueData {
+    _uniqueData = uniqueData;
+}
+
+- (void)setModificationDate:(NSDate *)modificationDate {
+    _modificationDate = modificationDate;
+}
+
+- (void)setKeyedDataProperties:(NSDictionary<NSString *,NSObject<NSCoding> *> *)keyedDataProperties {
+    _keyedDataProperties = keyedDataProperties;
 }
 
 - (NSString *)entityName {
@@ -37,14 +55,6 @@
 
 + (NSString *)entityName {
     return @"Device";
-}
-
-- (void)setKeyedDataProperties:(NSDictionary<NSString *,id<NSCoding>> *)keyedDataProperties {
-    self.keyedDataProperties = keyedDataProperties;
-}
-
-- (void)setModificationDate:(NSDate *)modificationDate {
-    self.modificationDate = modificationDate;
 }
 
 

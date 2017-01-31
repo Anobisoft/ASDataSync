@@ -15,7 +15,7 @@
 @interface ASRelatableObjectRepresentation : ASObjectRepresentation <ASRelatableToOne, ASRelatableToMany>
 
 @property (nonatomic, strong, readonly) NSDictionary <NSString *, ASReference *> *keyedReferences;
-@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSSet <ASReference *> *> *keyedSetOfReference;
+@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSSet <ASReference *> *> *keyedSetsOfReferences;
 
 @end
 

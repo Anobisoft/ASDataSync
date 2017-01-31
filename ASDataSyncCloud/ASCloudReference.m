@@ -54,11 +54,11 @@
 }
 
 + (instancetype)referenceWithUniqueData:(NSData *)uniqueData {
-    return [[super alloc] initWithRecordID:[ASCloudID cloudIDWithUniqueData:uniqueData] action:nil];
+    return [[super alloc] initWithRecordID:[ASCloudID cloudIDWithUniqueData:uniqueData] action:CKReferenceActionNone];
 }
 
 + (instancetype)referenceWithUUIDString:(NSString *)UUIDString {
-    return [[super alloc] initWithRecordID:[ASCloudID cloudIDWithRecordName:UUIDString] action:nil];
+    return [[super alloc] initWithRecordID:[ASCloudID cloudIDWithUUIDString:UUIDString] action:CKReferenceActionNone];
 }
 
 @end
