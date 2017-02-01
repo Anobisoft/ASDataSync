@@ -58,12 +58,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASMappedObject <ASDescription>
 - (NSDate *)modificationDate;
-- (NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties;
+- (NSDictionary <NSString *, NSObject<NSCoding> *> *)keyedDataProperties;
 @end
 
 @protocol ASMutableMappedObject <ASMappedObject>
 - (void)setModificationDate:(NSDate *)modificationDate;
-- (void)setKeyedDataProperties:(NSDictionary <NSString *, NSObject <NSCoding> *> *)keyedDataProperties;
+- (void)setKeyedDataProperties:(NSDictionary <NSString *, NSObject<NSCoding> *> *)keyedDataProperties;
 @end
 
 #pragma mark - Relationships
@@ -75,22 +75,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASRelatableToOne <ASRelatable>
 @required
-- (NSDictionary <NSString *, id<ASReference>> *)keyedReferences;
+- (NSDictionary <NSString *, NSObject<ASReference> *> *)keyedReferences;
 @end
 
 @protocol ASMutableRelatableToOne <ASRelatableToOne>
 @required
-- (void)replaceRelation:(NSString *)relationKey toReference:(NSObject <ASReference> *)reference;
+- (void)replaceRelation:(NSString *)relationKey toReference:(NSObject<ASReference> *)reference;
 @end
 
 @protocol ASRelatableToMany <ASRelatable>
 @required
-- (NSDictionary <NSString *, NSSet <NSObject <ASReference> *> *> *)keyedSetsOfReferences;
+- (NSDictionary <NSString *, NSSet <NSObject<ASReference> *> *> *)keyedSetsOfReferences;
 @end
 
 @protocol ASMutableRelatableToMany <ASRelatableToMany>
 @required
-- (void)replaceRelation:(NSString *)relationKey toSetsOfReferences:(NSSet <id<ASReference>> *)setOfReferences;
+- (void)replaceRelation:(NSString *)relationKey toSetsOfReferences:(NSSet<NSObject<ASReference> *> *)setOfReferences;
 @end
 
 #pragma mark - SynchronizableContext
