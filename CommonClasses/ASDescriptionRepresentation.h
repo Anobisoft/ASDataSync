@@ -14,7 +14,7 @@
 
 @interface ASDescriptionRepresentation : ASReference <ASDescription>
 
-+ (instancetype)instantiateWithDescription:(id <ASDescription>)description;
++ (instancetype)instantiateWithDescription:(NSObject<ASDescription> *)description;
 
 @property (nonatomic, strong, readonly) NSString *entityName;
 

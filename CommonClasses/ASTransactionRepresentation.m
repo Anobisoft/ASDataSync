@@ -15,8 +15,8 @@
 
 @interface ASTransactionRepresentation()
 
-@property (nonatomic, strong, readonly) NSSet <id <ASMappedObject>> *updatedObjects;
-@property (nonatomic, strong, readonly) NSSet <id <ASDescription>> *deletedObjects;
+@property (nonatomic, strong, readonly) NSSet <NSObject<ASMappedObject> *> *updatedObjects;
+@property (nonatomic, strong, readonly) NSSet <NSObject<ASDescription> *> *deletedObjects;
 @property (nonatomic, strong, readonly) NSString *contextIdentifier;
 
 @end
@@ -52,10 +52,10 @@
 - (instancetype)initWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction {
     if (self = [super init]) {
         _contextIdentifier = transaction.contextIdentifier;
-        NSSet <id <ASMappedObject>>* updatedObjects = transaction.updatedObjects;
+        NSSet <NSObject<ASMappedObject> *> *updatedObjects = transaction.updatedObjects;
         if (updatedObjects.count) {
             NSMutableSet <ASRelatableObjectRepresentation *> *tmpUSet = [NSMutableSet new];
-            for (id <ASMappedObject> updatedObject in updatedObjects) {
+            for (NSObject<ASMappedObject> *updatedObject in updatedObjects) {
                 [tmpUSet addObject:[ASRelatableObjectRepresentation instantiateWithMappedObject:updatedObject]];
             }
             _updatedObjects = tmpUSet.copy;
@@ -63,10 +63,10 @@
             _updatedObjects = nil;
         }
         
-        NSSet <id <ASDescription>>* deletedObjects = transaction.deletedObjects;
+        NSSet <NSObject<ASDescription> *> *deletedObjects = transaction.deletedObjects;
         if (deletedObjects.count) {
             NSMutableSet <ASDescriptionRepresentation *> *tmpSet = [NSMutableSet new];
-            for (id <ASDescription> description in deletedObjects) {
+            for (NSObject<ASDescription> *description in deletedObjects) {
                 [tmpSet addObject:[ASDescriptionRepresentation instantiateWithDescription:description]];
             }
             _deletedObjects = tmpSet.copy;

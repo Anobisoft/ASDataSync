@@ -69,8 +69,8 @@
 		CE9D88511E31F7F4007158BE /* ASRelatableObjectRepresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D884D1E31F7F4007158BE /* ASRelatableObjectRepresentation.m */; };
 		CE9D88541E35D791007158BE /* ASReference.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88521E35D791007158BE /* ASReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9D88551E35D791007158BE /* ASReference.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88521E35D791007158BE /* ASReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE9D88561E35D791007158BE /* ASReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASReference.m */; settings = {COMPILER_FLAGS = "-Wno-protocol -Wno-objc-protocol-property-synthesis"; }; };
-		CE9D88571E35D791007158BE /* ASReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASReference.m */; settings = {COMPILER_FLAGS = "-Wno-protocol -Wno-objc-protocol-property-synthesis"; }; };
+		CE9D88561E35D791007158BE /* ASReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASReference.m */; };
+		CE9D88571E35D791007158BE /* ASReference.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88531E35D791007158BE /* ASReference.m */; };
 		CE9D886A1E376A35007158BE /* ASCloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D885F1E376A35007158BE /* ASCloudManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9D886B1E376A35007158BE /* ASCloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88601E376A35007158BE /* ASCloudManager.m */; };
 		CE9D886C1E376A35007158BE /* ASCloudRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88611E376A35007158BE /* ASCloudRecord.h */; settings = {ATTRIBUTES = (Private, ); }; };

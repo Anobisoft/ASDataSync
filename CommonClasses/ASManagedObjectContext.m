@@ -28,7 +28,6 @@
 @end
 
 @interface ASManagedObjectContext() <ASDataSyncContextPrivate>
-@property (nonatomic, weak) id<ASTransactionsAgregator> agregator;
 
 @end
 
@@ -39,6 +38,7 @@
     NSMutableArray <id <ASRepresentableTransaction>> *recievedTransactionsQueue;
     NSString *name;
     ASCloudMapping *selfAutoMapping;
+    id<ASTransactionsAgregator> transactionsAgregator;
 }
 
 @synthesize delegate = _delegate;
@@ -81,11 +81,11 @@
 }
 
 - (void)setAgregator:(id<ASTransactionsAgregator>)agregator {
-    self.agregator = agregator;
+    transactionsAgregator = agregator;
 }
 
 - (NSManagedObjectModel *)model {
-    return self.persistentStoreCoordinator.managedObjectModel;
+    return managedObjectModel;
 }
 
 #pragma mark - cloud support
@@ -117,8 +117,7 @@
 
 #pragma mark - Synchronization
 
-- (void)enableWatchSynchronization {
-    recievedTransactionsQueue = [NSMutableArray new];
+- (void)enableWatchSynchronization {    
     [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];
 }
 
@@ -326,7 +325,7 @@
 - (void)commit {
     if ([self hasChanges]) {        
         [self performBlock:^{
-            if (self.agregator) [self.agregator willCommitTransaction:self];
+            if (transactionsAgregator) [transactionsAgregator willCommitTransaction:self];
             NSError *error;
             if ([self save:&error]) {
                 [self saveMainContext];
@@ -430,6 +429,7 @@
         [mainContext setPersistentStoreCoordinator:persistentStoreCoordinator];
         self.parentContext = mainContext;
         
+        recievedTransactionsQueue = [NSMutableArray new];
 //        [[NSNotificationCenter defaultCenter] addObserver:self
 //                                                 selector:@selector(appWillTerminate:)
 //                                                     name:UIApplicationWillResignActiveNotification

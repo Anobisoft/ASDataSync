@@ -30,11 +30,11 @@
     return self;
 }
 
-+ (instancetype)instantiateWithDescription:(id <ASDescription>)description {
++ (instancetype)instantiateWithDescription:(NSObject<ASDescription> *)description {
     return [[self alloc] initWithDescription:description];
 }
 
-- (instancetype)initWithDescription:(id <ASDescription>)description {
+- (instancetype)initWithDescription:(NSObject<ASDescription> *)description {
     if (self = [super initWithReference:description]) {
         @try {
             _entityName = description.entityName;

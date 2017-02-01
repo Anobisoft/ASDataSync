@@ -12,10 +12,13 @@
 #import <Foundation/Foundation.h>
 #import "ASPublicProtocol.h"
 
-@interface ASReference : NSObject <ASReference, NSCoding>
+@interface ASReference : NSObject <ASReference, NSCoding> {
+    @protected
+    NSData *_uniqueData;
+}
 
 + (instancetype)null;
-+ (instancetype)instantiateWithReference:(id <ASReference>)reference;
++ (instancetype)instantiateWithReference:(NSObject<ASReference> *)reference;
 - (NSString *)UUIDString;
 
 @property (nonatomic, strong, readonly) NSData *uniqueData;

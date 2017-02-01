@@ -33,11 +33,11 @@
     return self;
 }
 
-+ (instancetype)instantiateWithMappedObject:(id <ASMappedObject>)object {
++ (instancetype)instantiateWithMappedObject:(NSObject<ASMappedObject> *)object {
     return [[self alloc] initWithMappedObject:object];
 }
 
-- (instancetype)initWithMappedObject:(id <ASMappedObject>)object {
+- (instancetype)initWithMappedObject:(NSObject<ASMappedObject> *)object {
     if (self = [super initWithDescription:object]) {
         _modificationDate = object.modificationDate;
         _keyedDataProperties = object.keyedDataProperties;

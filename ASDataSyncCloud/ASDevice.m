@@ -18,10 +18,6 @@
 
 @implementation ASDevice
 
-@synthesize uniqueData = _uniqueData;
-@synthesize modificationDate = _modificationDate;
-@synthesize keyedDataProperties = _keyedDataProperties;
-
 + (instancetype)deviceWithMappedObject:(id <ASMappedObject>)mappedObject {
     return [[self alloc] initWithMappedObject:mappedObject];
 }

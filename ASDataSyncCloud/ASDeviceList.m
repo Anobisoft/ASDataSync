@@ -118,10 +118,11 @@ static NSString *thisDeviceVersion;
 }
 
 - (void)updateThisDeviceInfo {
-    thisDevice.keyedDataProperties = @{ @"name" : [[UIDevice currentDevice] name],
-                                    @"model" : [[UIDevice currentDevice] model],
-                                    @"version" : thisDeviceVersion,
-                                    @"system" : [NSString stringWithFormat:@"%@ %@", [[UIDevice currentDevice] systemName], [[UIDevice currentDevice] systemVersion]],
+    NSString *system = [NSString stringWithFormat:@"%@ %@", [[UIDevice currentDevice] systemName], [[UIDevice currentDevice] systemVersion]];
+    thisDevice.keyedDataProperties = @{ @"name"    : [[UIDevice currentDevice] name],
+                                        @"model"   : [[UIDevice currentDevice] model],
+                                        @"version" : thisDeviceVersion,
+                                        @"system"  : system,
                                     };
     thisDevice.modificationDate = [NSDate date];
 }

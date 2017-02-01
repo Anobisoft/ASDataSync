@@ -31,11 +31,11 @@
     return [[self alloc] init];
 }
 
-+ (instancetype)instantiateWithReference:(id <ASReference>)reference {
++ (instancetype)instantiateWithReference:(NSObject<ASReference> *)reference {
     return [[self alloc] initWithReference:reference];
 }
 
-- (instancetype)initWithReference:(id <ASReference>)reference {
+- (instancetype)initWithReference:(NSObject<ASReference> *)reference {
     if (self = [super init]) {
         _uniqueData = reference.uniqueData;
     }

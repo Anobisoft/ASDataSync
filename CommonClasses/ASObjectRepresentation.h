@@ -12,12 +12,16 @@
 #import <Foundation/Foundation.h>
 #import "ASDescriptionRepresentation.h"
 
-@interface ASObjectRepresentation : ASDescriptionRepresentation <ASMappedObject>
+@interface ASObjectRepresentation : ASDescriptionRepresentation <ASMappedObject> {
+    @protected
+    NSDate *_modificationDate;
+    NSDictionary <NSString *, NSObject<NSCoding> *> *_keyedDataProperties;
+}
 
-+ (instancetype)instantiateWithMappedObject:(id <ASMappedObject>)object;
++ (instancetype)instantiateWithMappedObject:(NSObject<ASMappedObject> *)object;
 
 @property (nonatomic, strong, readonly) NSDate *modificationDate;
-@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSObject <NSCoding> *> *keyedDataProperties;
+@property (nonatomic, strong, readonly) NSDictionary <NSString *, NSObject<NSCoding> *> *keyedDataProperties;
 
 @end
 
