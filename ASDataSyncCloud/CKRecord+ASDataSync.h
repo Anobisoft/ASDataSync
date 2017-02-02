@@ -23,4 +23,6 @@
 - (void)replaceRelation:(NSString *)relationKey toReference:(NSObject<ASReference> *)reference;
 - (void)replaceRelation:(NSString *)relationKey toSetsOfReferences:(NSSet<NSObject<ASReference> *> *)setOfReferences;
 
+- (NSString *)UUIDString;
+
 @end

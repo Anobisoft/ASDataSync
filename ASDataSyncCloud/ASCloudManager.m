@@ -154,6 +154,11 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
 
 - (instancetype)init {
     if (self = [super init]) {
+        recordsToSave = [NSMutableArray new];
+        recordIDsToDelete = [NSMutableArray new];
+        _cloudUpdatedRecords = [NSMutableSet new];
+        _cloudUpdatedDeletionInfoRecords = [NSMutableSet new];
+        
         lastSyncDateForEntityMutable = self.lastSyncDateForEntity.mutableCopy;
         deviceList = [ASDeviceList defaultList];
         enqueueUpdateWithSyncronizableObjectGroup = dispatch_group_create();
@@ -197,11 +202,11 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 - (void)subscribeToRegisteredRecordTypes {
     SaveSubscriptionCompletionHandler completionHandler = ^(CKSubscription * _Nullable subscription, NSError * _Nullable error) {
         if (error) {
-            CKQuerySubscription *qsubs = (CKQuerySubscription *)subscription;
-            NSLog(@"[ERROR] failed to subscribe to %@. %@", qsubs.recordType, error.localizedDescription);
+            NSLog(@"[ERROR] SaveSubscription failed: %@", error.localizedDescription);
         }
     };
     for (NSString *recordType in self.mapping.allRecordTypes) {
+        NSLog(@"subscribeToRecordType %@", recordType);
         CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
         [db saveSubscription:subscription completionHandler:completionHandler];
     }
@@ -414,14 +419,16 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     dispatch_group_enter(enqueueUpdateWithSyncronizableObjectGroup);
-    CKRecordID *recordID = [CKRecordID recordIDWithUUIDString:syncObject.UUIDString];
+    CKRecordID *recordID = [CKRecordID recordIDWithUUIDString:syncObject.uniqueData.UUIDString];
     [self recordByRecordID:recordID fetch:^(CKRecord<ASMappedObject> *record) {
         if (record) {
             if ([record.modificationDate compare:syncObject.modificationDate] != NSOrderedAscending) {
+                NSLog(@"[WARNING] Cloud record %@ up to date %@", record.UUIDString, record.modificationDate);
                 dispatch_group_leave(enqueueUpdateWithSyncronizableObjectGroup);
                 return ; // record update no needed
             }
         } else {
+            NSLog(@"[DEBUG] Not Found. Create new recordID %@", recordID);
             record = (CKRecord<ASMappedObject> *)[CKRecord recordWithRecordType:syncObject.entityName recordID:recordID];
         }
         record.keyedDataProperties = syncObject.keyedDataProperties;
@@ -435,12 +442,14 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    CKRecordID *recordID = [CKRecordID recordIDWithUUIDString:description.UUIDString];
+    NSLog(@"%@ description.uniqueData.UUIDString %@", description, description.uniqueData.UUIDString);
+    if (!description.uniqueData) return;
+    CKRecordID *recordID = [CKRecordID recordIDWithUUIDString:description.uniqueData.UUIDString];
     [recordIDsToDelete addObject:recordID];
     for (ASDevice *device in [ASDeviceList defaultList]) {
         CKRecord *deletionInfo = [CKRecord recordWithRecordType:ASCloudDeletionInfoRecordType];
         deletionInfo[ASCloudDeletionInfoRecordProperty_recordType] = self.mapping[description.entityName];
-        deletionInfo[ASCloudDeletionInfoRecordProperty_recordID] = description.UUIDString;
+        deletionInfo[ASCloudDeletionInfoRecordProperty_recordID] = description.uniqueData.UUIDString;
         deletionInfo[ASCloudDeletionInfoRecordProperty_deviceID] = device.UUIDString;
         [recordsToSave addObject:deletionInfo];
     }
@@ -454,7 +463,9 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         dispatch_group_wait(enqueueUpdateWithSyncronizableObjectGroup, DISPATCH_TIME_FOREVER);
         CKModifyRecordsOperation *mop = [[CKModifyRecordsOperation alloc] initWithRecordsToSave:recordsToSave.copy recordIDsToDelete:recordIDsToDelete.copy];
         NSUInteger recordsToSaveCount = recordsToSave.count;
+        NSLog(@"recordsToSaveCount %ld", recordsToSaveCount);
         NSUInteger recordIDsToDeleteCount = recordIDsToDelete.count;
+        NSLog(@"recordIDsToDeleteCount %ld", recordIDsToDeleteCount);
         [mop setModifyRecordsCompletionBlock:^(NSArray<CKRecord *> * _Nullable savedRecords, NSArray<CKRecordID *> * _Nullable deletedRecordIDs, NSError * _Nullable operationError) {
             if (operationError) {
                 NSLog(@"[ERROR] CKModifyRecordsOperation Error: %@", operationError);
@@ -462,12 +473,12 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
             } else {
                 if (savedRecords.count == recordsToSaveCount && deletedRecordIDs.count == recordIDsToDeleteCount) {
                     NSLog(@"[DEBUG] CKModifyRecordsOperation OK");
-                    successBlock(true);
+                    if (successBlock) successBlock(true);
                     [recordsToSave removeAllObjects];
                     [recordIDsToDelete removeAllObjects];
                 } else {
                     NSLog(@"[ERROR] CKModifyRecordsOperation checksum failed: recordsToSaveCount %ld / recordIDsToDeleteCount %ld", (unsigned long)recordsToSaveCount, (unsigned long)recordIDsToDeleteCount);
-                    successBlock(false);
+                    if (successBlock) successBlock(false);
                 }
             }
         }];

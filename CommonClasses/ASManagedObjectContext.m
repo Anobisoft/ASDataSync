@@ -27,7 +27,7 @@
 
 @end
 
-@interface ASManagedObjectContext() <ASDataSyncContextPrivate>
+@interface ASManagedObjectContext() <ASDataSyncContextPrivate, ASCloudMappingProvider>
 
 @end
 
@@ -37,7 +37,7 @@
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSMutableArray <id <ASRepresentableTransaction>> *recievedTransactionsQueue;
     NSString *name;
-    ASCloudMapping *selfAutoMapping;
+    ASCloudMapping *cloudMapping;
     id<ASTransactionsAgregator> transactionsAgregator;
 }
 
@@ -84,10 +84,6 @@
     transactionsAgregator = agregator;
 }
 
-- (NSManagedObjectModel *)model {
-    return managedObjectModel;
-}
-
 #pragma mark - cloud support
 
 - (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier {
@@ -98,25 +94,25 @@
     
 }
 
-- (ASCloudMapping *)autoMapping {
-    if (!selfAutoMapping) {
-        selfAutoMapping = [ASCloudMapping new];
-        for (NSEntityDescription *entity in self.model.entities) {
+- (ASCloudMapping *)cloudMapping {
+    if (!cloudMapping) {
+        cloudMapping = [ASCloudMapping new];
+        for (NSEntityDescription *entity in managedObjectModel.entities) {
             Class class = NSClassFromString([entity managedObjectClassName]);
             if ([class conformsToProtocol:@protocol(ASMappedObject)]) {
                 if ([class respondsToSelector:@selector(recordType)]) {
                     Class <ASMappedObject> mappedObjectClass = class;
                     NSString *recordType = [mappedObjectClass recordType];
                     if (![recordType isEqualToString:entity.name]) {
-                        [selfAutoMapping mapRecordType:recordType withEntityName:entity.name];
+                        [cloudMapping mapRecordType:recordType withEntityName:entity.name];
                         continue;
                     }
                 }
-                [selfAutoMapping addEntity:entity.name];
+                [cloudMapping addEntity:entity.name];
             }
         }
     }
-    return selfAutoMapping.copy;
+    return cloudMapping;
 }
 
 #pragma mark - Synchronization

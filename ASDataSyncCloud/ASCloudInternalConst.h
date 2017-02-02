@@ -10,6 +10,9 @@
 #define ASCloudInternalConst_h
 
 #define ASCloudLastSyncDateForEntityUDKey @"ASCloudLastSyncDateForEntityDictionary"
+
+#define ASCloudDevicesInfoRecordType @"Device"
+
 #define ASCloudDeletionInfoRecordType @"DeleteQueue"
 #define ASCloudDeletionInfoRecordProperty_recordType @"dq_recordType"
 #define ASCloudDeletionInfoRecordProperty_recordID @"dq_recordID"

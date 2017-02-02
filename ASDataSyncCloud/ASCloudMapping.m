@@ -12,6 +12,7 @@
 @interface ASMap : NSObject <ASKeyedSubscripted>
 
 - (void)mapObject:(NSString *)object withKey:(NSString *)key;
+- (NSDictionary *)dictionary;
 
 @end
 
@@ -32,6 +33,10 @@
 
 - (void)mapObject:(NSString *)object withKey:(NSString *)key {
     [map setObject:object forKey:key];
+}
+
+- (NSDictionary *)dictionary {
+    return map.copy;
 }
 
 @end
@@ -89,8 +94,8 @@
 
 - (void)mapRecordType:(NSString *)recordType withEntityName:(NSString *)entityName {
     [_map mapObject:recordType withKey:entityName];
-    if (_reverseMap[recordType]) @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:nil userInfo:nil];
-    else [_reverseMap mapObject:entityName withKey:recordType];
+    if ([_reverseMap[recordType] isEqualToString:recordType]) [_reverseMap mapObject:entityName withKey:recordType];
+    else @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:recordType userInfo:nil];
     [_entities addObject:entityName];
     [_recordTypes addObject:recordType];
 }

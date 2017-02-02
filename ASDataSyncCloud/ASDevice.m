@@ -8,6 +8,7 @@
 
 #import "ASDevice.h"
 #import "NSUUID+NSData.h"
+#import "ASCloudInternalConst.h"
 
 @interface ASObjectRepresentation(protected)
 
@@ -49,7 +50,7 @@
 }
 
 + (NSString *)entityName {
-    return @"Device";
+    return ASCloudDevicesInfoRecordType;
 }
 
 

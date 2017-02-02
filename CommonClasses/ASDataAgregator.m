@@ -48,6 +48,7 @@
         [self.watchConnector setAgregator:self];
         watchContextSet = [NSMutableSet new];
 #warning UNCOMPLETED reload "replication needed" status
+        cloudManagers = [NSMutableDictionary new];
     }
     return self;
 }

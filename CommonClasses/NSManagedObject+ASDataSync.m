@@ -7,6 +7,7 @@
 //
 
 #import "NSManagedObject+ASDataSync.h"
+#import "NSUUID+NSData.h"
 
 @implementation NSManagedObject (ASDataSync)
 
@@ -16,6 +17,13 @@
 
 + (NSString *)entityName {
     return [NSString stringWithString:self.entity.name];
+}
+
+- (NSString *)UUIDString {
+    if ([self respondsToSelector:@selector(uniqueData)]) {
+        return ((NSData *)[(NSManagedObject<ASReference> *)self uniqueData]).UUIDString;
+    }
+    return nil;
 }
 
 + (void)selectObjectsFromContext:(NSManagedObjectContext *)context fetch:(FetchArray)fetch {

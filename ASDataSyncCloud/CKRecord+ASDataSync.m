@@ -37,12 +37,16 @@
     return self.recordID.UUID.data;
 }
 
+- (NSString *)UUIDString {
+    return self.recordID.recordName;
+}
+
 - (NSDate *)modificationDate {
     return self[ASCloudRealModificationDateProperty];
 }
 
 - (NSString *)entityName {
-    @throw [NSException exceptionWithName:NSObjectInaccessibleException reason:nil userInfo:nil];
+    @throw [NSException exceptionWithName:NSObjectInaccessibleException reason:[NSString stringWithFormat:@"%@ %@", self.recordType, self.UUIDString] userInfo:nil];
     return nil;
 }
 
