@@ -14,11 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ASCloudManager : NSObject
 
 + (instancetype)defaultManager;
-- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(nullable ASCloudMapping *)mapping;
-- (void)initContainerWithIdentifier:(NSString *)identifier;
+- (instancetype)initWithContainerIdentifier:(NSString *)identifier;
 - (BOOL)ready;
 
-- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
+
 
 @end
 

@@ -90,8 +90,12 @@
 
 #pragma mark - cloud support
 
-- (void)enableCloudSynchronization {
-    [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self];
+- (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier {
+    [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self forCloudContainerIdentifier:containerIdentifier];
+}
+
+- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo {
+    
 }
 
 - (ASCloudMapping *)autoMapping {
@@ -108,7 +112,7 @@
                         continue;
                     }
                 }
-                [selfAutoMapping registerSynchronizableEntity:entity.name];
+                [selfAutoMapping addEntity:entity.name];
             }
         }
     }
@@ -390,7 +394,7 @@
     static dispatch_once_t pred;
     static id shared = nil;
     dispatch_once(&pred, ^{
-        shared = [[super alloc] initDefaultContext];
+        shared = [[self alloc] initDefaultContext];
     });
     return shared;
 }

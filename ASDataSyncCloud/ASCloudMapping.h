@@ -11,20 +11,28 @@
 #ifndef ASCloudMapping_h
 #define ASCloudMapping_h
 
-@interface ASCloudMapping : NSObject
+@protocol ASKeyedSubscripted <NSObject>
 
 - (NSString *)objectForKeyedSubscript:(NSString *)key;
+
+@end
+
+@interface ASCloudMapping : NSObject
+
+- (NSString *)objectForKeyedSubscript:(NSString *)key; //recordType by entityName
 
 + (instancetype)mappingWithSynchronizableEntities:(NSArray <NSString *> *)entities;
 + (instancetype)mappingWithRecordTypeKeyedByEntityNameDictionary:(NSDictionary <NSString *, NSString *> *)dictionary;
 
-- (NSDictionary *)map; //recordType keyed by entityName
-- (NSDictionary *)reverseMap; //entityName keyed by recordType
+@property (nonatomic, strong, readonly) id <ASKeyedSubscripted> map; //recordType by entityName
+@property (nonatomic, strong, readonly) id <ASKeyedSubscripted> reverseMap; //entityName by recordType
 - (NSSet <NSString *> *)synchronizableEntities; //all cloud-synchronizable entities
+- (NSSet <NSString *> *)allRecordTypes;
 
 //mutable
 - (void)mapRecordType:(NSString *)recordType withEntityName:(NSString *)entityName;
-- (void)registerSynchronizableEntity:(NSString *)entityName;
+- (void)addEntity:(NSString *)entityName;
+- (void)addEntities:(NSArray<NSString *> *)entities;
 
 @end
 

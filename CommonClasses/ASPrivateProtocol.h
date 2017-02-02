@@ -9,7 +9,7 @@
 
 @protocol ASRepresentableTransaction;
 @protocol ASDataSyncContextPrivate;
-@protocol ASCloudManager;
+@protocol ASCloudManager, ASCloudMappingProvider;
 @protocol ASWatchConnector;
 
 @protocol ASTransactionsAgregator;
@@ -44,10 +44,14 @@
 
 @protocol ASCloudManager <ASTransactionsAgregator>
 @required
-@property (nonatomic, strong, readonly) ASCloudMapping *mapping;
-
-- (void)setDataSyncContext:(id <ASDataSyncContextPrivate>)context;
+- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
+- (void)setDataSyncContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context;
 - (BOOL)ready;
+@end
+
+@protocol ASCloudMappingProvider <NSObject>
+
+- (ASCloudMapping *)cloudMapping;
 
 @end
 
@@ -65,6 +69,8 @@
 @protocol ASTransactionsAgregator <NSObject>
 @required
 - (void)willCommitTransaction:(id <ASRepresentableTransaction>)transaction;
+@optional
+- (void)context:(id <ASDataSyncContextPrivate>)context recievedPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 @end
 
 @protocol ASWatchTransactionsAgregator <NSObject>

@@ -6,27 +6,30 @@
 //  Copyright © 2016 Anobisoft. All rights reserved.
 //
 
-#import "ASCloudManager.h"
 #import <CloudKit/CloudKit.h>
+#import "ASCloudManager.h"
+
 #import "ASDeviceList.h"
-#import "ASCloudRecord.h"
-#import "ASCloudReference.h"
-#import "ASCloudTransaction.h"
 #import "ASPrivateProtocol.h"
 #import "NSUUID+NSData.h"
 
-typedef void (^FetchRecord)(__kindof ASCloudRecord *record);
-typedef void (^FetchRecordsArray)(NSArray <__kindof ASCloudRecord *> *records);
+#import "ASCloudTransaction.h"
+#import "ASCloudRecordRepresentation.h"
+#import "ASCloudDescriptionRepresentation.h"
+#import "CKRecord+ASDataSync.h"
+#import "CKRecordID+ASDataSync.h"
+#import "CKReference+ASDataSync.h"
+
+#import "ASCloudInternalConst.h"
+
+typedef void (^FetchRecord)(__kindof CKRecord *record);
+typedef void (^FetchRecordsArray)(NSArray <__kindof CKRecord *> *records);
 
 typedef NS_ENUM(NSUInteger, ASCloudState) {
     ASCloudStateAccountStatusAvailable = 1 << 0,
     ASCloudStateDeviceUpdated = 1 << 1,
     ASCloudStateDevicesReloaded = 1 << 2,
 };
-
-
-#define kASCloudManagerLastSyncDateForEntityDictionary @"ASCloudManagerLastSyncDateForEntityDictionary"
-#define kASCloudObjectDeletionInfoRecordType @"DeleteQueue"
 
 @interface ASCloudManager() <ASCloudManager>
     @property (nonatomic, strong, readonly) NSDictionary <NSString *, NSDate *> *lastSyncDateForEntity;
@@ -37,14 +40,26 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
     ASCloudState state;
     CKContainer *container;
     CKDatabase *db;
-    id <ASDataSyncContextPrivate> syncContext;
+    id <ASDataSyncContextPrivate, ASCloudMappingProvider> syncContext;
     ASDeviceList *deviceList;
-    NSMutableArray <ASCloudRecord *> *recordsToSave;
-    NSMutableArray <ASCloudID *> *recordIDsToDelete;
-    NSMutableSet <ASCloudRecord *> *_updatedRecords, *_deletionInfoRecords;
+    NSMutableArray <CKRecord *> *recordsToSave;
+    NSMutableArray <CKRecordID *> *recordIDsToDelete;
+    NSMutableSet <CKRecord *> *_cloudUpdatedRecords, *_cloudUpdatedDeletionInfoRecords;
     dispatch_group_t enqueueUpdateWithSyncronizableObjectGroup;
     dispatch_group_t reloadAllMappedRecordsTotalGroup;
+    dispatch_group_t reloadDevicesGroup;
     dispatch_queue_t waitingQueue;
+    
+    
+    
+}
+
+- (NSSet <CKRecord <ASMappedObject> *> *)cloudUpdatedRecords {
+    return _cloudUpdatedRecords.copy;
+}
+
+- (NSSet <CKRecord <ASMappedObject> *> *)cloudUpdatedDeletionInfoRecords {
+    return _cloudUpdatedDeletionInfoRecords.copy;
 }
 
 #pragma mark - ASCloudManager
@@ -54,19 +69,37 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
     return (state & requiredState) == requiredState;
 }
 
-- (NSSet<id<ASMappedObject>> *)updatedRecords {
-    return _updatedRecords.copy;
+- (NSSet<CKRecord<ASMappedObject> *> *)updatedRecords {
+    return _cloudUpdatedRecords.copy;
 }
 
-- (NSSet<id<ASMappedObject>> *)deletionInfoRecords {
-    return _deletionInfoRecords.copy;
+- (NSSet<CKRecord<ASMappedObject> *> *)deletionInfoRecords {
+    return _cloudUpdatedDeletionInfoRecords.copy;
 }
 
-- (void)setDataSyncContext:(id<ASDataSyncContextPrivate>)context {
+- (void)setDataSyncContext:(id<ASDataSyncContextPrivate, ASCloudMappingProvider>)context {
     syncContext = context;
+    dispatch_async(waitingQueue, ^{
+        dispatch_group_wait(reloadDevicesGroup, DISPATCH_TIME_FOREVER);
+        [self subscribeToRegisteredRecordTypes];
+        [self startReplication];
+    });
 }
 
-@synthesize mapping = _mapping;
+- (ASCloudMapping *)mapping {
+    return syncContext.cloudMapping;
+}
+
+- (id<ASDataSyncContextPrivate, ASCloudMappingProvider>)dataSyncContext {
+    return syncContext;
+}
+
+- (void)startReplication {
+    [self reloadAllMappedRecordsTotal:NO completion:^{
+#warning select newest local records
+    }];
+}
+
 
 #pragma mark - lastSyncDateForEntity
 
@@ -74,7 +107,7 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
 NSMutableDictionary *lastSyncDateForEntityMutable;
 - (NSDictionary <NSString *, NSDate *> *)lastSyncDateForEntity {
     if (!_lastSyncDateForEntity) {
-        _lastSyncDateForEntity = [[NSUserDefaults standardUserDefaults] objectForKey:kASCloudManagerLastSyncDateForEntityDictionary];
+        _lastSyncDateForEntity = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@-%@", ASCloudLastSyncDateForEntityUDKey, container.containerIdentifier]];
         if (!_lastSyncDateForEntity) _lastSyncDateForEntity = @{};
     }
     return _lastSyncDateForEntity;
@@ -86,7 +119,7 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
         [lastSyncDateForEntityMutable removeObjectForKey:entity];
     }
     _lastSyncDateForEntity = lastSyncDateForEntityMutable.copy;
-    [[NSUserDefaults standardUserDefaults] setObject:_lastSyncDateForEntity forKey:kASCloudManagerLastSyncDateForEntityDictionary];
+    [[NSUserDefaults standardUserDefaults] setObject:_lastSyncDateForEntity forKey:[NSString stringWithFormat:@"%@-%@", ASCloudLastSyncDateForEntityUDKey, container.containerIdentifier]];
 }
 
 #pragma mark - initialization
@@ -107,47 +140,54 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
     static dispatch_once_t pred;
     static id shared = nil;
     dispatch_once(&pred, ^{
-        shared = [[super alloc] initUniqueInstance];
+        shared = [[self alloc] initUniqueInstance];
     });
     return shared;
 }
 
 - (instancetype)initUniqueInstance {
+    if (self = [self init]) {
+        
+    }
+    return self;
+}
+
+- (instancetype)init {
     if (self = [super init]) {
         lastSyncDateForEntityMutable = self.lastSyncDateForEntity.mutableCopy;
         deviceList = [ASDeviceList defaultList];
         enqueueUpdateWithSyncronizableObjectGroup = dispatch_group_create();
+        reloadAllMappedRecordsTotalGroup = dispatch_group_create();
+        reloadDevicesGroup = dispatch_group_create();
         waitingQueue = dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     }
     return self;
 }
 
-- (void)initContainerWithIdentifier:(NSString *)identifier {
-    [self initContainerWithIdentifier:identifier entityMapping:nil];
-}
-
-- (void)initContainerWithIdentifier:(NSString *)identifier entityMapping:(ASCloudMapping *)mapping {
-    container = [CKContainer containerWithIdentifier:identifier];
-    if (mapping) {
-        _mapping = mapping;
-    }
-    
-    [container accountStatusWithCompletionHandler:^(CKAccountStatus accountStatus, NSError * _Nullable error) {
-        if (error) NSLog(@"%@", [error localizedDescription]);
-        else {
-            if (accountStatus == CKAccountStatusAvailable) {
-                state |= ASCloudStateAccountStatusAvailable;                
-#ifdef DEBUG
-                db = container.publicCloudDatabase;
-#else
-                db = container.privateCloudDatabase;
-#endif
-                [self updateDevices];
+- (instancetype)initWithContainerIdentifier:(NSString *)identifier {
+    if (self = [self init]) {
+        container = [CKContainer containerWithIdentifier:identifier];
+        dispatch_group_enter(reloadDevicesGroup);
+        [container accountStatusWithCompletionHandler:^(CKAccountStatus accountStatus, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"%@", [error localizedDescription]);
+                dispatch_group_leave(reloadDevicesGroup);
             } else {
-                state ^= state & ASCloudStateAccountStatusAvailable;
+                if (accountStatus == CKAccountStatusAvailable) {
+                    state |= ASCloudStateAccountStatusAvailable;
+#ifdef DEBUG
+                    db = container.publicCloudDatabase;
+#else
+                    db = container.privateCloudDatabase;
+#endif
+                    [self updateDevices];
+                } else {
+                    state ^= state & ASCloudStateAccountStatusAvailable;
+                }
             }
-        }
-    }];
+        }];
+    }
+    return self;
 }
 
 #pragma mark - Remote notification accepting
@@ -161,12 +201,13 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
             NSLog(@"[ERROR] failed to subscribe to %@. %@", qsubs.recordType, error.localizedDescription);
         }
     };
-    for (NSString *entityName in self.mapping.synchronizableEntities) {
-        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:self.mapping[entityName] predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+    for (NSString *recordType in self.mapping.allRecordTypes) {
+        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
         [db saveSubscription:subscription completionHandler:completionHandler];
     }
     
-    CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:kASCloudObjectDeletionInfoRecordType predicate:[NSPredicate predicateWithFormat:@"dq_deviceID == %@", [ASDeviceList defaultList].thisDevice.UUIDString] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+    NSPredicate *thisDeviceFilter = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"%@ == %%@", ASCloudDeletionInfoRecordProperty_deviceID], [ASDeviceList defaultList].thisDevice.UUIDString];
+    CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:thisDeviceFilter options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
     [db saveSubscription:subscription completionHandler:completionHandler];
     
 
@@ -176,22 +217,26 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     CKNotification *notification = [CKNotification notificationFromRemoteNotificationDictionary:userInfo];
     if (notification.notificationType == CKNotificationTypeQuery && notification.containerIdentifier == container.containerIdentifier) {
         CKQueryNotification *queryNotification = (CKQueryNotification *)notification;
-        [self recordByRecordID:queryNotification.recordID fetch:^(ASCloudRecord *record) {
+        [self recordByRecordID:queryNotification.recordID fetch:^(CKRecord <ASMappedObject>*record) {
             if (!self.ready) @throw [NSException exceptionWithName:@"ASCloudManager not ready" reason:@"" userInfo:nil];
             if (record) {
                 NSString *entityName = self.mapping[record.recordType];
                 if ([record.recordType isEqualToString:[ASDevice entityName]]) {
-                    ASDevice *device = [ASDevice deviceWithMappedObject:record];
+                    ASDevice *device = [ASDevice deviceWithMappedObject:(CKRecord <ASMappedObject> *)record];
                     NSLog(@"[DEBUG] create device.UUIDString %@", device.UUIDString);
                     [deviceList addDevice:device];
-                } else if ([record.recordType isEqualToString:kASCloudObjectDeletionInfoRecordType]) {
-                    [_deletionInfoRecords addObject:record];
-                    [syncContext performMergeWithTransaction:[ASCloudTransaction transactionWithUpdatedRecords:_updatedRecords deletionInfoRecords:_deletionInfoRecords mapping:self.mapping]];
-                    [_deletionInfoRecords removeAllObjects];
+                } else if ([record.recordType isEqualToString:ASCloudDeletionInfoRecordType]) {
+                    [_cloudUpdatedDeletionInfoRecords addObject:record];
+                    [syncContext performMergeWithTransaction:[ASCloudTransaction transactionWithUpdatedRecords:self.cloudUpdatedRecords
+                                                                                           deletionInfoRecords:self.cloudUpdatedDeletionInfoRecords
+                                                                                                       mapping:self.mapping]];
+                    [_cloudUpdatedDeletionInfoRecords removeAllObjects];
                 } else if (entityName) {
-                    [_updatedRecords addObject:record];
-                    [syncContext performMergeWithTransaction:[ASCloudTransaction transactionWithUpdatedRecords:_updatedRecords deletionInfoRecords:_deletionInfoRecords mapping:self.mapping]];
-                    [_updatedRecords removeAllObjects];
+                    [_cloudUpdatedRecords addObject:record];
+                    [syncContext performMergeWithTransaction:[ASCloudTransaction transactionWithUpdatedRecords:self.cloudUpdatedRecords
+                                                                                           deletionInfoRecords:self.cloudUpdatedDeletionInfoRecords
+                                                                                                       mapping:self.mapping]];
+                    [_cloudUpdatedRecords removeAllObjects];
                 }
 
             } else {
@@ -202,12 +247,12 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 }
 
 - (void)willCommitTransaction:(id<ASRepresentableTransaction>)transaction {
-    NSSet <id <ASMappedObject>> *updatedObjects = transaction.updatedObjects;
-    NSSet <id <ASDescription>> *deletedObjects = transaction.deletedObjects;
-    for (id <ASMappedObject> mappedObject in updatedObjects) {
+    NSSet <NSObject<ASMappedObject> *> *updatedObjects = transaction.updatedObjects;
+    NSSet <NSObject<ASDescription> *> *deletedObjects = transaction.deletedObjects;
+    for (NSObject<ASMappedObject> *mappedObject in updatedObjects) {
         [self enqueueUpdateWithMappedObject:mappedObject];
     }
-    for (id <ASDescription> description in deletedObjects) {
+    for (NSObject<ASDescription> *description in deletedObjects) {
         [self enqueueDeletionWithDescription:description];
     }
     [self pushQueueWithSuccessBlock:nil];
@@ -223,6 +268,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
             [self reloadDevises];
         } else {
             state ^= state & ASCloudStateDeviceUpdated;
+            dispatch_group_leave(reloadDevicesGroup);
         }
     }];
 }
@@ -231,30 +277,30 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    [self getAllRecordsOfEntityName:[ASDevice entityName] fetch:^(NSArray<__kindof ASCloudRecord *> *records) {
+    [self getAllRecordsOfEntityName:[ASDevice entityName] fetch:^(NSArray<__kindof CKRecord *> *records) {
         if (records) {
-            for (ASCloudRecord *record in records) {
+            for (CKRecord<ASMappedObject> *record in records) {
                 ASDevice *device = [ASDevice deviceWithMappedObject:record];
                 NSLog(@"[DEBUG] create device.UUIDString %@", device.UUIDString);
                 [deviceList addDevice:device];
             }
             state |= ASCloudStateDevicesReloaded;
-            [self subscribeToRegisteredRecordTypes];
             NSLog(@"deviceList %@", deviceList.devices);
         } else {
             state ^= state & ASCloudStateDevicesReloaded;
         }
+        dispatch_group_leave(reloadDevicesGroup);
     }];
 }
 
-- (void)reloadAllMappedRecordsTotal:(BOOL)total {
+- (void)reloadAllMappedRecordsTotal:(BOOL)total completion:(void(^)(void))completion {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     for (NSString *entityName in self.mapping.synchronizableEntities) {
-        FetchRecordsArray fetchArrayBlock = ^(NSArray<__kindof ASCloudRecord *> *records) {
-            for (ASCloudRecord *record in records) {
-                [_updatedRecords addObject:record];
+        FetchRecordsArray fetchArrayBlock = ^(NSArray<__kindof CKRecord *> *records) {
+            for (CKRecord *record in records) {
+                [_cloudUpdatedRecords addObject:record];
             }
             dispatch_group_leave(reloadAllMappedRecordsTotalGroup);
         };
@@ -264,13 +310,24 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         } else {
             [self getNewRecordsOfEntityName:entityName fetch:fetchArrayBlock];
         }
-        
     }
+    
+    dispatch_group_enter(reloadAllMappedRecordsTotalGroup);
+    [self getAllRecordsOfEntityName:ASCloudDeletionInfoRecordType fetch:^(NSArray<__kindof CKRecord *> *records) {
+        for (CKRecord *record in records) {
+            [_cloudUpdatedDeletionInfoRecords addObject:record];
+        }
+        dispatch_group_leave(reloadAllMappedRecordsTotalGroup);
+    }];
+    
     dispatch_async(waitingQueue, ^{
         dispatch_group_wait(reloadAllMappedRecordsTotalGroup, DISPATCH_TIME_FOREVER);
-        [syncContext performMergeWithTransaction:[ASCloudTransaction transactionWithUpdatedRecords:_updatedRecords deletionInfoRecords:_deletionInfoRecords mapping:self.mapping]];
-        [_updatedRecords removeAllObjects];
-        [_deletionInfoRecords removeAllObjects];
+        [syncContext performMergeWithTransaction:[ASCloudTransaction transactionWithUpdatedRecords:self.cloudUpdatedRecords
+                                                                               deletionInfoRecords:self.cloudUpdatedDeletionInfoRecords
+                                                                                           mapping:self.mapping]];
+        [_cloudUpdatedRecords removeAllObjects];
+        [_cloudUpdatedDeletionInfoRecords removeAllObjects];
+        
     });
 
 }
@@ -323,7 +380,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     
 }
 
-- (void)recordByRecordID:(ASCloudID *)recordID fetch:(void (^)(ASCloudRecord *record))fetch {
+- (void)recordByRecordID:(CKRecordID *)recordID fetch:(void (^)(CKRecord<ASMappedObject> *record))fetch {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
@@ -352,21 +409,20 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     [db addOperation:fetchOperation];
 }
 
-- (void)enqueueUpdateWithMappedObject:(id <ASMappedObject>)syncObject {
+- (void)enqueueUpdateWithMappedObject:(NSObject<ASMappedObject> *)syncObject {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     dispatch_group_enter(enqueueUpdateWithSyncronizableObjectGroup);
-    ASCloudID *recordID = [ASCloudID cloudIDWithUUIDString:syncObject.UUIDString];
-    [self recordByRecordID:recordID fetch:^(ASCloudRecord *record) {
+    CKRecordID *recordID = [CKRecordID recordIDWithUUIDString:syncObject.UUIDString];
+    [self recordByRecordID:recordID fetch:^(CKRecord<ASMappedObject> *record) {
         if (record) {
             if ([record.modificationDate compare:syncObject.modificationDate] != NSOrderedAscending) {
                 dispatch_group_leave(enqueueUpdateWithSyncronizableObjectGroup);
                 return ; // record update no needed
             }
-             
         } else {
-            record = [ASCloudRecord recordWithRecordType:syncObject.entityName recordID:recordID];
+            record = (CKRecord<ASMappedObject> *)[CKRecord recordWithRecordType:syncObject.entityName recordID:recordID];
         }
         record.keyedDataProperties = syncObject.keyedDataProperties;
         record.modificationDate = syncObject.modificationDate;
@@ -379,13 +435,13 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    ASCloudID *recordID = [ASCloudID cloudIDWithUUIDString:description.UUIDString];
+    CKRecordID *recordID = [CKRecordID recordIDWithUUIDString:description.UUIDString];
     [recordIDsToDelete addObject:recordID];
     for (ASDevice *device in [ASDeviceList defaultList]) {
-        ASCloudRecord *deletionInfo = [ASCloudRecord recordWithRecordType:kASCloudObjectDeletionInfoRecordType];
-        deletionInfo[@"dq_recordType"] = self.mapping[description.entityName];
-        deletionInfo[@"dq_recordID"] = description.UUIDString;
-        deletionInfo[@"dq_deviceID"] = device.UUIDString;
+        CKRecord *deletionInfo = [CKRecord recordWithRecordType:ASCloudDeletionInfoRecordType];
+        deletionInfo[ASCloudDeletionInfoRecordProperty_recordType] = self.mapping[description.entityName];
+        deletionInfo[ASCloudDeletionInfoRecordProperty_recordID] = description.UUIDString;
+        deletionInfo[ASCloudDeletionInfoRecordProperty_deviceID] = device.UUIDString;
         [recordsToSave addObject:deletionInfo];
     }
 }
@@ -399,7 +455,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         CKModifyRecordsOperation *mop = [[CKModifyRecordsOperation alloc] initWithRecordsToSave:recordsToSave.copy recordIDsToDelete:recordIDsToDelete.copy];
         NSUInteger recordsToSaveCount = recordsToSave.count;
         NSUInteger recordIDsToDeleteCount = recordIDsToDelete.count;
-        [mop setModifyRecordsCompletionBlock:^(NSArray<ASCloudRecord *> * _Nullable savedRecords, NSArray<ASCloudID *> * _Nullable deletedRecordIDs, NSError * _Nullable operationError) {
+        [mop setModifyRecordsCompletionBlock:^(NSArray<CKRecord *> * _Nullable savedRecords, NSArray<CKRecordID *> * _Nullable deletedRecordIDs, NSError * _Nullable operationError) {
             if (operationError) {
                 NSLog(@"[ERROR] CKModifyRecordsOperation Error: %@", operationError);
                 successBlock(false);

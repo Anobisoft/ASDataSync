@@ -99,6 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 - (void)commit;
 - (void)rollbackCompletion:(nullable void (^)(void))completion;
+- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 @property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
 @end
 
@@ -110,6 +111,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASDataSyncSearchableContext <NSObject>
 - (id <ASFindableReference>)objectByUniqueData:(NSData *)uniqueData entityName:(NSString *)entityName;
 @end
+
+
 
 NS_ASSUME_NONNULL_END
 

@@ -12,14 +12,13 @@
 @interface ASDataAgregator : NSObject
 
 - (void)addWatchSynchronizableContext:(id <ASDataSyncContext>)context;
-- (void)setPrivateCloudContext:(id <ASDataSyncContext>)context;
+- (void)setPrivateCloudContext:(id <ASDataSyncContext>)context forCloudContainerIdentifier:(NSString *)containerIdentifier;
 
-+ (instancetype)defaultAgregator;
-
-+ (instancetype)alloc NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;
 - (id)mutableCopy NS_UNAVAILABLE;
+
++ (instancetype)defaultAgregator;
 
 @end
 

@@ -19,7 +19,6 @@ FOUNDATION_EXPORT const unsigned char ASDataSyncVersionString[];
 
 #import "ASManagedObjectContext.h"
 #import "ASPublicProtocol.h"
-#import "ASCloudManager.h"
 #import "ASWatchConnector.h"
 #import "NSManagedObject+ASDataSync.h"
 #import "NSManagedObjectContext+SQLike.h"

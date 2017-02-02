@@ -8,7 +8,6 @@
 
 #import "ASDevice.h"
 #import "NSUUID+NSData.h"
-#import "ASCloudRecord.h"
 
 @interface ASObjectRepresentation(protected)
 

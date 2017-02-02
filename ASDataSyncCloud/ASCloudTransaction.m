@@ -7,30 +7,31 @@
 //
 
 #import "ASCloudTransaction.h"
-#import "ASCloudRecord.h"
+#import "ASCloudRecordRepresentation.h"
+#import "CKRecord+ASDataSync.h"
 
 @implementation ASCloudTransaction {
-    NSSet <id <ASMappedObject>> *_updatedObjects;
-    NSSet <id <ASDescription>> *_deletedDescriptions;
+    NSSet <NSObject<ASMappedObject> *> *_updatedObjects;
+    NSSet <NSObject<ASDescription> *> *_deletedDescriptions;
 }
 
-+ (instancetype)transactionWithUpdatedRecords:(NSSet <ASCloudRecord *> *)updatedRecords deletionInfoRecords:(NSSet <ASCloudRecord *> *)deletionInfoRecords mapping:(ASCloudMapping *)mapping {
++ (instancetype)transactionWithUpdatedRecords:(NSSet <CKRecord<ASMappedObject> *> *)updatedRecords deletionInfoRecords:(NSSet <CKRecord *> *)deletionInfoRecords mapping:(ASCloudMapping *)mapping {
     return [[self alloc] initWithUpdatedRecords:updatedRecords deletionInfoRecords:deletionInfoRecords mapping:mapping];
 }
 
-- (instancetype)initWithUpdatedRecords:(NSSet <ASCloudRecord *> *)updatedRecords deletionInfoRecords:(NSSet <ASCloudRecord *> *)deletionInfoRecords mapping:(ASCloudMapping *)mapping {
+- (instancetype)initWithUpdatedRecords:(NSSet <CKRecord<ASMappedObject> *> *)updatedRecords deletionInfoRecords:(NSSet <CKRecord *> *)deletionInfoRecords mapping:(ASCloudMapping *)mapping {
     if (self = [super init]) {
         NSMutableSet *tmpSet;
         if (updatedRecords.count) {
             tmpSet = [NSMutableSet new];
-            for (ASCloudRecord *record in updatedRecords) {
+            for (CKRecord<ASMappedObject> *record in updatedRecords) {
                 [tmpSet addObject:[record mappedObjectWithMapping:mapping]];
             }
             _updatedObjects = tmpSet.copy;
         } else _updatedObjects = nil;
         if (deletionInfoRecords.count) {
             tmpSet = [NSMutableSet new];
-            for (ASCloudRecord *record in deletionInfoRecords) {
+            for (CKRecord *record in deletionInfoRecords) {
                 [tmpSet addObject:[record descriptionOfDeletedObjectWithMapping:mapping]];
             }
             _deletedDescriptions = tmpSet.copy;

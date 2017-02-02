@@ -26,8 +26,9 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
+- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 
-- (void)enableCloudSynchronization;
+- (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;

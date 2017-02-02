@@ -47,7 +47,7 @@
     static id shared = nil;
     dispatch_once(&pred, ^{
         if (WCSession.isSupported) {
-            shared = [[super alloc] initUniqueInstance];
+            shared = [[self alloc] initUniqueInstance];
         } else {
             NSLog(@"[ERROR] %s WCSession not supported", __PRETTY_FUNCTION__);
         }

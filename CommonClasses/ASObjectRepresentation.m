@@ -40,7 +40,10 @@
 - (instancetype)initWithMappedObject:(NSObject<ASMappedObject> *)object {
     if (self = [super initWithDescription:object]) {
         _modificationDate = object.modificationDate;
-        _keyedDataProperties = object.keyedDataProperties;
+        NSMutableDictionary *mutableProperties = object.keyedDataProperties.mutableCopy;
+        for (NSString *key in object.keyedDataProperties.allKeys)
+            if ([object.keyedDataProperties[key] isKindOfClass:[NSNull class]]) [mutableProperties removeObjectForKey:key];
+        _keyedDataProperties = mutableProperties.copy;
     }
     return self;
 }

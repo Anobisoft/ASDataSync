@@ -41,7 +41,7 @@ NSString* machine()
     static dispatch_once_t pred;
     static id shared = nil;
     dispatch_once(&pred, ^{
-        shared = [[super alloc] initUniqueInstance];
+        shared = [[self alloc] initUniqueInstance];
     });
     return shared;
 }

@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "ASPrivateProtocol.h"
 
-@class ASCloudRecord;
+@class CKRecord;
 
 @interface ASCloudTransaction : NSObject <ASRepresentableTransaction>
 
-+ (instancetype)transactionWithUpdatedRecords:(NSSet <ASCloudRecord *> *)updatedRecords deletionInfoRecords:(NSSet <ASCloudRecord *> *)deletionInfoRecords mapping:(ASCloudMapping *)mapping;
++ (instancetype)transactionWithUpdatedRecords:(NSSet <CKRecord<ASMappedObject> *> *)updatedRecords deletionInfoRecords:(NSSet <CKRecord *> *)deletionInfoRecords mapping:(ASCloudMapping *)mapping;
 
 @end

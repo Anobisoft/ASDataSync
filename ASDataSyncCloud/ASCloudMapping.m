@@ -9,128 +9,112 @@
 #import "ASCloudMapping.h"
 #import <objc/runtime.h>
 
-//@interface NSDictionary (mapping)
-//
-//
-//@end
-//
-//@implementation NSDictionary(mapping)
-//
-//+ (void)initialize {
-//    [super initialize];
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        Class class = NSDictionary.class;
-//        SEL originalSelector = @selector(objectForKeyedSubscript:);
-//        SEL swizzledSelector = @selector(objectOKForKey:);
-//        
-//        Method originalMethod = class_getInstanceMethod(class, originalSelector);
-//        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-//        
-//        BOOL didAddMethod =
-//        class_addMethod(class,
-//                        originalSelector,
-//                        method_getImplementation(swizzledMethod),
-//                        method_getTypeEncoding(swizzledMethod));
-//        
-//        if (didAddMethod) {
-//            class_replaceMethod(class,
-//                                swizzledSelector,
-//                                method_getImplementation(originalMethod),
-//                                method_getTypeEncoding(originalMethod));
-//        } else {
-//            method_exchangeImplementations(originalMethod, swizzledMethod);
-//        }
-//    });
-//
-//}
-//
-//- (id)objectOKForKey:(id)aKey {
-//    id object = [self objectOKForKey:aKey];
-//    NSLog(@"swizzled object %@ aKey %@", object, aKey);
-//    if (!object && [aKey isKindOfClass:NSString.class]) {
-//        return aKey;
-//    }
-//    return object;
-//}
-//
-//@end
+@interface ASMap : NSObject <ASKeyedSubscripted>
 
-@implementation ASCloudMapping {
-    NSMutableDictionary *mutableMap;
-    NSMutableDictionary *mutableReverseMap;
-    NSMutableSet *mutableSynchronizableEntities;
-}
+- (void)mapObject:(NSString *)object withKey:(NSString *)key;
 
-- (NSString *)objectForKeyedSubscript:(NSString *)key {
-    return self.map[key] ?: self.reverseMap[key] ?: key;
+@end
+
+@implementation ASMap {
+    NSMutableDictionary *map;
 }
 
 - (instancetype)init {
     if (self = [super init]) {
-        mutableMap = [NSMutableDictionary new];
-        mutableSynchronizableEntities = [NSMutableSet new];
-        
+        map = [NSMutableDictionary new];
     }
     return self;
 }
 
+- (NSString *)objectForKeyedSubscript:(NSString *)key {
+    return map[key] ?: key;
+}
+
+- (void)mapObject:(NSString *)object withKey:(NSString *)key {
+    [map setObject:object forKey:key];
+}
+
+@end
+
+@implementation ASCloudMapping {
+    NSMutableSet *_entities;
+    NSMutableSet *_recordTypes;
+    ASMap *_map, *_reverseMap;
+}
+
+- (NSString *)objectForKeyedSubscript:(NSString *)key {
+    return self.map[key];
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _entities = [NSMutableSet new];
+        _recordTypes = [NSMutableSet new];
+        [self emptyMap];
+    }
+    return self;
+}
+
+- (void)emptyMap {
+    _map = [ASMap new];
+    _reverseMap = [ASMap new];
+}
+
 + (instancetype)mappingWithSynchronizableEntities:(NSArray <NSString *> *)entities {
-    return [[super alloc] initWithArray:entities];
+    return [[self alloc] initWithArray:entities];
 }
 
 
 - (instancetype)initWithArray:(NSArray <NSString *> *)array {
-    if (self = [self init]) {
-        mutableSynchronizableEntities = [NSMutableSet setWithArray:array];
+    if (self = [super init]) {
+        _entities = [NSMutableSet setWithArray:array];
+        _recordTypes = _entities.mutableCopy;
+        [self emptyMap];
     }
     return self;
 }
 
 + (instancetype)mappingWithRecordTypeKeyedByEntityNameDictionary:(NSDictionary <NSString *, NSString *> *)dictionary {
-    return [[super alloc] initWithDictionary:dictionary];
+    return [[self alloc] initWithDictionary:dictionary];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary <NSString *, NSString *> *)dictionary {
     if (self = [self init]) {
-        mutableMap = dictionary.mutableCopy;
-        [self reverseRecreate];
+        for (NSString *entityName in dictionary.allKeys) {
+            [self mapRecordType:dictionary[entityName] withEntityName:entityName];
+        }
     }
     return self;
 }
 
-
-- (NSDictionary<NSString *,NSString *> *)map {
-    return mutableMap.copy;
+- (void)mapRecordType:(NSString *)recordType withEntityName:(NSString *)entityName {
+    [_map mapObject:recordType withKey:entityName];
+    if (_reverseMap[recordType]) @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:nil userInfo:nil];
+    else [_reverseMap mapObject:entityName withKey:recordType];
+    [_entities addObject:entityName];
+    [_recordTypes addObject:recordType];
 }
 
-- (NSDictionary<NSString *,NSString *> *)reverseMap {
-    if (!mutableReverseMap) [self reverseRecreate];
-    return mutableReverseMap.copy;
+- (void)addEntity:(NSString *)entityName {
+    [_entities addObject:entityName];
+    [_recordTypes addObject:self.map[entityName]];
+}
+
+- (void)addEntities:(NSArray<NSString *> *)entities {
+    [_entities addObjectsFromArray:entities];
+    for (NSString *entityName in entities) {
+        [_recordTypes addObject:self.map[entityName]];
+    }
 }
 
 - (NSSet<NSString *> *)synchronizableEntities {
-    return mutableSynchronizableEntities.copy;
+    return _entities.copy;
 }
 
-- (void)reverseRecreate {
-    mutableReverseMap = [NSMutableDictionary new];
-    for (NSString *key in mutableMap.allKeys) {
-        mutableReverseMap[mutableMap[key]] = key;
-    }
+- (NSSet<NSString *> *)allRecordTypes {
+    return _recordTypes.copy;
 }
 
-- (void)mapRecordType:(NSString *)recordType withEntityName:(NSString *)entityName {
-    [self registerSynchronizableEntity:entityName];
-    if (![recordType isEqualToString:entityName]) {
-        mutableMap[entityName] = recordType;
-        if (!mutableReverseMap) [self reverseRecreate];
-        else mutableReverseMap[recordType] = entityName;
-    }
-}
 
-- (void)registerSynchronizableEntity:(NSString *)entityName {
-    [mutableSynchronizableEntities addObject:entityName];
-}
 
 @end
