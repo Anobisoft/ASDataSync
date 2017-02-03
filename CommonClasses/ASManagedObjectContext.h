@@ -22,8 +22,6 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 - (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL;
 - (instancetype)initWithStoreURL:(NSURL *)storeURL;
 
-- (NSManagedObjectModel *)model;
-
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
 - (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;

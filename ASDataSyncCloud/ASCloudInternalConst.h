@@ -10,6 +10,7 @@
 #define ASCloudInternalConst_h
 
 #define ASCloudLastSyncDateForEntityUDKey @"ASCloudLastSyncDateForEntityDictionary"
+#define ASCloudSubscriptionsInfoUDKey @"ASCloudSubscriptions"
 
 #define ASCloudDevicesInfoRecordType @"Device"
 

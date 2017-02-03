@@ -7,7 +7,6 @@
 //
 
 #import "ASCloudMapping.h"
-#import <objc/runtime.h>
 
 @interface ASMap : NSObject <ASKeyedSubscripted>
 

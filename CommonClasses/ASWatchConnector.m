@@ -39,7 +39,7 @@
 }
 
 - (void)setAgregator:(id<ASWatchTransactionsAgregator>)agregator {
-    self.agregator = agregator;
+    _agregator = agregator;
 }
 
 + (instancetype)sharedInstance {

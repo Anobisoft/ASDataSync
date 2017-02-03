@@ -11,10 +11,8 @@
 
 @interface ASDeviceList : NSObject <NSFastEnumeration>
 
-+ (instancetype)defaultList;
 - (ASDevice *)thisDevice;
 - (void)addDevice:(ASDevice *)device;
-- (ASDevice *)deviceForUniqueID:(NSData *)uniqueID;
 - (NSArray <ASDevice *> *)devices;
 
 

@@ -92,6 +92,8 @@
 		CEEF8DD31E4334C200CC4B29 /* CKRecordID+ASDataSync.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DD11E4334C200CC4B29 /* CKRecordID+ASDataSync.m */; };
 		CEEF8DD61E4334F400CC4B29 /* CKReference+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DD41E4334F400CC4B29 /* CKReference+ASDataSync.h */; };
 		CEEF8DD71E4334F400CC4B29 /* CKReference+ASDataSync.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DD51E4334F400CC4B29 /* CKReference+ASDataSync.m */; };
+		CEEF8DDC1E44DF9100CC4B29 /* ASLocalTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DDA1E44DF9100CC4B29 /* ASLocalTransaction.h */; };
+		CEEF8DDD1E44DF9100CC4B29 /* ASLocalTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DDB1E44DF9100CC4B29 /* ASLocalTransaction.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -146,6 +148,8 @@
 		CEEF8DD41E4334F400CC4B29 /* CKReference+ASDataSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CKReference+ASDataSync.h"; sourceTree = "<group>"; };
 		CEEF8DD51E4334F400CC4B29 /* CKReference+ASDataSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CKReference+ASDataSync.m"; sourceTree = "<group>"; };
 		CEEF8DD81E435DCA00CC4B29 /* ASCloudInternalConst.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASCloudInternalConst.h; sourceTree = "<group>"; };
+		CEEF8DDA1E44DF9100CC4B29 /* ASLocalTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLocalTransaction.h; sourceTree = "<group>"; };
+		CEEF8DDB1E44DF9100CC4B29 /* ASLocalTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASLocalTransaction.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -262,6 +266,8 @@
 				CE9D884D1E31F7F4007158BE /* ASRelatableObjectRepresentation.m */,
 				CE6C399A1DC1DF550047B3A8 /* ASTransactionRepresentation.h */,
 				CE6C399B1DC1DF550047B3A8 /* ASTransactionRepresentation.m */,
+				CEEF8DDA1E44DF9100CC4B29 /* ASLocalTransaction.h */,
+				CEEF8DDB1E44DF9100CC4B29 /* ASLocalTransaction.m */,
 			);
 			name = Representation;
 			sourceTree = "<group>";
@@ -289,6 +295,7 @@
 				CEEF8DCE1E432FA500CC4B29 /* ASCloudRecordRepresentation.h in Headers */,
 				CE6C394E1DC1DDF40047B3A8 /* ASDataSync.h in Headers */,
 				CE6C39C41DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */,
+				CEEF8DDC1E44DF9100CC4B29 /* ASLocalTransaction.h in Headers */,
 				CEEF8DD21E4334C200CC4B29 /* CKRecordID+ASDataSync.h in Headers */,
 				CEEF8DD61E4334F400CC4B29 /* CKReference+ASDataSync.h in Headers */,
 				CEEF8DCA1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h in Headers */,
@@ -471,6 +478,7 @@
 				CE6C39BE1DC1DF550047B3A8 /* ASObjectRepresentation.m in Sources */,
 				CE9D88451E31D930007158BE /* NSUUID+NSData.m in Sources */,
 				CEEF8DD71E4334F400CC4B29 /* CKReference+ASDataSync.m in Sources */,
+				CEEF8DDD1E44DF9100CC4B29 /* ASLocalTransaction.m in Sources */,
 				CEEF8DCF1E432FA500CC4B29 /* ASCloudRecordRepresentation.m in Sources */,
 				CE6C39D61DC1DF550047B3A8 /* NSManagedObject+ASDataSync.m in Sources */,
 				CEEF8DCB1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.m in Sources */,
