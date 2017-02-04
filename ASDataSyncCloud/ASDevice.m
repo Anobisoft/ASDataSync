@@ -33,6 +33,10 @@
     _uniqueData = UUID.data;
 }
 
+- (void)setUUIDString:(NSString *)UUIDString {
+    _uniqueData = [NSUUID UUIDWithUUIDString:UUIDString].data;
+}
+
 - (void)setUniqueData:(NSData *)uniqueData {
     _uniqueData = uniqueData;
 }

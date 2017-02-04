@@ -14,5 +14,6 @@
 + (instancetype)deviceWithMappedObject:(id <ASMappedObject>)mappedObject;
 
 - (void)setUUID:(NSUUID *)UUID;
+- (void)setUUIDString:(NSString *)UUIDString;
 
 @end

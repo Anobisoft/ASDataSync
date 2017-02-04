@@ -55,13 +55,17 @@
     __block NSMutableSet <NSManagedObject<ASMappedObject> *> *result = [NSMutableSet new];;
     [self performBlockAndWait:^{
         for (NSManagedObject *obj in super.insertedObjects) {
-            if ([obj conformsToProtocol:@protocol(ASMappedObject)]) {
-                [result addObject:(NSManagedObject<ASMappedObject> *)obj];
+            if ([obj conformsToProtocol:@protocol(ASMutableMappedObject)]) {
+                NSManagedObject<ASMutableMappedObject> *mappedObject = (NSManagedObject<ASMutableMappedObject> *)obj;
+                mappedObject.modificationDate = [NSDate date];
+                [result addObject:mappedObject];
             }
         }
         for (NSManagedObject *obj in super.updatedObjects) {
-            if ([obj conformsToProtocol:@protocol(ASMappedObject)]) {
-                [result addObject:(NSManagedObject<ASMappedObject> *)obj];
+            if ([obj conformsToProtocol:@protocol(ASMutableMappedObject)]) {
+                NSManagedObject<ASMutableMappedObject> *mappedObject = (NSManagedObject<ASMutableMappedObject> *)obj;
+                mappedObject.modificationDate = [NSDate date];
+                [result addObject:mappedObject];
             }
         }
     }];

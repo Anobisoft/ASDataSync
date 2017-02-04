@@ -17,9 +17,7 @@
 
 @end
 
-@interface ASCloudMapping : NSObject
-
-- (NSString *)objectForKeyedSubscript:(NSString *)key; //recordType by entityName
+@interface ASCloudMapping : NSObject <ASKeyedSubscripted> //recordType by entityName
 
 + (instancetype)mappingWithSynchronizableEntities:(NSArray <NSString *> *)entities;
 + (instancetype)mappingWithRecordTypeKeyedByEntityNameDictionary:(NSDictionary <NSString *, NSString *> *)dictionary;
