@@ -46,7 +46,7 @@
 }
 
 - (NSString *)entityName {
-    @throw [NSException exceptionWithName:NSObjectInaccessibleException reason:[NSString stringWithFormat:@"%@ %@", self.recordType, self.UUIDString] userInfo:nil];
+    @throw [NSException exceptionWithName:NSObjectInaccessibleException reason:[NSString stringWithFormat:@"[NOTICE] -[CKRecord entityName] unavailable. recordType %@ UUID %@", self.recordType, self.UUIDString] userInfo:nil];
     return nil;
 }
 
@@ -79,7 +79,7 @@
     for (id<ASReference> reference in setOfReferences) {
         [tmpArray addObject:[CKReference referenceWithUniqueData:reference.uniqueData]];
     }
-    self[relationKey] = tmpArray.copy;
+    self[relationKey] = tmpArray.count ? tmpArray.copy : nil;
 }
 
 

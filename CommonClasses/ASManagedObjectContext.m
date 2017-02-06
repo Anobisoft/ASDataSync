@@ -39,6 +39,7 @@
     NSString *name;
     ASCloudMapping *cloudMapping;
     id<ASTransactionsAgregator> transactionsAgregator;
+    id<ASCloudManager> ownedCloudManager;
 }
 
 @synthesize delegate = _delegate;
@@ -72,12 +73,12 @@
     return result.copy;
 }
 
-- (NSSet <NSManagedObject<ASDescription> *> *)deletedObjects {
-    __block NSMutableSet <NSManagedObject<ASDescription> *> *result = [NSMutableSet new];
+- (NSSet <NSObject<ASDescription> *> *)deletedObjects {
+    __block NSMutableSet <NSObject<ASDescription> *> *result = [NSMutableSet new];
     [self performBlockAndWait:^{
         for (NSManagedObject *obj in super.deletedObjects) {
             if ([obj conformsToProtocol:@protocol(ASDescription)]) {
-                [result addObject:(NSManagedObject<ASDescription> *)obj];
+                [result addObject:[ASDescriptionRepresentation instantiateWithDescription:(NSManagedObject <ASDescription> *)obj]];
             }
         }
     }];
@@ -90,12 +91,22 @@
 
 #pragma mark - cloud support
 
+- (void)setCloudManager:(id<ASCloudManager>)cloudManager {
+    ownedCloudManager = cloudManager;
+}
+
 - (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier {
     [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self forCloudContainerIdentifier:containerIdentifier];
 }
 
 - (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo {
-    
+    if (ownedCloudManager) [ownedCloudManager acceptPushNotificationWithUserInfo:userInfo];
+    else NSLog(@"[ERROR] owned cloud manager unordered");
+}
+
+- (void)cloudReplication {
+    if (ownedCloudManager) [ownedCloudManager smartReplication];
+    else NSLog(@"[ERROR] owned cloud manager unordered");
 }
 
 - (ASCloudMapping *)cloudMapping {
@@ -204,8 +215,8 @@
                 NSManagedObject <ASFindableReference> *foundObject = [self objectByDescription:recievedMappedObject];
                 NSManagedObject <ASManagedObject> *managedObject;
                 if (foundObject) {
-                    if ([foundObject.class conformsToProtocol:@protocol(ASMutableMappedObject)]) {
-                        NSManagedObject <ASMutableMappedObject> *managedObject = (NSManagedObject <ASMutableMappedObject> *)foundObject;
+                    if ([foundObject.class conformsToProtocol:@protocol(ASManagedObject)]) {
+                        managedObject = (NSManagedObject <ASManagedObject> *)foundObject;
                         if ([managedObject.modificationDate compare:recievedMappedObject.modificationDate] == NSOrderedAscending) {
                             managedObject.modificationDate = recievedMappedObject.modificationDate;
                             managedObject.keyedDataProperties = recievedMappedObject.keyedDataProperties;
@@ -221,6 +232,7 @@
                 BOOL relatableToMany = [recievedMappedObject conformsToProtocol:@protocol(ASRelatableToMany)];
                 
                 if (relatableToOne || relatableToMany) {
+                    NSLog(@"[DEBUG] recievedMappedObject %@ %@", relatableToOne ? @"relatableToOne" : @"", relatableToMany ? @"relatableToMany" : @"");
                     WholeShit *theWholeShit = [WholeShit new];
                     if (relatableToOne) {
                         theWholeShit.recievedRelationsToOne = (NSObject <ASRelatableToOne> *)recievedMappedObject;
@@ -238,10 +250,16 @@
             }
         }
         
+        NSLog(@"[DEBUG] theTotalShit %@ count %ld", theTotalShit, (long)theTotalShit.count);
+        
         for (WholeShit *theWholeShit in theTotalShit) {
+            NSLog(@"[DEBUG] theWholeShit.managedObject %@", theWholeShit.managedObject);
             if (theWholeShit.recievedRelationsToOne && [theWholeShit.managedObject conformsToProtocol:@protocol(ASMutableRelatableToOne)]) {
+                NSLog(@"[DEBUG] theWholeShit.recievedRelationsToOne %@", theWholeShit.recievedRelationsToOne);
                 NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *managedObjectRelatableToOne = (NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *)theWholeShit.managedObject;
+                NSLog(@"theWholeShit.recievedRelationsToOne.keyedReferences %@", theWholeShit.recievedRelationsToOne.keyedReferences);
                 for (NSString *relationKey in theWholeShit.recievedRelationsToOne.keyedReferences.allKeys) {
+                    NSLog(@"[DEBUG] recievedRelationsToOne relationKey %@", relationKey);
                     NSObject <ASReference> *reference = theWholeShit.recievedRelationsToOne.keyedReferences[relationKey];
                     NSString *relatedEntityName = [managedObjectRelatableToOne.class entityNameByRelationKey][relationKey];
                     NSManagedObject <ASFindableReference> *relatedObject;
@@ -251,11 +269,15 @@
                         NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
                     }
                     [managedObjectRelatableToOne replaceRelation:relationKey toReference:relatedObject];
+                    
                 }
             }
             if (theWholeShit.recievedRelationsToMany && [theWholeShit.managedObject conformsToProtocol:@protocol(ASMutableRelatableToMany)]) {
+                NSLog(@"[DEBUG] theWholeShit.recievedRelationsToMany %@", theWholeShit.recievedRelationsToMany);
                 NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *managedObjectRelatableToMany = (NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *)theWholeShit.managedObject;
+                NSLog(@"theWholeShit.recievedRelationsToMany.keyedSetsOfReferences %@", theWholeShit.recievedRelationsToMany.keyedSetsOfReferences);
                 for (NSString *relationKey in theWholeShit.recievedRelationsToMany.keyedSetsOfReferences.allKeys) {
+                    NSLog(@"[DEBUG] recievedRelationsToMany relationKey %@", relationKey);
                     NSSet <NSObject <ASReference> *> *setOfReferences = theWholeShit.recievedRelationsToMany.keyedSetsOfReferences[relationKey];
                     NSString *relatedEntityName = [managedObjectRelatableToMany.class entityNameByRelationKey][relationKey];
                     NSMutableSet *newSet = [NSMutableSet new];
@@ -266,7 +288,7 @@
                         } @catch (NSException *exception) {
                             NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
                         }
-                        [newSet addObject:relatedObject];
+                        if (relatedObject) [newSet addObject:relatedObject];
                     }
                     [managedObjectRelatableToMany replaceRelation:relationKey toSetsOfReferences:newSet.copy];
                 }
@@ -531,6 +553,7 @@
     while (waiting) {
         [waitingCondition wait];
     }
+    NSLog(@"rollbackAndWait didFinishWaiting");
 }
 
 

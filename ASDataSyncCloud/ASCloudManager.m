@@ -45,6 +45,7 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
     ASCloudState state;
     CKContainer *container;
     CKDatabase *db;
+    
     ASDeviceList *deviceList;
     NSPredicate *thisDevicePredicate;
     
@@ -150,11 +151,14 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
             } else {
                 if (accountStatus == CKAccountStatusAvailable) {
                     state |= ASCloudStateAccountStatusAvailable;
+
 #ifdef DEBUG
                     db = container.publicCloudDatabase;
+                    NSLog(@"[DEBUG] Public database selected");
 #else
                     db = container.privateCloudDatabase;
 #endif
+
                     [self updateDevicesCompletion:^{
                         dispatch_group_leave(primaryInitializationGroup);
                     }];
@@ -206,7 +210,9 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
         for (NSObject<ASDescription> *description in deletedObjects) {
             [self enqueueDeletionWithDescription:description];
         }
-        [self pushQueueWithSuccessBlock:nil];
+        [self pushQueueWithSuccessBlock:^(BOOL success) {
+            NSLog(@"[DEBUG] Push %@", success ? @"successs" : @"unsuccesss");
+        }];
     }];
 
 }
@@ -256,20 +262,44 @@ NSMutableDictionary *lastSyncDateForEntityMutable;
 typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable subscription, NSError * _Nullable error);
 
 - (void)subscribeToRegisteredRecordTypes {
-    SaveSubscriptionCompletionHandler completionHandler = ^(CKSubscription * _Nullable subscription, NSError * _Nullable error) {
-        if (error) {
-            NSLog(@"[ERROR] SaveSubscription failed: %@", error.localizedDescription);
-        }
-    };
     
-    for (NSString *recordType in self.mapping.allRecordTypes) {
-        NSLog(@"[INFO] Try to subscribe to recordType <%@>", recordType);
-        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+    [db fetchAllSubscriptionsWithCompletionHandler:^(NSArray<CKSubscription *> * _Nullable subscriptions, NSError * _Nullable error) {
+        
+        dispatch_group_t removeSubscriptionsGroup = dispatch_group_create();
+        
+        if (error) NSLog(@"[ERROR] fetchAllSubscriptions error: %@", error.localizedDescription);
+        for (CKQuerySubscription *subscription in subscriptions) {
+            dispatch_group_enter(removeSubscriptionsGroup);
+            [db deleteSubscriptionWithID:subscription.subscriptionID completionHandler:^(NSString * _Nullable subscriptionID, NSError * _Nullable error) {
+                if (error) NSLog(@"[ERROR] deleteSubscription error: %@", error.localizedDescription);
+                dispatch_group_leave(removeSubscriptionsGroup);
+            }];
+        }
+        dispatch_group_wait(removeSubscriptionsGroup, DISPATCH_TIME_FOREVER);
+        
+        SaveSubscriptionCompletionHandler completionHandler = ^(CKSubscription * _Nullable subscription, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"[ERROR] SaveSubscription failed: %@", error.localizedDescription);
+            } else {
+                NSLog(@"[DEBUG] Subscripted OK %@", subscription);
+            }
+        };
+        
+        for (NSString *recordType in self.mapping.allRecordTypes) {
+            NSLog(@"[INFO] Try to subscribe to recordType <%@>", recordType);
+            CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+            subscription.notificationInfo = [CKNotificationInfo new];
+            subscription.notificationInfo.alertBody = @"";
+            subscription.notificationInfo.soundName = @"default";
+            subscription.notificationInfo.shouldSendContentAvailable = YES;
+            subscription.notificationInfo.category = @"CloudKit";
+            [db saveSubscription:subscription completionHandler:completionHandler];
+        }
+        
+        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:thisDevicePredicate options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
         [db saveSubscription:subscription completionHandler:completionHandler];
-    }
-
-    CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:thisDevicePredicate options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
-    [db saveSubscription:subscription completionHandler:completionHandler];
+        
+    }];
 
 }
 
@@ -277,10 +307,10 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    CKNotification *notification = [CKNotification notificationFromRemoteNotificationDictionary:userInfo];
-    if (notification.notificationType == CKNotificationTypeQuery && notification.containerIdentifier == container.containerIdentifier) {
-        CKQueryNotification *queryNotification = (CKQueryNotification *)notification;
-        [self recordByRecordID:queryNotification.recordID fetch:^(CKRecord <ASMappedObject>*record, NSError * _Nullable error) {
+    CKQueryNotification *notification = [CKQueryNotification notificationFromRemoteNotificationDictionary:userInfo];
+    if (notification.notificationType == CKNotificationTypeQuery && notification.databaseScope == db.databaseScope && [notification.containerIdentifier isEqualToString:container.containerIdentifier]) {
+        NSLog(@"[DEBUG] notification %@", notification);
+        [self recordByRecordID:notification.recordID fetch:^(CKRecord <ASMappedObject>*record, NSError * _Nullable error) {
             if (!self.ready) @throw [NSException exceptionWithName:@"acceptPushNotificationWithUserInfo error" reason:@"ASCloudManager not ready" userInfo:nil];
             if (record) {
                 NSString *entityName = self.mapping[record.recordType];
@@ -297,9 +327,11 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
                     [self performMergeWithContextAndCleanup];
                 }
             } else {
-                @throw [NSException exceptionWithName:@"CKFetchRecordsOperation failed"  reason:[NSString stringWithFormat:@"Object with recordID %@ not found.", queryNotification.recordID.recordName] userInfo:nil];
+//                @throw [NSException exceptionWithName:@"CKFetchRecordsOperation failed"  reason:[NSString stringWithFormat:@"Object with recordID %@ not found.", notification.recordID.recordName] userInfo:nil];
             }
         }];
+    } else {
+        NSLog(@"[ERROR] unacceptable notification %@", notification);
     }
 }
 
@@ -378,10 +410,13 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     NSLog(@"[DEBUG] %s %@", __PRETTY_FUNCTION__, entityName);
 #endif
     NSDate *lastSyncDate = self.lastSyncDateForEntity[entityName];
+    NSLog(@"[DEBUG] entity %@ lastSyncDate %@", entityName, [NSDateFormatter localizedStringFromDate:lastSyncDate
+                                                                                           dateStyle:NSDateFormatterMediumStyle
+                                                                                           timeStyle:NSDateFormatterShortStyle]);
     NSDate *queryDate = [NSDate date];
     NSPredicate *predicate = lastSyncDate ? [NSPredicate predicateWithFormat:@"modificationDate > %@", lastSyncDate] : nil;
     [self getRecordsOfEntityName:entityName withPredicate:predicate fetch:^(NSArray<__kindof CKRecord *> *records) {
-        if (records) [self setLastSyncDate:queryDate forEntity:entityName];
+        if (records.count) [self setLastSyncDate:queryDate forEntity:entityName];
         fetch(records);
     }];    
 }
@@ -486,6 +521,23 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         }
         record.keyedDataProperties = syncObject.keyedDataProperties;
         record.modificationDate = syncObject.modificationDate;
+        
+        if ([syncObject conformsToProtocol:@protocol(ASRelatableToOne)]) {
+            NSObject <ASRelatableToOne> *relatableObject = (NSObject <ASRelatableToOne> *)syncObject;
+            NSDictionary <NSString *, NSObject<ASReference> *> *keyedReferences = relatableObject.keyedReferences;
+            for (NSString *relationKey in keyedReferences.allKeys) {
+                [record replaceRelation:relationKey toReference:keyedReferences[relationKey]];
+            }
+        }
+        
+        if ([syncObject conformsToProtocol:@protocol(ASRelatableToMany)]) {
+            NSObject <ASRelatableToMany> *relatableObject = (NSObject <ASRelatableToMany> *)syncObject;
+            NSDictionary <NSString *, NSSet <NSObject<ASReference> *> *> *keyedSetsOfReferences = relatableObject.keyedSetsOfReferences;
+            for (NSString *relationKey in keyedSetsOfReferences.allKeys) {
+                [record replaceRelation:relationKey toSetsOfReferences:keyedSetsOfReferences[relationKey]];
+            }
+        }
+        
         [mutableRecordsToSave addObject:record];
         dispatch_group_leave(enqueueUpdateWithMappedObjectGroup);
     }];
@@ -528,12 +580,14 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
                 [mutableRecordIDsToDelete removeAllObjects];
                 if (successBlock) successBlock(true);
             } else {
+                
                 for (CKRecord *record in savedRecords) {
                     [mutableRecordsToSave removeObject:record];
                 }
                 for (CKRecordID *recordID in deletedRecordIDs) {
                     [mutableRecordIDsToDelete removeObject:recordID];
                 }
+                NSLog(@"[DEBUG] ModifyRecordsCompletion RecordsToSave count %ld / RecordIDsToDelete count %ld", (long)mutableRecordsToSave.count, (long)mutableRecordIDsToDelete.count);
                 if (successBlock) successBlock(false);
             }
         }];

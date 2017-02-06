@@ -27,6 +27,7 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 - (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 
 - (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier;
+- (void)cloudReplication;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;

@@ -20,11 +20,11 @@
 }
 
 + (instancetype)referenceWithUniqueData:(NSData *)uniqueData {
-    return [[self alloc] initWithRecordID:[CKRecordID recordIDWithUniqueData:uniqueData] action:CKReferenceActionNone];
+    return uniqueData ? [[self alloc] initWithRecordID:[CKRecordID recordIDWithUniqueData:uniqueData] action:CKReferenceActionNone] : nil;
 }
 
 + (instancetype)referenceWithUUIDString:(NSString *)UUIDString {
-    return [[self alloc] initWithRecordID:[CKRecordID recordIDWithUUIDString:UUIDString] action:CKReferenceActionNone];
+    return UUIDString ? [[self alloc] initWithRecordID:[CKRecordID recordIDWithUUIDString:UUIDString] action:CKReferenceActionNone] : nil;
 }
 
 @end
