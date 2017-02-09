@@ -7,16 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CloudKit/CloudKit.h>
 #import "ASCloudMapping.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCloudManager : NSObject
 
-+ (instancetype)defaultManager;
-- (instancetype)initWithContainerIdentifier:(NSString *)identifier;
-- (BOOL)ready;
+@property (nonatomic, strong, readonly) NSString *instanceIdentifier;
 
++ (instancetype)instanceWithContainerIdentifier:(NSString *)identifier databaseScope:(CKDatabaseScope)databaseScope; //unique for identifier privateDB as default scope
+
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
 
 @end

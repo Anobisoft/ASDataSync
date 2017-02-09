@@ -109,7 +109,11 @@
 - (void)setPrivateCloudContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context forCloudContainerIdentifier:(NSString *)containerIdentifier; {
     id<ASCloudManager> cloudManager = cloudManagers[context.contextIdentifier];
     if (!cloudManager) {
-        cloudManager = (id<ASCloudManager>)[[ASCloudManager alloc] initWithContainerIdentifier:containerIdentifier];
+#ifdef DEBUG
+        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:CKDatabaseScopePublic];
+#else
+        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:CKDatabaseScopePrivate];
+#endif
         cloudManagers[context.contextIdentifier] = cloudManager;
     }
     [context setAgregator:self];

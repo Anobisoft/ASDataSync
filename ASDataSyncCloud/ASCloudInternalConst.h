@@ -9,8 +9,8 @@
 #ifndef ASCloudInternalConst_h
 #define ASCloudInternalConst_h
 
-#define ASCloudLastSyncDateForEntityUDKey @"ASCloudLastSyncDateForEntityDictionary"
-#define ASCloudSubscriptionsInfoUDKey @"ASCloudSubscriptions"
+#define ASCloudLastSyncDateForEntityUDKey @"ASCloudLastSyncDateForEntity"
+#define ASCloudPreparedToCloudRecordsUDKey @"ASCloudPreparedToCloudRecords"
 
 #define ASCloudDevicesInfoRecordType @"Device"
 
@@ -20,5 +20,8 @@
 #define ASCloudDeletionInfoRecordProperty_deviceID @"dq_deviceID"
 
 #define ASCloudRealModificationDateProperty @"changeDate"
+
+#define ASCloudInitTimeout 60
+#define ASCloudTryToPushTimeout 60
 
 #endif /* ASCloudInternalConst_h */

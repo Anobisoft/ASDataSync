@@ -15,7 +15,7 @@
 
 //#import <UIKit/UIKit.h>
 
-@interface WholeShit : NSObject
+@interface FoundObjectWithRelationRepresentation : NSObject
 
 @property (nonatomic, strong) NSObject <ASRelatableToOne> *recievedRelationsToOne;
 @property (nonatomic, strong) NSObject <ASRelatableToMany> *recievedRelationsToMany;
@@ -23,7 +23,7 @@
 
 @end
 
-@implementation WholeShit
+@implementation FoundObjectWithRelationRepresentation
 
 @end
 
@@ -209,7 +209,7 @@
 
 - (void)performMergeBlockWithTransaction:(id<ASRepresentableTransaction>)transaction {
     [self performBlock:^{
-        NSMutableArray <WholeShit *> *theTotalShit = [NSMutableArray new];
+        NSMutableArray <FoundObjectWithRelationRepresentation *> *foundObjectsWithRelationRepresentations = [NSMutableArray new];
         for (NSObject <ASMappedObject> *recievedMappedObject in transaction.updatedObjects) {
             @try {
                 NSManagedObject <ASFindableReference> *foundObject = [self objectByDescription:recievedMappedObject];
@@ -233,15 +233,15 @@
                 
                 if (relatableToOne || relatableToMany) {
                     NSLog(@"[DEBUG] recievedMappedObject %@ %@", relatableToOne ? @"relatableToOne" : @"", relatableToMany ? @"relatableToMany" : @"");
-                    WholeShit *theWholeShit = [WholeShit new];
+                    FoundObjectWithRelationRepresentation *theFoundObjectWithRelationRepresentation = [FoundObjectWithRelationRepresentation new];
                     if (relatableToOne) {
-                        theWholeShit.recievedRelationsToOne = (NSObject <ASRelatableToOne> *)recievedMappedObject;
+                        theFoundObjectWithRelationRepresentation.recievedRelationsToOne = (NSObject <ASRelatableToOne> *)recievedMappedObject;
                     }
                     if (relatableToMany) {
-                        theWholeShit.recievedRelationsToMany = (NSObject <ASRelatableToMany> *)recievedMappedObject;
+                        theFoundObjectWithRelationRepresentation.recievedRelationsToMany = (NSObject <ASRelatableToMany> *)recievedMappedObject;
                     }
-                    theWholeShit.managedObject = managedObject;
-                    [theTotalShit addObject:theWholeShit];
+                    theFoundObjectWithRelationRepresentation.managedObject = managedObject;
+                    [foundObjectsWithRelationRepresentations addObject:theFoundObjectWithRelationRepresentation];
                 }
                 
 
@@ -250,17 +250,17 @@
             }
         }
         
-        NSLog(@"[DEBUG] theTotalShit %@ count %ld", theTotalShit, (long)theTotalShit.count);
+//        NSLog(@"[DEBUG] foundObjectsWithRelationRepresentations %@ count %ld", foundObjectsWithRelationRepresentations, (long)foundObjectsWithRelationRepresentations.count);
         
-        for (WholeShit *theWholeShit in theTotalShit) {
-            NSLog(@"[DEBUG] theWholeShit.managedObject %@", theWholeShit.managedObject);
-            if (theWholeShit.recievedRelationsToOne && [theWholeShit.managedObject conformsToProtocol:@protocol(ASMutableRelatableToOne)]) {
-                NSLog(@"[DEBUG] theWholeShit.recievedRelationsToOne %@", theWholeShit.recievedRelationsToOne);
-                NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *managedObjectRelatableToOne = (NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *)theWholeShit.managedObject;
-                NSLog(@"theWholeShit.recievedRelationsToOne.keyedReferences %@", theWholeShit.recievedRelationsToOne.keyedReferences);
-                for (NSString *relationKey in theWholeShit.recievedRelationsToOne.keyedReferences.allKeys) {
-                    NSLog(@"[DEBUG] recievedRelationsToOne relationKey %@", relationKey);
-                    NSObject <ASReference> *reference = theWholeShit.recievedRelationsToOne.keyedReferences[relationKey];
+        for (FoundObjectWithRelationRepresentation *theFoundObjectWithRelationRepresentation in foundObjectsWithRelationRepresentations) {
+//            NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.managedObject %@", theFoundObjectWithRelationRepresentation.managedObject);
+            if (theFoundObjectWithRelationRepresentation.recievedRelationsToOne && [theFoundObjectWithRelationRepresentation.managedObject conformsToProtocol:@protocol(ASMutableRelatableToOne)]) {
+//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToOne %@", theFoundObjectWithRelationRepresentation.recievedRelationsToOne);
+                NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *managedObjectRelatableToOne = (NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *)theFoundObjectWithRelationRepresentation.managedObject;
+//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences %@", theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences);
+                for (NSString *relationKey in theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences.allKeys) {
+//                    NSLog(@"[DEBUG] recievedRelationsToOne relationKey %@", relationKey);
+                    NSObject <ASReference> *reference = theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences[relationKey];
                     NSString *relatedEntityName = [managedObjectRelatableToOne.class entityNameByRelationKey][relationKey];
                     NSManagedObject <ASFindableReference> *relatedObject;
                     @try {
@@ -272,13 +272,13 @@
                     
                 }
             }
-            if (theWholeShit.recievedRelationsToMany && [theWholeShit.managedObject conformsToProtocol:@protocol(ASMutableRelatableToMany)]) {
-                NSLog(@"[DEBUG] theWholeShit.recievedRelationsToMany %@", theWholeShit.recievedRelationsToMany);
-                NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *managedObjectRelatableToMany = (NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *)theWholeShit.managedObject;
-                NSLog(@"theWholeShit.recievedRelationsToMany.keyedSetsOfReferences %@", theWholeShit.recievedRelationsToMany.keyedSetsOfReferences);
-                for (NSString *relationKey in theWholeShit.recievedRelationsToMany.keyedSetsOfReferences.allKeys) {
-                    NSLog(@"[DEBUG] recievedRelationsToMany relationKey %@", relationKey);
-                    NSSet <NSObject <ASReference> *> *setOfReferences = theWholeShit.recievedRelationsToMany.keyedSetsOfReferences[relationKey];
+            if (theFoundObjectWithRelationRepresentation.recievedRelationsToMany && [theFoundObjectWithRelationRepresentation.managedObject conformsToProtocol:@protocol(ASMutableRelatableToMany)]) {
+//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToMany %@", theFoundObjectWithRelationRepresentation.recievedRelationsToMany);
+                NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *managedObjectRelatableToMany = (NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *)theFoundObjectWithRelationRepresentation.managedObject;
+//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences %@", theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences);
+                for (NSString *relationKey in theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences.allKeys) {
+//                    NSLog(@"[DEBUG] recievedRelationsToMany relationKey %@", relationKey);
+                    NSSet <NSObject <ASReference> *> *setOfReferences = theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences[relationKey];
                     NSString *relatedEntityName = [managedObjectRelatableToMany.class entityNameByRelationKey][relationKey];
                     NSMutableSet *newSet = [NSMutableSet new];
                     for (NSObject <ASReference> *reference in setOfReferences) {
@@ -301,7 +301,7 @@
                 if (foundObject) {
                     [self deleteObject:foundObject];
                 } else {
-                    NSLog(@"[WARNING] %s dequeue DELETE: object with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.UUIDString);
+                    NSLog(@"[WARNING] %s dequeue DELETE: object of Entity <%@> with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.entityName, recievedDescription.UUIDString);
                 }
             } @catch (NSException *exception) {
                 NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);
@@ -351,7 +351,7 @@
 - (void)commit {
     if ([self hasChanges]) {        
         [self performBlock:^{
-            if (transactionsAgregator) [transactionsAgregator willCommitTransaction:self];
+            if (transactionsAgregator) [transactionsAgregator willCommitTransaction:[ASTransactionRepresentation instantiateWithRepresentableTransaction:self]];
             NSError *error;
             if ([self save:&error]) {
                 [self saveMainContext];

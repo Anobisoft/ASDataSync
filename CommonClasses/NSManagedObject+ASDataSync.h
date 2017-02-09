@@ -16,14 +16,14 @@ typedef void (^FetchArray)(NSArray <__kindof NSManagedObject *> *objects);
 - (NSString *)entityName;
 + (NSString *)entityName;
 
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context fetch:(FetchArray)fetch;
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context limit:(NSUInteger)limit fetch:(FetchArray)fetch;
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors fetch:(FetchArray)fetch;
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors limit:(NSUInteger)limit fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context limit:(NSUInteger)limit fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors limit:(NSUInteger)limit fetch:(FetchArray)fetch;
 
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause fetch:(FetchArray)fetch;
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause limit:(NSUInteger)limit fetch:(FetchArray)fetch;
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors fetch:(FetchArray)fetch;
-+ (void)selectObjectsFromContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors limit:(NSUInteger)limit fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause limit:(NSUInteger)limit fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors fetch:(FetchArray)fetch;
++ (void)selectObjectsInContext:(NSManagedObjectContext *)context where:(NSPredicate *)clause orderBy:(NSArray <NSSortDescriptor *> *)sortDescriptors limit:(NSUInteger)limit fetch:(FetchArray)fetch;
 
 @end

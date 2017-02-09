@@ -15,6 +15,7 @@
 @interface ASTransactionRepresentation : NSObject <ASRepresentableTransaction, NSCoding>
 
 + (instancetype)instantiateWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction;
+- (void)mergeWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction;
 
 @end
 

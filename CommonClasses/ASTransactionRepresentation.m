@@ -77,4 +77,36 @@
     return (_deletedObjects || _updatedObjects) ? self : nil;
 }
 
+- (void)mergeWithRepresentableTransaction:(id <ASRepresentableTransaction>)transaction {
+    if ([self.contextIdentifier isEqualToString:transaction.contextIdentifier]) {
+        NSSet <NSObject<ASMappedObject> *> *updatedObjects = transaction.updatedObjects;
+        if (updatedObjects.count) {
+            NSMutableSet <ASRelatableObjectRepresentation *> *tmpUSet = _updatedObjects.mutableCopy;
+            for (NSObject<ASMappedObject> *updatedObject in updatedObjects) {
+                ASRelatableObjectRepresentation *existedRepresentation = nil;
+                for (ASRelatableObjectRepresentation *enumerObj in tmpUSet)
+                    if ([updatedObject.uniqueData isEqualToData:enumerObj.uniqueData]) existedRepresentation = enumerObj;
+                if (existedRepresentation) [tmpUSet removeObject:existedRepresentation];
+                [tmpUSet addObject:[ASRelatableObjectRepresentation instantiateWithMappedObject:updatedObject]];
+            }
+            _updatedObjects = tmpUSet.copy;
+        }
+        
+        NSSet <NSObject<ASDescription> *> *deletedObjects = transaction.deletedObjects;
+        if (deletedObjects.count) {
+            NSMutableSet <ASDescriptionRepresentation *> *tmpSet = _deletedObjects.mutableCopy;
+            for (NSObject<ASDescription> *description in deletedObjects) {
+                ASDescriptionRepresentation *existedRepresentation = nil;
+                for (ASDescriptionRepresentation *enumerObj in tmpSet)
+                    if ([description.uniqueData isEqualToData:enumerObj.uniqueData]) existedRepresentation = enumerObj;
+                if (existedRepresentation) [tmpSet removeObject:existedRepresentation];
+                [tmpSet addObject:[ASDescriptionRepresentation instantiateWithDescription:description]];
+            }
+            _deletedObjects = tmpSet.copy;
+        }
+    } else {
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"invalid contextIdentifier" userInfo:nil];
+    }
+}
+
 @end
