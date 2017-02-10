@@ -15,6 +15,12 @@
 #ifndef ASPublicProtocol_h
 #define ASPublicProtocol_h
 
+typedef NS_ENUM(NSInteger, ASDatabaseScope) {
+    ASDatabaseScopePublic = 1,
+    ASDatabaseScopePrivate,
+    ASDatabaseScopeShared,
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 

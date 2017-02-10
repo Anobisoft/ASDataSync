@@ -35,10 +35,14 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
+#ifdef DEBUG
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
+#endif
     if (self = [super init]) {
         mutableRecordsToSave = [aDecoder decodeObjectForKey:@"mutableRecordsToSave"];
         mutableRecordIDsToDelete = [aDecoder decodeObjectForKey:@"mutableRecordIDsToDelete"];
         failedObjectsRepresentations = [aDecoder decodeObjectForKey:@"failedObjectsRepresentations"];
+        self.accumulativeTransaction = [aDecoder decodeObjectForKey:@"accumulativeTransaction"];
         _lockGroup = dispatch_group_create();
     }
     return self;
@@ -48,9 +52,13 @@
     [aCoder encodeObject:mutableRecordsToSave forKey:@"mutableRecordsToSave"];
     [aCoder encodeObject:mutableRecordIDsToDelete forKey:@"mutableRecordIDsToDelete"];
     [aCoder encodeObject:failedObjectsRepresentations forKey:@"failedObjectsRepresentations"];
+    [aCoder encodeObject:self.accumulativeTransaction forKey:@"accumulativeTransaction"];
 }
 
 - (instancetype)init {
+#ifdef DEBUG
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
+#endif
     if (self = [super init]) {
         mutableRecordsToSave = [NSMutableArray new];
         mutableRecordIDsToDelete = [NSMutableArray new];
@@ -83,6 +91,7 @@
     _recordsToSave = nil;
     [mutableRecordsToSave removeReference:record];
     [mutableRecordsToSave addObject:record];
+    NSLog(@"[DEBUG] mutableRecordsToSave.count %ld", (unsigned long)mutableRecordsToSave.count);
     _failedEnqueueUpdateObjects = nil;
     [failedObjectsRepresentations removeReference:record];
 }
@@ -97,6 +106,7 @@
     _recordIDsToDelete = nil;
     [mutableRecordIDsToDelete removeReference:recordID];
     [mutableRecordIDsToDelete addObject:recordID];
+    NSLog(@"[DEBUG] mutableRecordIDsToDelete.count %ld", (unsigned long)mutableRecordIDsToDelete.count);
 }
 
 - (BOOL)isEmpty {
@@ -104,6 +114,9 @@
 }
 
 - (void)clearAll {
+#ifdef DEBUG
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
+#endif
     _recordsToSave = @[];
     [mutableRecordsToSave removeAllObjects];
     _recordIDsToDelete = @[];
@@ -111,9 +124,15 @@
 }
 
 - (void)clearWithSavedRecords:(NSArray<CKRecord<ASReference> *> *)savedRecords deletedRecordIDs:(NSArray<CKRecordID<ASReference> *> *)deletedRecordIDs {
+#ifdef DEBUG
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
+#endif
     _recordsToSave = nil; _recordIDsToDelete = nil;
     for (CKRecord<ASReference> *record in savedRecords) [mutableRecordsToSave removeReference:record];
     for (CKRecordID<ASReference> *recordID in deletedRecordIDs) [mutableRecordIDsToDelete removeReference:recordID];
+#ifdef DEBUG
+    NSLog(@"[DEBUG] mutableRecordsToSave.count %ld mutableRecordIDsToDelete.count %ld", (unsigned long)mutableRecordsToSave.count, (unsigned long)mutableRecordIDsToDelete.count);
+#endif
 }
 
 

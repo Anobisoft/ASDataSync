@@ -232,7 +232,7 @@
                 BOOL relatableToMany = [recievedMappedObject conformsToProtocol:@protocol(ASRelatableToMany)];
                 
                 if (relatableToOne || relatableToMany) {
-                    NSLog(@"[DEBUG] recievedMappedObject %@ %@", relatableToOne ? @"relatableToOne" : @"", relatableToMany ? @"relatableToMany" : @"");
+//                    NSLog(@"[DEBUG] recievedMappedObject %@ %@", relatableToOne ? @"relatableToOne" : @"", relatableToMany ? @"relatableToMany" : @"");
                     FoundObjectWithRelationRepresentation *theFoundObjectWithRelationRepresentation = [FoundObjectWithRelationRepresentation new];
                     if (relatableToOne) {
                         theFoundObjectWithRelationRepresentation.recievedRelationsToOne = (NSObject <ASRelatableToOne> *)recievedMappedObject;

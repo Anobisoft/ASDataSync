@@ -66,11 +66,7 @@
     }
     id<ASCloudManager> cloudManager = cloudManagers[transaction.contextIdentifier];
     if (cloudManager) {
-        if (cloudManager.ready) {
-            [cloudManager willCommitTransaction:transaction];
-        } else {
-            NSLog(@"[ERROR] ASCloudManager is not ready. ");
-        }
+        [cloudManager willCommitTransaction:transaction];
     }
 }
 
@@ -110,9 +106,9 @@
     id<ASCloudManager> cloudManager = cloudManagers[context.contextIdentifier];
     if (!cloudManager) {
 #ifdef DEBUG
-        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:CKDatabaseScopePublic];
+        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:ASDatabaseScopePublic];
 #else
-        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:CKDatabaseScopePrivate];
+        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:ASDatabaseScopePrivate];
 #endif
         cloudManagers[context.contextIdentifier] = cloudManager;
     }

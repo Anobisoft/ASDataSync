@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CloudKit/CloudKit.h>
 #import "ASCloudMapping.h"
+#import "ASPublicProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,7 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) NSString *instanceIdentifier;
 
-+ (instancetype)instanceWithContainerIdentifier:(NSString *)identifier databaseScope:(CKDatabaseScope)databaseScope; //unique for identifier privateDB as default scope
++ (instancetype)instanceWithContainerIdentifier:(NSString *)identifier databaseScope:(ASDatabaseScope)databaseScope; //unique for identifier privateDB as default scope
+- (void)totalReplication;
+- (void)smartReplication;
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;

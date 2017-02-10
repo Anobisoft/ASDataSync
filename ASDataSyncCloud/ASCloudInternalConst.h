@@ -23,5 +23,6 @@
 
 #define ASCloudInitTimeout 60
 #define ASCloudTryToPushTimeout 60
+#define ASCloudSmartReplicationTimeout 60
 
 #endif /* ASCloudInternalConst_h */
