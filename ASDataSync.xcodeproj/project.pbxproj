@@ -79,25 +79,25 @@
 		CE9D88711E376A35007158BE /* ASDeviceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88661E376A35007158BE /* ASDeviceList.m */; };
 		CE9D88721E376A35007158BE /* ASCloudMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9D88671E376A35007158BE /* ASCloudMapping.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CE9D88731E376A35007158BE /* ASCloudMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASCloudMapping.m */; };
-		CED1B3F21E49AC5E009744C7 /* NSDate+ASUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = CED1B3F01E49AC5E009744C7 /* NSDate+ASUtilities.h */; };
+		CED1B3F21E49AC5E009744C7 /* NSDate+ASUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = CED1B3F01E49AC5E009744C7 /* NSDate+ASUtilities.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CED1B3F31E49AC5E009744C7 /* NSDate+ASUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = CED1B3F11E49AC5E009744C7 /* NSDate+ASUtilities.m */; };
 		CEEF8D961E38CAB200CC4B29 /* ASCloudMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9D88681E376A35007158BE /* ASCloudMapping.m */; };
 		CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8D971E3A2A5700CC4B29 /* ASCloudTransaction.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8D9A1E3A2A5700CC4B29 /* ASCloudTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8D981E3A2A5700CC4B29 /* ASCloudTransaction.m */; };
-		CEEF8DC61E43088A00CC4B29 /* CKRecord+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DC41E43088A00CC4B29 /* CKRecord+ASDataSync.h */; };
+		CEEF8DC61E43088A00CC4B29 /* CKRecord+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DC41E43088A00CC4B29 /* CKRecord+ASDataSync.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8DC71E43088A00CC4B29 /* CKRecord+ASDataSync.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DC51E43088A00CC4B29 /* CKRecord+ASDataSync.m */; };
-		CEEF8DCA1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DC81E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h */; };
+		CEEF8DCA1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DC81E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8DCB1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DC91E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.m */; };
-		CEEF8DCE1E432FA500CC4B29 /* ASCloudRecordRepresentation.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DCC1E432FA500CC4B29 /* ASCloudRecordRepresentation.h */; };
+		CEEF8DCE1E432FA500CC4B29 /* ASCloudRecordRepresentation.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DCC1E432FA500CC4B29 /* ASCloudRecordRepresentation.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8DCF1E432FA500CC4B29 /* ASCloudRecordRepresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DCD1E432FA500CC4B29 /* ASCloudRecordRepresentation.m */; };
-		CEEF8DD21E4334C200CC4B29 /* CKRecordID+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DD01E4334C200CC4B29 /* CKRecordID+ASDataSync.h */; };
+		CEEF8DD21E4334C200CC4B29 /* CKRecordID+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DD01E4334C200CC4B29 /* CKRecordID+ASDataSync.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8DD31E4334C200CC4B29 /* CKRecordID+ASDataSync.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DD11E4334C200CC4B29 /* CKRecordID+ASDataSync.m */; };
-		CEEF8DD61E4334F400CC4B29 /* CKReference+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DD41E4334F400CC4B29 /* CKReference+ASDataSync.h */; };
+		CEEF8DD61E4334F400CC4B29 /* CKReference+ASDataSync.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEF8DD41E4334F400CC4B29 /* CKReference+ASDataSync.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEEF8DD71E4334F400CC4B29 /* CKReference+ASDataSync.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEF8DD51E4334F400CC4B29 /* CKReference+ASDataSync.m */; };
 		CEEF8DE01E460B1500CC4B29 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEEF8DDF1E460B1500CC4B29 /* Security.framework */; };
-		CEF6AF261E4C5A19005DCADA /* ASPreparedToCloudRecords.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6AF241E4C5A19005DCADA /* ASPreparedToCloudRecords.h */; };
+		CEF6AF261E4C5A19005DCADA /* ASPreparedToCloudRecords.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6AF241E4C5A19005DCADA /* ASPreparedToCloudRecords.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEF6AF271E4C5A19005DCADA /* ASPreparedToCloudRecords.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6AF251E4C5A19005DCADA /* ASPreparedToCloudRecords.m */; };
-		CEF6AF2A1E4C9A50005DCADA /* ASRepresentableTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6AF281E4C9A50005DCADA /* ASRepresentableTransaction.h */; };
+		CEF6AF2A1E4C9A50005DCADA /* ASRepresentableTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6AF281E4C9A50005DCADA /* ASRepresentableTransaction.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEF6AF2B1E4C9A50005DCADA /* ASRepresentableTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6AF291E4C9A50005DCADA /* ASRepresentableTransaction.m */; };
 		CEF6AF2C1E4C9A5D005DCADA /* ASRepresentableTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6AF291E4C9A50005DCADA /* ASRepresentableTransaction.m */; };
 /* End PBXBuildFile section */
@@ -325,33 +325,33 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEEF8DCE1E432FA500CC4B29 /* ASCloudRecordRepresentation.h in Headers */,
 				CE6C394E1DC1DDF40047B3A8 /* ASDataSync.h in Headers */,
 				CE6C39C41DC1DF550047B3A8 /* ASManagedObjectContext.h in Headers */,
-				CEEF8DD21E4334C200CC4B29 /* CKRecordID+ASDataSync.h in Headers */,
-				CEEF8DD61E4334F400CC4B29 /* CKReference+ASDataSync.h in Headers */,
-				CEEF8DCA1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h in Headers */,
 				CE6C39CC1DC1DF550047B3A8 /* ASWatchConnector.h in Headers */,
-				CEF6AF2A1E4C9A50005DCADA /* ASRepresentableTransaction.h in Headers */,
 				CE6C39D01DC1DF550047B3A8 /* ASPublicProtocol.h in Headers */,
 				CE9D886A1E376A35007158BE /* ASCloudManager.h in Headers */,
 				CE9D88721E376A35007158BE /* ASCloudMapping.h in Headers */,
 				CE6C39D41DC1DF550047B3A8 /* NSManagedObject+ASDataSync.h in Headers */,
 				CE9D88431E31D930007158BE /* NSUUID+NSData.h in Headers */,
-				CEEF8DC61E43088A00CC4B29 /* CKRecord+ASDataSync.h in Headers */,
-				CE6C39D81DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
-				CEF6AF261E4C5A19005DCADA /* ASPreparedToCloudRecords.h in Headers */,
 				CE6C39D21DC1DF550047B3A8 /* ASPrivateProtocol.h in Headers */,
+				CE6C39D81DC1DF550047B3A8 /* NSManagedObjectContext+SQLike.h in Headers */,
+				CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */,
 				CE6C39B01DC1DF550047B3A8 /* ASDataAgregator.h in Headers */,
 				CE6C39B81DC1DF550047B3A8 /* ASDescriptionRepresentation.h in Headers */,
 				CE6C39BC1DC1DF550047B3A8 /* ASObjectRepresentation.h in Headers */,
+				CEEF8DCE1E432FA500CC4B29 /* ASCloudRecordRepresentation.h in Headers */,
+				CEEF8DD21E4334C200CC4B29 /* CKRecordID+ASDataSync.h in Headers */,
+				CEEF8DD61E4334F400CC4B29 /* CKReference+ASDataSync.h in Headers */,
+				CEEF8DCA1E430A1F00CC4B29 /* ASCloudDescriptionRepresentation.h in Headers */,
+				CEF6AF2A1E4C9A50005DCADA /* ASRepresentableTransaction.h in Headers */,
+				CEEF8DC61E43088A00CC4B29 /* CKRecord+ASDataSync.h in Headers */,
+				CEF6AF261E4C5A19005DCADA /* ASPreparedToCloudRecords.h in Headers */,
 				CED1B3F21E49AC5E009744C7 /* NSDate+ASUtilities.h in Headers */,
 				CE9D884E1E31F7F4007158BE /* ASRelatableObjectRepresentation.h in Headers */,
 				CE6C39B41DC1DF550047B3A8 /* ASTransactionRepresentation.h in Headers */,
 				CE9D88541E35D791007158BE /* ASReference.h in Headers */,
 				CE9D886E1E376A35007158BE /* ASDevice.h in Headers */,
 				CE9D88701E376A35007158BE /* ASDeviceList.h in Headers */,
-				CEEF8D991E3A2A5700CC4B29 /* ASCloudTransaction.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
