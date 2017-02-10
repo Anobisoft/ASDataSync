@@ -45,8 +45,10 @@
 @protocol ASCloudManager <ASTransactionsAgregator>
 @required
 - (void)setDataSyncContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context;
+@property (nonatomic, assign) BOOL enabled;
 - (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 - (void)smartReplication;
+- (void)totalReplication;
 - (BOOL)ready;
 @end
 

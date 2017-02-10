@@ -31,7 +31,7 @@
 }
 
 + (BOOL)supportsSecureCoding {
-    return YES;
+    return true;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {

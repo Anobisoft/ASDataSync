@@ -9,21 +9,21 @@
 #import "ASRepresentableTransaction.h"
 
 @implementation ASRepresentableTransaction {
-    NSString *contextIdentifier;
-    NSSet <NSObject <ASMappedObject> *> *updatedObjects;
-    NSSet <NSObject <ASDescription> *> *deletedObjects;
+    NSString *_contextIdentifier;
+    NSSet <NSObject <ASMappedObject> *> *_updatedObjects;
+    NSSet <NSObject <ASDescription> *> *_deletedObjects;
 }
 
 - (NSString *)contextIdentifier {
-    return contextIdentifier;
+    return _contextIdentifier;
 }
 
 - (NSSet <NSObject <ASMappedObject> *> *)updatedObjects {
-    return updatedObjects;
+    return _updatedObjects;
 }
 
 - (NSSet <NSObject <ASDescription> *> *)deletedObjects {
-    return deletedObjects;
+    return _deletedObjects;
 }
 
 + (instancetype)instantiateWithContext:(id <ASRepresentableTransaction>)context {
@@ -32,11 +32,16 @@
 
 - (instancetype)initWithContext:(id <ASRepresentableTransaction>)context {
     if (self = [super init]) {
-        contextIdentifier = context.contextIdentifier;
-        updatedObjects = context.updatedObjects.copy;
-        
+        _contextIdentifier = context.contextIdentifier;
+        _updatedObjects = context.updatedObjects.copy;
+        _deletedObjects = context.deletedObjects.copy;
     }
     return self;
+}
+
+- (void)addObjects:(NSSet<NSObject<ASMappedObject> *> *)objects {
+    if (!_updatedObjects) _updatedObjects = [NSSet set];
+    _updatedObjects = [_updatedObjects setByAddingObjectsFromSet:objects];
 }
 
 @end

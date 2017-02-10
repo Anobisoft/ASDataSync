@@ -168,16 +168,30 @@ static NSMutableDictionary<NSString *, id> *instances[4];
     return self;
 }
 
+@synthesize enabled = _enabled;
+- (void)setEnabled:(BOOL)enabled {
+    _enabled = enabled;
+    if (enabled) {
+        [self tryPerformInit];
+        [self startSmart];
+    } else {
+        [self removeAllSubscriptionsCompletion:nil];
+    }
+}
+- (BOOL)enabled {
+    return _enabled;
+}
+
 - (void)tryPerformInit {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    [self performPrimaryInitCompletion:^{
+    if (self.enabled) [self performPrimaryInitCompletion:^{
         if (self.ready) {
             NSLog(@"[DEBUG] READY!!!");
             if (preparedToCloudRecords.accumulativeTransaction) [self performCloudUpdateWithLocalTransaction:preparedToCloudRecords.accumulativeTransaction];
         } else {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudInitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (self.enabled) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudInitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self tryPerformInit];
             });
         }
@@ -231,15 +245,15 @@ static NSMutableDictionary<NSString *, id> *instances[4];
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    dispatch_async(waitingQueue, ^{
+    if (self.enabled) dispatch_async(waitingQueue, ^{
         dispatch_group_wait(primaryInitializationGroup, DISPATCH_TIME_FOREVER);
         if (self.ready) {
             NSLog(@"[DEBUG] READY!!!");
             [self subscribeToRegisteredRecordTypes];
             [self smartReplication];
         } else {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudInitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self startSmart];
+            if (self.enabled) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudInitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if (self.enabled) [self startSmart];
             });
         }
     });
@@ -257,11 +271,21 @@ static NSMutableDictionary<NSString *, id> *instances[4];
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    if (preparedToCloudRecords.accumulativeTransaction) {
-        [preparedToCloudRecords.accumulativeTransaction mergeWithRepresentableTransaction:transaction];
+    if (self.enabled) {
+        if (preparedToCloudRecords.accumulativeTransaction) {
+            [preparedToCloudRecords.accumulativeTransaction mergeWithRepresentableTransaction:transaction];
+            [self savePreparedToCloudRecords];
+            [self performCloudUpdateWithLocalTransaction:preparedToCloudRecords.accumulativeTransaction];
+        } else [self performCloudUpdateWithLocalTransaction:transaction];
+    } else {
+        if (preparedToCloudRecords.accumulativeTransaction) {
+            [preparedToCloudRecords.accumulativeTransaction mergeWithRepresentableTransaction:transaction];
+        } else {
+            preparedToCloudRecords.accumulativeTransaction = [ASTransactionRepresentation instantiateWithRepresentableTransaction:transaction];
+        }
         [self savePreparedToCloudRecords];
-        [self performCloudUpdateWithLocalTransaction:preparedToCloudRecords.accumulativeTransaction];
-    } else [self performCloudUpdateWithLocalTransaction:transaction];
+    }
+
 
 }
 
@@ -294,8 +318,8 @@ static NSMutableDictionary<NSString *, id> *instances[4];
                 preparedToCloudRecords.accumulativeTransaction = [ASTransactionRepresentation instantiateWithRepresentableTransaction:transaction];
                 [self savePreparedToCloudRecords];
             }
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudInitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self performPrimaryInitCompletion:^{
+            if (self.enabled) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudInitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if (self.enabled) [self performPrimaryInitCompletion:^{
                     [self performCloudUpdateWithLocalTransaction:preparedToCloudRecords.accumulativeTransaction];
                 }];
             });
@@ -345,14 +369,16 @@ static NSMutableDictionary<NSString *, id> *instances[4];
 
 
 
-#pragma mark - Remote notifications
-
-typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable subscription, NSError * _Nullable error);
+#pragma mark - Subscriptions and Remote notifications
 
 - (void)subscribeToRegisteredRecordTypes {
-    
+    [self removeAllSubscriptionsCompletion:^{
+        [self saveSubscriptions];
+    }];
+}
+
+- (void)removeAllSubscriptionsCompletion:(void (^)(void))completion {
     [db fetchAllSubscriptionsWithCompletionHandler:^(NSArray<CKSubscription *> * _Nullable subscriptions, NSError * _Nullable error) {
-        
         dispatch_group_t removeSubscriptionsGroup = dispatch_group_create();
         
         if (error) NSLog(@"[ERROR] fetchAllSubscriptions error: %@", error.localizedDescription);
@@ -363,34 +389,32 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
                 dispatch_group_leave(removeSubscriptionsGroup);
             }];
         }
-        dispatch_group_wait(removeSubscriptionsGroup, DISPATCH_TIME_FOREVER);
-        
-        SaveSubscriptionCompletionHandler completionHandler = ^(CKSubscription * _Nullable subscription, NSError * _Nullable error) {
-            if (error) {
-                NSLog(@"[ERROR] Subscription failed: %@", error.localizedDescription);
-            } else {
-                NSLog(@"[DEBUG] Success subscripted: %@", subscription);
-            }
-        };
-        
-        for (NSString *recordType in self.mapping.allRecordTypes) {
-            CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
-            subscription.notificationInfo = [CKNotificationInfo new];
-//            subscription.notificationInfo.alertBody = @"";
-            subscription.notificationInfo.shouldBadge = YES;
-            subscription.notificationInfo.category = @"CloudKit";
-            [db saveSubscription:subscription completionHandler:completionHandler];
+        if (completion) {
+            dispatch_group_wait(removeSubscriptionsGroup, DISPATCH_TIME_FOREVER);
+            completion();
         }
-//#ifdef DevicePredicateCrutch
-//        NSLog(@"[NOTICE] DevicePredicateCrutch Subscription");
-//        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:[NSPredicate predicateWithValue:YES] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
-//#else
-        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:thisDevicePredicate options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
-//#endif
-        [db saveSubscription:subscription completionHandler:completionHandler];
-        
     }];
+}
 
+typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable subscription, NSError * _Nullable error);
+- (void)saveSubscriptions {
+    SaveSubscriptionCompletionHandler completionHandler = ^(CKSubscription * _Nullable subscription, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"[ERROR] Subscription failed: %@", error.localizedDescription);
+        } else {
+            NSLog(@"[DEBUG] Success subscripted: %@", subscription);
+        }
+    };
+    for (NSString *recordType in self.mapping.allRecordTypes) {
+        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:true] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+        subscription.notificationInfo = [CKNotificationInfo new];
+        //            subscription.notificationInfo.alertBody = @"";
+        subscription.notificationInfo.shouldBadge = true;
+        subscription.notificationInfo.category = @"CloudKit";
+        [db saveSubscription:subscription completionHandler:completionHandler];
+    }
+    CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:thisDevicePredicate options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+    [db saveSubscription:subscription completionHandler:completionHandler];
 }
 
 - (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo {
@@ -401,7 +425,6 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     if (notification.notificationType == CKNotificationTypeQuery && notification.databaseScope == db.databaseScope && [notification.containerIdentifier isEqualToString:container.containerIdentifier]) {
         NSLog(@"[DEBUG] Recieved notification: %@", notification);
         [self smartReplication];
-        
 /*
         [self recordByRecordID:notification.recordID fetch:^(CKRecord <ASMappedObject>*record, NSError * _Nullable error) {
             if (!self.ready) @throw [NSException exceptionWithName:@"acceptPushNotificationWithUserInfo error" reason:@"ASCloudManager not ready" userInfo:nil];
@@ -413,20 +436,9 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
                     NSLog(@"[DEBUG] accept NEW Device %@", device.UUIDString);
                     [deviceList addDevice:device];
                 } else if ([record.recordType isEqualToString:ASCloudDeletionInfoRecordType]) {                    
-//#ifdef DevicePredicateCrutch
-//                    NSLog(@"[DEBUG] DevicePredicateCrutch: DeletionInfoRecord %@", record);
-//                    NSString *deletionInfoRecordDeviceID = record[ASCloudDeletionInfoRecordProperty_deviceID];
-//                    if ([deletionInfoRecordDeviceID isEqualToString:deviceList.thisDevice.UUIDString]) {
-//                        NSLog(@"[DEBUG] DevicePredicateCrutch: deletionInfoRecordDeviceID %@", deletionInfoRecordDeviceID);
-//#endif
-                        [_recievedDeletionInfoRecords addObject:record];
-                        [preparedToCloudRecords addRecordIDToDelete:record.recordID];
-                        [self performMergeWithContextAndCleanup];
-//#ifdef DevicePredicateCrutch
-//                    } else {
-//                        NSLog(@"[DEBUG] DevicePredicateCrutch: Skip DeletionInfoRecord with deviceID %@", deletionInfoRecordDeviceID);
-//                    }
-//#endif
+                    [_recievedDeletionInfoRecords addObject:record];
+                    [preparedToCloudRecords addRecordIDToDelete:record.recordID];
+                    [self performMergeWithContextAndCleanup];
                 } else if (entityName) {
                     [_recievedUpdatedRecords addObject:record];
                     [self performMergeWithContextAndCleanup];
@@ -450,14 +462,14 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
     if (replicationInprogress) return ;
-    [self replicationTotal:NO];
+    if (self.enabled) [self replicationTotal:false];
 }
 
 - (void)totalReplication {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    [self replicationTotal:YES];
+    if (self.enabled) [self replicationTotal:true];
 }
 
 - (void)replicationTotal:(BOOL)total {
@@ -483,8 +495,8 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudSmartReplicationTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self smartReplication];
+    if (self.enabled) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudSmartReplicationTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.enabled) [self smartReplication];
     });
 }
 
@@ -736,7 +748,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
             } else {
                 [preparedToCloudRecords clearWithSavedRecords:savedRecords deletedRecordIDs:deletedRecordIDs];
                 [self savePreparedToCloudRecords];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudTryToPushTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if (self.enabled) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ASCloudTryToPushTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     dispatch_async(waitingQueue, ^{
                         dispatch_group_wait(preparedToCloudRecords.lockGroup, DISPATCH_TIME_FOREVER);
                         dispatch_group_wait(lockCloudGroup, DISPATCH_TIME_FOREVER);

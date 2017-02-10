@@ -12,5 +12,7 @@
 @interface ASRepresentableTransaction : NSObject <ASRepresentableTransaction>
 
 + (instancetype)instantiateWithContext:(id <ASRepresentableTransaction>)context;
+- (void)addObjects:(NSSet<NSObject<ASMappedObject> *> *)objects;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end

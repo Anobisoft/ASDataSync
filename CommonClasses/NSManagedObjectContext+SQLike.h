@@ -8,8 +8,8 @@
 
 #import <CoreData/CoreData.h>
 
-#define ASC ascending:YES
-#define DESC ascending:NO
+#define ASC ascending:true
+#define DESC ascending:false
 
 NS_ASSUME_NONNULL_BEGIN
 

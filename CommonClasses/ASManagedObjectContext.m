@@ -7,7 +7,8 @@
 //
 
 #import "ASManagedObjectContext.h"
-#import "ASTransactionRepresentation.h"
+#import "ASRepresentableTransaction.h"
+#import "ASDescriptionRepresentation.h"
 #import "NSManagedObjectContext+SQLike.h"
 #import "ASPrivateProtocol.h"
 #import "NSUUID+NSData.h"
@@ -95,7 +96,7 @@
     ownedCloudManager = cloudManager;
 }
 
-- (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier {
+- (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier {
     [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self forCloudContainerIdentifier:containerIdentifier];
 }
 
@@ -107,6 +108,33 @@
 - (void)cloudReplication {
     if (ownedCloudManager) [ownedCloudManager smartReplication];
     else NSLog(@"[ERROR] owned cloud manager unordered");
+}
+
+- (void)cloudTotalReplication {
+    if (ownedCloudManager) [ownedCloudManager totalReplication];
+    else NSLog(@"[ERROR] owned cloud manager unordered");
+}
+
+- (void)setCloudEnabled:(BOOL)cloudEnabled {
+    if (ownedCloudManager) {
+        ownedCloudManager.enabled = cloudEnabled;
+        [self totalReplication];
+    }
+    else NSLog(@"[ERROR] owned cloud manager unordered");
+}
+
+- (void)totalReplication {
+    if (transactionsAgregator) [self performBlock:^{
+        ASRepresentableTransaction *transaction = [ASRepresentableTransaction instantiateWithContext:self];
+        for (NSString *entityName in self.cloudMapping.synchronizableEntities) {
+            [transaction addObjects:[NSSet setWithArray:[self selectFrom:entityName]]];
+        }
+        [transactionsAgregator willCommitTransaction:transaction];
+    }];
+}
+
+- (BOOL)cloudEnabled {
+    return ownedCloudManager ? ownedCloudManager.enabled : false;
 }
 
 - (ASCloudMapping *)cloudMapping {
@@ -351,7 +379,7 @@
 - (void)commit {
     if ([self hasChanges]) {        
         [self performBlock:^{
-            if (transactionsAgregator) [transactionsAgregator willCommitTransaction:[ASTransactionRepresentation instantiateWithRepresentableTransaction:self]];
+            if (transactionsAgregator) [transactionsAgregator willCommitTransaction:[ASRepresentableTransaction instantiateWithContext:self]];
             NSError *error;
             if ([self save:&error]) {
                 [self saveMainContext];
@@ -447,8 +475,8 @@
         self.contextIdentifier = [NSString stringWithFormat:@"%@store %@", idModelPart, [storeURL.absoluteString componentsSeparatedByString:@"/"].lastObject];
         persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
         NSError *error = nil;
-        NSDictionary *autoMigration = @{ NSMigratePersistentStoresAutomaticallyOption : @(YES),
-                                         NSInferMappingModelAutomaticallyOption : @(YES) };
+        NSDictionary *autoMigration = @{ NSMigratePersistentStoresAutomaticallyOption : @(true),
+                                         NSInferMappingModelAutomaticallyOption : @(true) };
         if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:autoMigration error:&error]) {
             if (error) NSLog(@"[ERROR] %s %@\n%@", __PRETTY_FUNCTION__, error.localizedDescription, error.userInfo);
         }
@@ -540,13 +568,13 @@
 }
 
 - (void)rollbackAndWait {
-    __block BOOL waiting = YES;
+    __block BOOL waiting = true;
     NSCondition *waitingCondition = [NSCondition new];
     [self performBlock:^{
         [super rollback];
     }];
     [self mergeQueueCompletion:^{
-        waiting = NO;
+        waiting = false;
         [waitingCondition signal];
     }];
     [waitingCondition lock];

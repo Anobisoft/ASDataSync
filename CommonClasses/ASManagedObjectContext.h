@@ -10,8 +10,8 @@
 #import "ASPublicProtocol.h"
 #import "NSManagedObject+ASDataSync.h"
 
-#define ASC ascending:YES
-#define DESC ascending:NO
+#define ASC ascending:true
+#define DESC ascending:false
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,10 +24,12 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
-- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 
-- (void)enableCloudSynchronizationWithContainerIdentifier:(NSString *)containerIdentifier ;
+- (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier;
+@property (nonatomic, assign) BOOL cloudEnabled;
 - (void)cloudReplication;
+- (void)totalReplication;
+- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;

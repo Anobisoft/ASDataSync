@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)totalReplication;
 - (void)smartReplication;
 
+
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 

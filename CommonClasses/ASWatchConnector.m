@@ -137,11 +137,11 @@
 }
 
 - (void)sessionDidDeactivate:(WCSession *)session {
-    sessionActivated = NO;
+    sessionActivated = false;
 }
 
 - (void)sessionDidBecomeInactive:(WCSession *)session {
-    sessionActivated = NO;
+    sessionActivated = false;
 }
 
 #if TARGET_OS_IOS
@@ -196,7 +196,7 @@
     else NSLog(@"[DEBUG] %s %@ success", __PRETTY_FUNCTION__, userInfoTransfer);
     dispatch_async(dispatch_get_main_queue(), ^{
         [logTimer invalidate];
-        logTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(logOutstandingUserInfoTransfers) userInfo:nil repeats:YES];
+        logTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(logOutstandingUserInfoTransfers) userInfo:nil repeats:true];
     });
 #endif
     if (self.delegate && [self.delegate respondsToSelector:@selector(watchConnector:didFinishUserInfoTransfer:error:)]) {
