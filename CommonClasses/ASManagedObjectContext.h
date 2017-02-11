@@ -29,7 +29,7 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 @property (nonatomic, assign) BOOL cloudEnabled;
 - (void)cloudReplication;
 - (void)totalReplication;
-- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo;
+- (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;

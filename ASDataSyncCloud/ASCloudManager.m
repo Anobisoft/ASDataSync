@@ -417,7 +417,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     [db saveSubscription:subscription completionHandler:completionHandler];
 }
 
-- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo {
+- (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
@@ -430,7 +430,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
             if (!self.ready) @throw [NSException exceptionWithName:@"acceptPushNotificationWithUserInfo error" reason:@"ASCloudManager not ready" userInfo:nil];
             if (record) {
                 NSLog(@"[DEBUG] found record %@", record);
-                NSString *entityName = self.mapping[record.recordType];
+                NSString *entityName = self.mapping.reverseMap[record.recordType];
                 if ([record.recordType isEqualToString:[ASDevice entityName]]) {
                     ASDevice *device = [ASDevice deviceWithMappedObject:(CKRecord <ASMappedObject> *)record];
                     NSLog(@"[DEBUG] accept NEW Device %@", device.UUIDString);
@@ -669,7 +669,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         } else {
             if (error.code == CKErrorUnknownItem) {
                 NSLog(@"[INFO] Not found. Create new record with recordID %@", recordID);
-                record = (CKRecord<ASMappedObject> *)[CKRecord recordWithRecordType:syncObject.entityName recordID:recordID];
+                record = (CKRecord<ASMappedObject> *)[CKRecord recordWithRecordType:self.mapping[syncObject.entityName] recordID:recordID];
             } else {
                 NSLog(@"[ERROR] recordByRecordID %@", error);
 

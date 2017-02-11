@@ -100,8 +100,8 @@
     [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self forCloudContainerIdentifier:containerIdentifier];
 }
 
-- (void)acceptPushNotificationWithUserInfo:(NSDictionary *)userInfo {
-    if (ownedCloudManager) [ownedCloudManager acceptPushNotificationWithUserInfo:userInfo];
+- (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo {
+    if (ownedCloudManager) [ownedCloudManager acceptPushNotificationUserInfo:userInfo];
     else NSLog(@"[ERROR] owned cloud manager unordered");
 }
 

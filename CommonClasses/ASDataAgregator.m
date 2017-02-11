@@ -87,15 +87,6 @@
     NSLog(@"[ERROR] %s : context <%@> not found", __PRETTY_FUNCTION__, transaction.contextIdentifier);
 }
 
-//- (void)context:(id <ASDataSyncContextPrivate>)context recievedPushNotificationWithUserInfo:(NSDictionary *)userInfo {
-//    id<ASCloudManager> cloudManager = cloudManagers[context.contextIdentifier];
-//    if (cloudManager) {
-//        [cloudManager acceptPushNotificationWithUserInfo:userInfo];
-//    } else {
-//        @throw [NSException exceptionWithName:NSPortReceiveException reason:nil userInfo:nil];
-//    }
-//}
-
 - (void)addWatchSynchronizableContext:(id<ASDataSyncContextPrivate>)context {
     [watchContextSet addObject:context];
     [context setAgregator:self];
