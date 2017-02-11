@@ -122,8 +122,9 @@
             if (self.ready) {
                 #ifdef DEBUG
                 NSLog(@"[DEBUG] %@ ready", self.class);
-                [self dequeue];
                 #endif
+                [self dequeue];
+
             } else {
                 #if TARGET_OS_IOS
                 NSLog(@"[ERROR] %@ not ready: %@, %@", self.class,

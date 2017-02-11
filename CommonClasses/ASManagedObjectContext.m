@@ -249,7 +249,8 @@
                             managedObject.modificationDate = recievedMappedObject.modificationDate;
                             managedObject.keyedDataProperties = recievedMappedObject.keyedDataProperties;
                         } else {
-                            NSLog(@"[WARNING] %s dequeue UPDATE: recieved object with UUID <%@> out of date", __PRETTY_FUNCTION__, recievedMappedObject.UUIDString);
+                            NSLog(@"[WARNING] %s Reject UPDATE %@ object %@: out of date", __PRETTY_FUNCTION__, recievedMappedObject.entityName, recievedMappedObject.UUIDString);
+                            continue ;
                         }
                     }
                 } else {
@@ -329,7 +330,7 @@
                 if (foundObject) {
                     [self deleteObject:foundObject];
                 } else {
-                    NSLog(@"[WARNING] %s dequeue DELETE: object of Entity <%@> with UUID <%@> not found", __PRETTY_FUNCTION__, recievedDescription.entityName, recievedDescription.UUIDString);
+                    NSLog(@"[WARNING] %s DELETE FROM %@ object UUID %@ not found", __PRETTY_FUNCTION__, recievedDescription.entityName, recievedDescription.UUIDString);
                 }
             } @catch (NSException *exception) {
                 NSLog(@"[ERROR] %s Exception: %@", __PRETTY_FUNCTION__, exception);

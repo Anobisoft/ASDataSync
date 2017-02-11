@@ -27,12 +27,10 @@
 }
 
 - (NSString *)objectForKeyedSubscript:(NSString *)key {
-    NSLog(@"[DEBUG] %s key %@ map[key] %@", __PRETTY_FUNCTION__, key, map[key]);
     return map[key] ?: key;
 }
 
 - (void)mapObject:(NSString *)object withKey:(NSString *)key {
-    NSLog(@"[DEBUG] %s object %@ key %@", __PRETTY_FUNCTION__, object, key);
     [map setObject:object forKey:key];
 }
 
