@@ -1,2 +1,2 @@
 # ASDataSync
-iOS-watchOS CoreData Syncronization
+CoreData-CloudKit Syncronization
