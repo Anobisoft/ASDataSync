@@ -9,8 +9,9 @@
 #import "ASDataAgregator.h"
 #import "ASPrivateProtocol.h"
 #import "ASWatchConnector.h"
-#import "ASCloudManager.h"
 #import "ASTransactionRepresentation.h"
+
+#import "ASCloudManager.h"
 
 @interface ASDataAgregator() <ASWatchTransactionsAgregator, ASTransactionsAgregator>
 @property (nonatomic, weak) id<ASWatchConnector> watchConnector;
@@ -18,7 +19,9 @@
 
 @implementation ASDataAgregator {
     NSMutableSet <id<ASDataSyncContextPrivate>> *watchContextSet;
+#if TARGET_OS_IOS
     NSMutableDictionary <NSString *, id<ASCloudManager>> *cloudManagers;
+#endif
 }
 
 + (instancetype)new {
@@ -48,7 +51,9 @@
         [self.watchConnector setAgregator:self];
         watchContextSet = [NSMutableSet new];
 #warning UNCOMPLETED reload "replication needed" status
+#if TARGET_OS_IOS
         cloudManagers = [NSMutableDictionary new];
+#endif
     }
     return self;
 }
@@ -64,10 +69,12 @@
             }
         }
     }
+#if TARGET_OS_IOS
     id<ASCloudManager> cloudManager = cloudManagers[transaction.contextIdentifier];
     if (cloudManager) {
         [cloudManager willCommitTransaction:transaction];
     }
+#endif
 }
 
 - (void)watchConnectorGetReady:(id<ASWatchConnector>)connector {
@@ -93,6 +100,7 @@
 #warning UNCOMPLETED Start full replication if connector ready and replication needed.
 }
 
+#if TARGET_OS_IOS
 - (void)setPrivateCloudContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context forCloudContainerIdentifier:(NSString *)containerIdentifier; {
     id<ASCloudManager> cloudManager = cloudManagers[context.contextIdentifier];
     if (!cloudManager) {
@@ -107,7 +115,7 @@
     [context setCloudManager:cloudManager];
     [cloudManager setDataSyncContext:context];
 }
-
+#endif
 
 
 @end

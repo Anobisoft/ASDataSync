@@ -27,10 +27,17 @@
 @implementation FoundObjectWithRelationRepresentation
 
 @end
-
+#if TARGET_OS_IOS
 @interface ASManagedObjectContext() <ASDataSyncContextPrivate, ASCloudMappingProvider>
 
+
 @end
+#else
+@interface ASManagedObjectContext() <ASDataSyncContextPrivate>
+
+@end
+#endif
+
 
 @implementation ASManagedObjectContext {
     NSManagedObjectContext *mainContext;
@@ -38,9 +45,11 @@
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSMutableArray <id <ASRepresentableTransaction>> *recievedTransactionsQueue;
     NSString *name;
-    ASCloudMapping *cloudMapping;
     id<ASTransactionsAgregator> transactionsAgregator;
+#if TARGET_OS_IOS
+    ASCloudMapping *cloudMapping;
     id<ASCloudManager> ownedCloudManager;
+#endif
 }
 
 @synthesize delegate = _delegate;
@@ -91,7 +100,7 @@
 }
 
 #pragma mark - cloud support
-
+#if TARGET_OS_IOS
 - (void)setCloudManager:(id<ASCloudManager>)cloudManager {
     ownedCloudManager = cloudManager;
 }
@@ -99,6 +108,7 @@
 - (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier {
     [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self forCloudContainerIdentifier:containerIdentifier];
 }
+
 
 - (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo {
     if (ownedCloudManager) [ownedCloudManager acceptPushNotificationUserInfo:userInfo];
@@ -121,16 +131,6 @@
         [self totalReplication];
     }
     else NSLog(@"[ERROR] owned cloud manager unordered");
-}
-
-- (void)totalReplication {
-    if (transactionsAgregator) [self performBlock:^{
-        ASRepresentableTransaction *transaction = [ASRepresentableTransaction instantiateWithContext:self];
-        for (NSString *entityName in self.cloudMapping.synchronizableEntities) {
-            [transaction addObjects:[NSSet setWithArray:[self selectFrom:entityName]]];
-        }
-        [transactionsAgregator willCommitTransaction:transaction];
-    }];
 }
 
 - (BOOL)cloudEnabled {
@@ -157,8 +157,36 @@
     }
     return cloudMapping;
 }
+#endif
+
+
 
 #pragma mark - Synchronization
+
+- (void)totalReplication {
+    if (transactionsAgregator) [self performBlock:^{
+        ASRepresentableTransaction *transaction = [ASRepresentableTransaction instantiateWithContext:self];
+        NSError *error;
+        if ([self save:&error]) {
+            [self saveMainContext];
+        } else {
+            if (error) NSLog(@"[ERROR] saveContext error: %@\n%@", error.localizedDescription, error.userInfo);
+        }
+#if TARGET_OS_IOS
+        for (NSString *entityName in self.cloudMapping.synchronizableEntities) {
+            [transaction addObjects:[NSSet setWithArray:[self selectFrom:entityName]]];
+        }
+#else
+        for (NSEntityDescription *entity in managedObjectModel.entities) {
+            Class class = NSClassFromString([entity managedObjectClassName]);
+            if ([class conformsToProtocol:@protocol(ASMappedObject)]) {
+                [transaction addObjects:[NSSet setWithArray:[self selectFrom:entity.name]]];
+            }
+        }
+#endif
+        [transactionsAgregator willCommitTransaction:transaction];
+    }];
+}
 
 - (void)enableWatchSynchronization {    
     [[ASDataAgregator defaultAgregator] addWatchSynchronizableContext:self];

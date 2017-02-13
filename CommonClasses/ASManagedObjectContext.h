@@ -25,11 +25,12 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 + (instancetype)defaultContext;
 @property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
 
-- (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier;
-@property (nonatomic, assign) BOOL cloudEnabled;
-- (void)cloudReplication;
+- (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier __WATCHOS_UNAVAILABLE;
+@property (nonatomic, assign) BOOL cloudEnabled __WATCHOS_UNAVAILABLE;
+- (void)cloudReplication __WATCHOS_UNAVAILABLE;
+
+- (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo __WATCHOS_UNAVAILABLE;
 - (void)totalReplication;
-- (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;

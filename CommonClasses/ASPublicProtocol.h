@@ -105,7 +105,9 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 - (void)commit;
 - (void)rollbackCompletion:(nullable void (^)(void))completion;
+#if TARGET_OS_IOS
 - (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo;
+#endif
 @property (nonatomic, weak) id <ASDataSyncContextDelegate> delegate;
 @end
 

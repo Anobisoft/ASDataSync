@@ -12,7 +12,7 @@
 @interface ASDataAgregator : NSObject
 
 - (void)addWatchSynchronizableContext:(id <ASDataSyncContext>)context;
-- (void)setPrivateCloudContext:(id <ASDataSyncContext>)context forCloudContainerIdentifier:(NSString *)containerIdentifier;
+- (void)setPrivateCloudContext:(id <ASDataSyncContext>)context forCloudContainerIdentifier:(NSString *)containerIdentifier __WATCHOS_UNAVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;

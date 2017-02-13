@@ -9,7 +9,9 @@
 
 @protocol ASRepresentableTransaction;
 @protocol ASDataSyncContextPrivate;
+#if TARGET_OS_IOS
 @protocol ASCloudManager, ASCloudMappingProvider;
+#endif
 @protocol ASWatchConnector;
 
 @protocol ASTransactionsAgregator;
@@ -41,7 +43,7 @@
 @end
 
 #pragma mark - ASCloudManager protocol
-
+#if TARGET_OS_IOS
 @protocol ASCloudManager <ASTransactionsAgregator>
 @required
 - (void)setDataSyncContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context;
@@ -55,8 +57,8 @@
 @protocol ASCloudMappingProvider <NSObject>
 - (void)setCloudManager:(id<ASCloudManager>)cloudManager;
 - (ASCloudMapping *)cloudMapping;
-
 @end
+#endif
 
 #pragma mark - ASWatchConnector protocol
 

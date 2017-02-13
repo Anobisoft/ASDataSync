@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		CE6C39921DC1DED60047B3A8 /* UniversalBuilder */ = {
+		CE6C39921DC1DED60047B3A8 /* Builder */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = CE6C39931DC1DED60047B3A8 /* Build configuration list for PBXAggregateTarget "UniversalBuilder" */;
+			buildConfigurationList = CE6C39931DC1DED60047B3A8 /* Build configuration list for PBXAggregateTarget "Builder" */;
 			buildPhases = (
 				CE6C39961DC1DEF00047B3A8 /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = UniversalBuilder;
+			name = Builder;
 			productName = UniversalBuilder;
 		};
 /* End PBXAggregateTarget section */
@@ -452,7 +452,7 @@
 			targets = (
 				CE6C39481DC1DDF40047B3A8 /* ASDataSync */,
 				CE6C39891DC1DEB00047B3A8 /* ASDataSyncWatch */,
-				CE6C39921DC1DED60047B3A8 /* UniversalBuilder */,
+				CE6C39921DC1DED60047B3A8 /* Builder */,
 			);
 		};
 /* End PBXProject section */
@@ -486,7 +486,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\nUNIVERSAL_OUTPUTFOLDER=${BUILD_DIR}/${CONFIGURATION}-universal\n\n# make sure the output directory exists\nmkdir -p \"${UNIVERSAL_OUTPUTFOLDER}\"\n\n# Step 1. Build Device and Simulator versions on iOS\nxcodebuild clean build -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}\" -sdk iphoneos\n#xcodebuild clean build -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}Watch\" -sdk watchos -arch 'armv7k'\n#xcodebuild clean build -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}\" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6'\n#xcodebuild clean build -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}Watch\" -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 42mm' -arch 'x86_64'\n\n# Step 2. Copy the framework structure (from iphoneos build) to the universal folder\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework\" \"${UNIVERSAL_OUTPUTFOLDER}\"\n\n# Step 3. Create universal binary file using lipo and place the combined executable in the copied framework directory\nlipo -create -output \"${UNIVERSAL_OUTPUTFOLDER}/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \\\n\"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \\\n#\"${BUILD_DIR}/${CONFIGURATION}-watchos/${PROJECT_NAME}Watch.framework/${PROJECT_NAME}Watch\" \\\n#\"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \\\n#\"${BUILD_DIR}/${CONFIGURATION}-watchsimulator/${PROJECT_NAME}Watch.framework/${PROJECT_NAME}Watch\"\n\ncp -r ${UNIVERSAL_OUTPUTFOLDER}/${PROJECT_NAME}.framework ~/Documents/\n";
+			shellScript = "xcodebuild clean build -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}\" -sdk iphoneos\nxcodebuild clean build -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}Watch\" -sdk watchos -arch 'armv7k'\n\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework\" ~/Documents/\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-watchos/${PROJECT_NAME}Watch.framework\" ~/Documents/\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -769,7 +769,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CE6C39931DC1DED60047B3A8 /* Build configuration list for PBXAggregateTarget "UniversalBuilder" */ = {
+		CE6C39931DC1DED60047B3A8 /* Build configuration list for PBXAggregateTarget "Builder" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CE6C39941DC1DED60047B3A8 /* Debug */,
