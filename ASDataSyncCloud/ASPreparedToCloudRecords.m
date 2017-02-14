@@ -79,6 +79,9 @@
     ASObjectRepresentation *representedObject = [ASObjectRepresentation instantiateWithMappedObject:object];
     [failedObjectsRepresentations removeReference:representedObject];
     [failedObjectsRepresentations addObject:representedObject];
+    #ifdef DEBUG
+        NSLog(@"[DEBUG] %s count %ld", __PRETTY_FUNCTION__, (long)failedObjectsRepresentations.count);
+    #endif
 }
 
 

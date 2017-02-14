@@ -127,8 +127,7 @@
 - (void)setCloudEnabled:(BOOL)cloudEnabled {
     if (ownedCloudManager) {
         ownedCloudManager.enabled = cloudEnabled;
-        [ownedCloudManager totalReplication];
-        [self totalReplication];        
+        [self performTotalReplication];
     }
     else NSLog(@"[ERROR] owned cloud manager unordered");
 }
@@ -163,7 +162,7 @@
 
 #pragma mark - Synchronization
 
-- (void)totalReplication {
+- (void)performTotalReplication {
     if (transactionsAgregator) [self performBlock:^{
         ASRepresentableTransaction *transaction = [ASRepresentableTransaction instantiateWithContext:self];
         NSError *error;
@@ -185,6 +184,9 @@
         }
 #endif
         [transactionsAgregator willCommitTransaction:transaction];
+        #if TARGET_OS_IOS
+        [self cloudTotalReplication];
+        #endif
     }];
 }
 

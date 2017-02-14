@@ -28,9 +28,8 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 - (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier databaseScope:(ASDatabaseScope)databaseScope __WATCHOS_UNAVAILABLE;
 @property (nonatomic, assign) BOOL cloudEnabled __WATCHOS_UNAVAILABLE;
 - (void)cloudReplication __WATCHOS_UNAVAILABLE;
-
 - (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo __WATCHOS_UNAVAILABLE;
-- (void)totalReplication __WATCHOS_UNAVAILABLE;
+- (void)performTotalReplication;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;
