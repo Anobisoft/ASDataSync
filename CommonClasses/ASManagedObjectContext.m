@@ -372,7 +372,7 @@
 - (void)saveMainContext {
     dispatch_async(dispatch_get_main_queue(), ^{
 #ifdef DEBUG
-        NSLog(@"[ERROR] %s", __PRETTY_FUNCTION__);
+        NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
         NSError *error;
         if (![mainContext save:&error]) {
