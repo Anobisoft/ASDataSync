@@ -20,7 +20,7 @@
 @implementation ASDataAgregator {
     NSMutableSet <id<ASDataSyncContextPrivate>> *watchContextSet;
 #if TARGET_OS_IOS
-    NSMutableDictionary <NSString *, id<ASCloudManager>> *cloudManagers;
+    NSMutableDictionary <NSString *, id<ASCloudManager>> *cloudManagers[4];
 #endif
 }
 
@@ -52,7 +52,9 @@
         watchContextSet = [NSMutableSet new];
 #warning UNCOMPLETED reload "replication needed" status
 #if TARGET_OS_IOS
-        cloudManagers = [NSMutableDictionary new];
+        cloudManagers[0] = cloudManagers[ASDatabaseScopePrivate] = [NSMutableDictionary new];
+        cloudManagers[ASDatabaseScopePublic] = [NSMutableDictionary new];
+        cloudManagers[ASDatabaseScopeShared] = nil;
 #endif
     }
     return self;
@@ -70,9 +72,11 @@
         }
     }
 #if TARGET_OS_IOS
-    id<ASCloudManager> cloudManager = cloudManagers[transaction.contextIdentifier];
-    if (cloudManager) {
-        [cloudManager willCommitTransaction:transaction];
+    for (int i = 0; i < 4; i++) {
+        id<ASCloudManager> cloudManager = cloudManagers[i][transaction.contextIdentifier];
+        if (cloudManager) {
+            [cloudManager willCommitTransaction:transaction];
+        }
     }
 #endif
 }
@@ -101,15 +105,11 @@
 }
 
 #if TARGET_OS_IOS
-- (void)setPrivateCloudContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context forCloudContainerIdentifier:(NSString *)containerIdentifier; {
-    id<ASCloudManager> cloudManager = cloudManagers[context.contextIdentifier];
+- (void)setCloudContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context containerIdentifier:(NSString *)containerIdentifier databaseScope:(ASDatabaseScope)databaseScope {
+    id<ASCloudManager> cloudManager = cloudManagers[databaseScope][context.contextIdentifier];
     if (!cloudManager) {
-#ifdef DEBUG
-        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:ASDatabaseScopePublic];
-#else
-        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:ASDatabaseScopePrivate];
-#endif
-        cloudManagers[context.contextIdentifier] = cloudManager;
+        cloudManager = (id<ASCloudManager>)[ASCloudManager instanceWithContainerIdentifier:containerIdentifier databaseScope:databaseScope];
+        cloudManagers[databaseScope][context.contextIdentifier] = cloudManager;
     }
     [context setAgregator:self];
     [context setCloudManager:cloudManager];

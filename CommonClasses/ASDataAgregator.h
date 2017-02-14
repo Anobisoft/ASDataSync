@@ -9,10 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "ASPublicProtocol.h"
 
+@protocol ASDataSyncContextPrivate, ASCloudMappingProvider;
+
 @interface ASDataAgregator : NSObject
 
 - (void)addWatchSynchronizableContext:(id <ASDataSyncContext>)context;
-- (void)setPrivateCloudContext:(id <ASDataSyncContext>)context forCloudContainerIdentifier:(NSString *)containerIdentifier __WATCHOS_UNAVAILABLE;
+- (void)setCloudContext:(id <ASDataSyncContextPrivate, ASCloudMappingProvider>)context containerIdentifier:(NSString *)containerIdentifier databaseScope:(ASDatabaseScope)databaseScope __WATCHOS_UNAVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (id)copy NS_UNAVAILABLE;

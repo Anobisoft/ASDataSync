@@ -105,10 +105,9 @@
     ownedCloudManager = cloudManager;
 }
 
-- (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier {
-    [[ASDataAgregator defaultAgregator] setPrivateCloudContext:self forCloudContainerIdentifier:containerIdentifier];
+- (void)initCloudWithContainerIdentifier:(NSString *)containerIdentifier databaseScope:(ASDatabaseScope)databaseScope {
+    [[ASDataAgregator defaultAgregator] setCloudContext:self containerIdentifier:containerIdentifier databaseScope:databaseScope];
 }
-
 
 - (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo {
     if (ownedCloudManager) [ownedCloudManager acceptPushNotificationUserInfo:userInfo];
@@ -128,7 +127,8 @@
 - (void)setCloudEnabled:(BOOL)cloudEnabled {
     if (ownedCloudManager) {
         ownedCloudManager.enabled = cloudEnabled;
-        [self totalReplication];
+        [ownedCloudManager totalReplication];
+        [self totalReplication];        
     }
     else NSLog(@"[ERROR] owned cloud manager unordered");
 }

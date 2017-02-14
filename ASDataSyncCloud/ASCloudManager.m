@@ -587,7 +587,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         [foundRecords addObject:record];
     };
     
-    NSDate *queryDate = [NSDate date];
+    NSDate *queryDate = [[NSDate date] dateByAddingTimeInterval:-60.0f]; //time divergence corrective
     void (^queryCompletionBlock)(CKQueryCursor * _Nullable cursor, NSError * _Nullable operationError) = ^(CKQueryCursor * _Nullable cursor, NSError * _Nullable operationError) {
         if (operationError) {
             fetch(nil);
