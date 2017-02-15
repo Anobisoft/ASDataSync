@@ -598,25 +598,5 @@
     [self mergeQueue];
 }
 
-- (void)rollbackAndWait {
-    __block BOOL waiting = true;
-    NSCondition *waitingCondition = [NSCondition new];
-    [self performBlock:^{
-        [super rollback];
-    }];
-    [self mergeQueueCompletion:^{
-        waiting = false;
-        [waitingCondition signal];
-    }];
-    [waitingCondition lock];
-    while (waiting) {
-        [waitingCondition wait];
-    }
-    NSLog(@"rollbackAndWait didFinishWaiting");
-}
-
-
-
-
 
 @end

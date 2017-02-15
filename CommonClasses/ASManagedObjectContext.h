@@ -54,7 +54,6 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 - (void)selectFrom:(NSString *)entity where:(nullable NSPredicate *)clause orderBy:(nullable NSArray <NSSortDescriptor *> *)sortDescriptors limit:(NSUInteger)limit fetch:(FetchArray)fetch;
 
 - (void)rollbackCompletion:(nullable void (^)(void))completion;
-- (void)rollbackAndWait;
 
 NS_ASSUME_NONNULL_END
 
