@@ -19,7 +19,8 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 
 @interface ASManagedObjectContext : NSManagedObjectContext <ASDataSyncContext>
 
-- (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL;
+- (instancetype)initWithConcurrencyType:(NSManagedObjectContextConcurrencyType)ct NS_UNAVAILABLE;
+- (instancetype)initWithStoreURL:(NSURL *)storeURL modelURL:(nullable NSURL *)modelURL NS_DESIGNATED_INITIALIZER API_AVAILABLE(macosx(10.7),ios(5.0));
 - (instancetype)initWithStoreURL:(NSURL *)storeURL;
 
 + (instancetype)defaultContext;

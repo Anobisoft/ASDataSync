@@ -291,7 +291,6 @@
                 BOOL relatableToMany = [recievedMappedObject conformsToProtocol:@protocol(ASRelatableToMany)];
                 
                 if (relatableToOne || relatableToMany) {
-//                    NSLog(@"[DEBUG] recievedMappedObject %@ %@", relatableToOne ? @"relatableToOne" : @"", relatableToMany ? @"relatableToMany" : @"");
                     FoundObjectWithRelationRepresentation *theFoundObjectWithRelationRepresentation = [FoundObjectWithRelationRepresentation new];
                     if (relatableToOne) {
                         theFoundObjectWithRelationRepresentation.recievedRelationsToOne = (NSObject <ASRelatableToOne> *)recievedMappedObject;
@@ -309,16 +308,10 @@
             }
         }
         
-//        NSLog(@"[DEBUG] foundObjectsWithRelationRepresentations %@ count %ld", foundObjectsWithRelationRepresentations, (long)foundObjectsWithRelationRepresentations.count);
-        
         for (FoundObjectWithRelationRepresentation *theFoundObjectWithRelationRepresentation in foundObjectsWithRelationRepresentations) {
-//            NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.managedObject %@", theFoundObjectWithRelationRepresentation.managedObject);
             if (theFoundObjectWithRelationRepresentation.recievedRelationsToOne && [theFoundObjectWithRelationRepresentation.managedObject conformsToProtocol:@protocol(ASMutableRelatableToOne)]) {
-//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToOne %@", theFoundObjectWithRelationRepresentation.recievedRelationsToOne);
                 NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *managedObjectRelatableToOne = (NSManagedObject <ASManagedObject, ASMutableRelatableToOne> *)theFoundObjectWithRelationRepresentation.managedObject;
-//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences %@", theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences);
                 for (NSString *relationKey in theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences.allKeys) {
-//                    NSLog(@"[DEBUG] recievedRelationsToOne relationKey %@", relationKey);
                     NSObject <ASReference> *reference = theFoundObjectWithRelationRepresentation.recievedRelationsToOne.keyedReferences[relationKey];
                     NSString *relatedEntityName = [managedObjectRelatableToOne.class entityNameByRelationKey][relationKey];
                     NSManagedObject <ASFindableReference> *relatedObject;
@@ -332,11 +325,8 @@
                 }
             }
             if (theFoundObjectWithRelationRepresentation.recievedRelationsToMany && [theFoundObjectWithRelationRepresentation.managedObject conformsToProtocol:@protocol(ASMutableRelatableToMany)]) {
-//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToMany %@", theFoundObjectWithRelationRepresentation.recievedRelationsToMany);
                 NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *managedObjectRelatableToMany = (NSManagedObject <ASManagedObject, ASMutableRelatableToMany> *)theFoundObjectWithRelationRepresentation.managedObject;
-//                NSLog(@"[DEBUG] theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences %@", theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences);
                 for (NSString *relationKey in theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences.allKeys) {
-//                    NSLog(@"[DEBUG] recievedRelationsToMany relationKey %@", relationKey);
                     NSSet <NSObject <ASReference> *> *setOfReferences = theFoundObjectWithRelationRepresentation.recievedRelationsToMany.keyedSetsOfReferences[relationKey];
                     NSString *relatedEntityName = [managedObjectRelatableToMany.class entityNameByRelationKey][relationKey];
                     NSMutableSet *newSet = [NSMutableSet new];
@@ -515,18 +505,9 @@
         self.parentContext = mainContext;
         
         recievedTransactionsQueue = [NSMutableArray new];
-//        [[NSNotificationCenter defaultCenter] addObserver:self
-//                                                 selector:@selector(appWillTerminate:)
-//                                                     name:UIApplicationWillResignActiveNotification
-//                                                   object:nil];
     }
     return self;
 }
-
-//- (void)appWillTerminate:(NSNotification *)note {
-//    [self rollbackAndWait];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self];
-//}
 
 #pragma mark - thread safe queries
 
