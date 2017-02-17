@@ -162,7 +162,7 @@
 
 #pragma mark - Synchronization
 
-- (void)performTotalReplication {
+- (void)performTotalReplicationCompletion:(void (^)(void))completion {
     if (transactionsAgregator) [self performBlock:^{
         ASRepresentableTransaction *transaction = [ASRepresentableTransaction instantiateWithContext:self];
         NSError *error;

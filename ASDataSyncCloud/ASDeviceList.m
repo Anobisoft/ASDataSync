@@ -102,7 +102,7 @@ static ASDevice *thisDevice;
     CFDictionaryRef result = nil;
     OSStatus sts = SecItemCopyMatching((__bridge CFDictionaryRef)keychainItem, (CFTypeRef *)&result);
     
-    if (sts) NSLog(@"[ERROR] Load UniqueDeviceIdentifier Error: %d", (int)sts);
+    if (sts) NSLog(@"[WARNING] Load UniqueDeviceIdentifier Error: %d", (int)sts);
     
     if (sts == noErr) {
         NSDictionary *resultDict = (__bridge_transfer NSDictionary *)result;
@@ -110,6 +110,9 @@ static ASDevice *thisDevice;
         uniqueDeviceIdentifier = [[NSString alloc] initWithData:pswd encoding:NSUTF8StringEncoding];
     } else {
         uniqueDeviceIdentifier = [UIDevice currentDevice].identifierForVendor.UUIDString;
+#ifdef DEBUG
+        NSLog(@"[DEBUG] Save new UniqueDeviceIdentifier %@", uniqueDeviceIdentifier);
+#endif
         keychainItem[(__bridge id)kSecValueData] = [uniqueDeviceIdentifier dataUsingEncoding:NSUTF8StringEncoding];
         OSStatus sts = SecItemAdd((__bridge CFDictionaryRef)keychainItem, NULL);
         if (sts) NSLog(@"[ERROR] Save UniqueDeviceIdentifier Error: %d", (int)sts);
