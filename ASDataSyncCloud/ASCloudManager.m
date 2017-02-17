@@ -518,27 +518,23 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    if (self.enabled) [self replicationTotal:false completion:nil];
+    if (self.enabled) [self replicationTotal:false];
 }
 
-- (void)totalReplicationCompletion:(void (^)(void))completion {
+- (void)totalReplication {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    if (self.enabled) [self replicationTotal:true completion:completion];
+    if (self.enabled) [self replicationTotal:true];
 }
 
-- (void)replicationTotal:(BOOL)total completion:(void (^)(void))completion {
+- (void)replicationTotal:(BOOL)total {
     if (total) {
-        if (totalReplicationInprogress) {
-            if (completion) completion();
-            return ;
-        } else totalReplicationInprogress = smartReplicationInprogress = true;
+        if (totalReplicationInprogress) return ;
+        else totalReplicationInprogress = smartReplicationInprogress = true;
     } else {
-        if (smartReplicationInprogress) {
-            if (completion) completion();
-            return ;
-        } else smartReplicationInprogress = true;
+        if (smartReplicationInprogress) return ;
+        else smartReplicationInprogress = true;
     }
     dispatch_async(waitingQueue, ^{
         dispatch_group_wait(primaryInitializationGroup, DISPATCH_TIME_FOREVER);
@@ -549,12 +545,10 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
                 dispatch_group_leave(lockCloudGroup);
                 totalReplicationInprogress = smartReplicationInprogress = false;
                 [self resmart];
-                if (completion) completion();
             }];
         } else {
             totalReplicationInprogress = smartReplicationInprogress = false;
             [self resmart];
-            if (completion) completion();
         }
     });
 }

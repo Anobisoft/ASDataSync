@@ -30,7 +30,7 @@ typedef void (^FetchObject)(__kindof NSManagedObject *object);
 @property (nonatomic, assign) BOOL cloudEnabled __WATCHOS_UNAVAILABLE;
 - (void)cloudReplication __WATCHOS_UNAVAILABLE;
 - (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo __WATCHOS_UNAVAILABLE;
-- (void)performTotalReplicationCompletion:(void (^)(void))completion;
+- (void)performTotalReplication;
 - (void)enableWatchSynchronization;
 
 - (id)init NS_UNAVAILABLE;
