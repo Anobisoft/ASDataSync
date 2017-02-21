@@ -9,7 +9,7 @@
 #ifndef ASCloudInternalConst_h
 #define ASCloudInternalConst_h
 
-#define ASCloudLastSyncDateForEntityUDKey @"ASCloudLastSyncDateForEntity"
+#define ASCloudMaxModificationDateForEntityUDKey @"ASCloudMaxModificationDateForEntity"
 #define ASCloudPreparedToCloudRecordsUDKey @"ASCloudPreparedToCloudRecords"
 
 #define ASCloudDevicesInfoRecordType @"Device"

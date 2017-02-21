@@ -25,8 +25,6 @@
 #import "ASCloudInternalConst.h"
 #import "NSDate+ASUtilities.h"
 
-//#define DevicePredicateCrutch
-
 typedef void (^FetchRecord)(__kindof CKRecord *record);
 typedef void (^FetchRecordsArray)(NSArray <__kindof CKRecord *> *records);
 
@@ -37,8 +35,8 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
 };
 
 @interface ASCloudManager() <ASCloudManager>
-    @property (nonatomic, strong, readonly) NSDictionary <NSString *, NSDate *> *lastSyncDateForEntity;
-    - (void)setLastSyncDate:(NSDate *)date forEntity:(NSString *)entity;
+    @property (nonatomic, strong, readonly) NSDictionary <NSString *, NSDate *> *maxCloudModificationDateForEntity;
+    - (void)setMaxCloudModificationDate:(NSDate *)date forEntity:(NSString *)entity;
 
     
 @end
@@ -60,7 +58,7 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
     dispatch_queue_t waitingQueue;
     BOOL smartReplicationInprogress, totalReplicationInprogress;
     
-    NSString *lastSyncDateForEntityUDCompositeKey, *preparedToCloudRecordsUDCompositeKey;
+    NSString *maxCloudModificationDateForEntityUDCompositeKey, *preparedToCloudRecordsUDCompositeKey;
     
     NSTimer *retryToInitTimer;
     NSTimer *resmartTimer;
@@ -77,23 +75,23 @@ typedef NS_ENUM(NSUInteger, ASCloudState) {
     return _recievedDeletionInfoRecords.copy;
 }
 
-@synthesize lastSyncDateForEntity = _lastSyncDateForEntity;
-NSMutableDictionary *lastSyncDateForEntityMutable;
-- (NSDictionary <NSString *, NSDate *> *)lastSyncDateForEntity {
-    if (!_lastSyncDateForEntity) {
-        _lastSyncDateForEntity = [[NSUserDefaults standardUserDefaults] objectForKey:lastSyncDateForEntityUDCompositeKey];
-        if (!_lastSyncDateForEntity) _lastSyncDateForEntity = @{};
+@synthesize maxCloudModificationDateForEntity = _maxCloudModificationDateForEntity;
+NSMutableDictionary *maxCloudModificationDateForEntityMutable;
+- (NSDictionary <NSString *, NSDate *> *)maxCloudModificationDateForEntity {
+    if (!_maxCloudModificationDateForEntity) {
+        _maxCloudModificationDateForEntity = [[NSUserDefaults standardUserDefaults] objectForKey:maxCloudModificationDateForEntityUDCompositeKey];
+        if (!_maxCloudModificationDateForEntity) _maxCloudModificationDateForEntity = @{};
     }
-    return _lastSyncDateForEntity;
+    return _maxCloudModificationDateForEntity;
 }
-- (void)setLastSyncDate:(NSDate *)date forEntity:(NSString *)entity {
+- (void)setMaxCloudModificationDate:(NSDate *)date forEntity:(NSString *)entity {
     if (date) {
-        [lastSyncDateForEntityMutable setObject:date forKey:entity];
+        [maxCloudModificationDateForEntityMutable setObject:date forKey:entity];
     } else {
-        [lastSyncDateForEntityMutable removeObjectForKey:entity];
+        [maxCloudModificationDateForEntityMutable removeObjectForKey:entity];
     }
-    _lastSyncDateForEntity = lastSyncDateForEntityMutable.copy;
-    [[NSUserDefaults standardUserDefaults] setObject:_lastSyncDateForEntity forKey:lastSyncDateForEntityUDCompositeKey];
+    _maxCloudModificationDateForEntity = maxCloudModificationDateForEntityMutable.copy;
+    [[NSUserDefaults standardUserDefaults] setObject:_maxCloudModificationDateForEntity forKey:maxCloudModificationDateForEntityUDCompositeKey];
 }
 
 
@@ -158,8 +156,8 @@ static NSMutableDictionary<NSString *, id> *instances[4];
         }
         _instanceIdentifier = [NSString stringWithFormat:@"%@%@-%@", NSStringFromClass(self.class), dbScopeString, container.containerIdentifier];
         
-        lastSyncDateForEntityUDCompositeKey = [NSString stringWithFormat:@"%@-%@", _instanceIdentifier, ASCloudLastSyncDateForEntityUDKey];
-        lastSyncDateForEntityMutable = self.lastSyncDateForEntity.mutableCopy;
+        maxCloudModificationDateForEntityUDCompositeKey = [NSString stringWithFormat:@"%@-%@", _instanceIdentifier, ASCloudMaxModificationDateForEntityUDKey];
+        maxCloudModificationDateForEntityMutable = self.maxCloudModificationDateForEntity.mutableCopy;
         
         preparedToCloudRecordsUDCompositeKey = [NSString stringWithFormat:@"%@-%@", _instanceIdentifier, ASCloudPreparedToCloudRecordsUDKey];
         NSData *preparedToCloudRecordsData = [[NSUserDefaults standardUserDefaults] objectForKey:preparedToCloudRecordsUDCompositeKey];
@@ -261,7 +259,7 @@ static NSMutableDictionary<NSString *, id> *instances[4];
                     NSLog(@"[DEBUG] pushDevice success");
 #endif
                     state |= ASCloudStateThisDeviceUpdated;
-                    [self reloadDevisesCompletion:^{
+                    [self loadAllDevisesCompletion:^{
                         if (completion) completion();
                     }];
                 } else {
@@ -283,11 +281,11 @@ static NSMutableDictionary<NSString *, id> *instances[4];
     
 }
 
-- (void)reloadDevisesCompletion:(void (^)(void))completion {
+- (void)loadAllDevisesCompletion:(void (^)(void))completion {
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
-    [self getNewRecordsOfEntityName:[ASDevice entityName] fetch:^(NSArray<__kindof CKRecord *> *records) {
+    [self getAllRecordsOfEntityName:[ASDevice entityName] fetch:^(NSArray<__kindof CKRecord *> *records) {
         if (records) {
 #ifdef DEBUG
             NSLog(@"[DEBUG] %s count: %ld", __PRETTY_FUNCTION__, (long)records.count);
@@ -304,7 +302,23 @@ static NSMutableDictionary<NSString *, id> *instances[4];
     }];
 }
 
-
+- (void)reloadDevisesCompletion:(void (^)(void))completion {
+#ifdef DEBUG
+    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
+#endif
+    [self getNewRecordsOfEntityName:[ASDevice entityName] fetch:^(NSArray<__kindof CKRecord *> *records) {
+        if (records) {
+#ifdef DEBUG
+            NSLog(@"[DEBUG] %s count: %ld", __PRETTY_FUNCTION__, (long)records.count);
+#endif
+            for (CKRecord<ASMappedObject> *record in records) {
+                ASDevice *device = [ASDevice deviceWithMappedObject:record];
+                [deviceList addDevice:device];
+            }
+        }
+        if (completion) completion();
+    }];
+}
 
 #pragma mark - Subscriptions and Remote notifications
 
@@ -514,7 +528,6 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 #pragma mark - Replication
 
 - (void)smartReplication {
-    
 #ifdef DEBUG
     NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
 #endif
@@ -629,7 +642,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 //#ifdef DEBUG
 //    NSLog(@"[DEBUG] %s %@", __PRETTY_FUNCTION__, entityName);
 //#endif
-    [self setLastSyncDate:nil forEntity:entityName];
+    [self setMaxCloudModificationDate:nil forEntity:entityName];
     [self getNewRecordsOfEntityName:entityName fetch:fetch];
 }
 
@@ -637,12 +650,23 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
 //#ifdef DEBUG
 //    NSLog(@"[DEBUG] %s %@", __PRETTY_FUNCTION__, entityName);
 //#endif
-    NSDate *lastSyncDate = self.lastSyncDateForEntity[entityName];
+    NSDate *maxCloudModificationDate = self.maxCloudModificationDateForEntity[entityName];
     
-    NSPredicate *predicate = lastSyncDate ? [NSPredicate predicateWithFormat:@"modificationDate > %@", lastSyncDate] : nil;
+    NSPredicate *predicate = maxCloudModificationDate ? [NSPredicate predicateWithFormat:@"modificationDate >= %@", maxCloudModificationDate] : nil;
     [self getRecordsOfEntityName:entityName withPredicate:predicate fetch:^(NSArray<__kindof CKRecord *> *records) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSDate *maxDate = maxCloudModificationDate;
+            BOOL changed = false;
+            for (CKRecord *record in records) {
+                if (!maxDate || [maxDate compare:(NSDate *)record[@"modificationDate"]] == NSOrderedAscending) {
+                    maxDate = record[@"modificationDate"];
+                    changed = true;
+                }
+            }
+            if (changed) [self setMaxCloudModificationDate:[maxDate dateByAddingTimeInterval:-60.0f] forEntity:entityName];
+        });
         fetch(records);
-    }];    
+    }];
 }
 
 - (void)getRecordsOfEntityName:(NSString *)entityName withPredicate:(NSPredicate *)predicate fetch:(FetchRecordsArray)fetch {
@@ -655,7 +679,6 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         [foundRecords addObject:record];
     };
     
-    NSDate *queryDate = [[NSDate date] dateByAddingTimeInterval:-60.0f]; //time divergence corrective
     void (^queryCompletionBlock)(CKQueryCursor * _Nullable cursor, NSError * _Nullable operationError) = ^(CKQueryCursor * _Nullable cursor, NSError * _Nullable operationError) {
         if (operationError) {
             fetch(nil);
@@ -666,9 +689,6 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
                 fetchNext.queryCompletionBlock = queryCompletionBlock;
                 [db addOperation:fetchNext];
             } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self setLastSyncDate:queryDate forEntity:entityName];
-                });
                 fetch(foundRecords.copy);
             }
         }
