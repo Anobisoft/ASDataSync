@@ -3,7 +3,7 @@
 //  ASDataSync
 //
 //  Created by Stanislav Pletnev on 23.01.17.
-//  Copyright © 2017 anobisoft. All rights reserved.
+//  Copyright © 2017 Anobisoft. All rights reserved.
 //
 
 #import "ASReference.h"

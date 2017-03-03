@@ -363,53 +363,54 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         }
     };
     for (NSString *recordType in self.mapping.allRecordTypes) {
-        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType predicate:[NSPredicate predicateWithValue:true] options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+        CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:recordType
+                                                                                  predicate:[NSPredicate predicateWithValue:true]
+                                                                                    options:+CKQuerySubscriptionOptionsFiresOnRecordCreation
+                                                                                            +CKQuerySubscriptionOptionsFiresOnRecordUpdate
+                                                                                            +CKQuerySubscriptionOptionsFiresOnRecordDeletion];
         subscription.notificationInfo = [CKNotificationInfo new];
         //            subscription.notificationInfo.alertBody = @"";
         subscription.notificationInfo.shouldBadge = true;
         subscription.notificationInfo.category = @"CloudKit";
         [db saveSubscription:subscription completionHandler:completionHandler];
     }
-    CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType predicate:thisDevicePredicate options:CKQuerySubscriptionOptionsFiresOnRecordCreation|CKQuerySubscriptionOptionsFiresOnRecordUpdate];
+    CKQuerySubscription *subscription = [[CKQuerySubscription alloc] initWithRecordType:ASCloudDeletionInfoRecordType
+                                                                              predicate:thisDevicePredicate
+                                                                                options:CKQuerySubscriptionOptionsFiresOnRecordCreation+CKQuerySubscriptionOptionsFiresOnRecordUpdate];
     [db saveSubscription:subscription completionHandler:completionHandler];
 }
 
 - (void)acceptPushNotificationUserInfo:(NSDictionary *)userInfo {
-    //#ifdef DEBUG
-    //    NSLog(@"[DEBUG] %s", __PRETTY_FUNCTION__);
-    //#endif
     CKQueryNotification *notification = [CKQueryNotification notificationFromRemoteNotificationDictionary:userInfo];
     if (notification.notificationType == CKNotificationTypeQuery && notification.databaseScope == db.databaseScope && [notification.containerIdentifier isEqualToString:container.containerIdentifier]) {
-        //        #ifdef DEBUG
-        //        NSLog(@"[DEBUG] Recieved notification: %@", notification);
-        //        #endif
-        [self smartReplication];
-        /*
-         [self recordByRecordID:notification.recordID fetch:^(CKRecord <ASMappedObject>*record, NSError * _Nullable error) {
-         if (!self.ready) @throw [NSException exceptionWithName:@"acceptPushNotificationWithUserInfo error" reason:@"ASCloudManager not ready" userInfo:nil];
-         if (record) {
-         NSLog(@"[DEBUG] found record %@", record);
-         NSString *entityName = self.mapping.reverseMap[record.recordType];
-         if ([record.recordType isEqualToString:[ASDevice entityName]]) {
-         ASDevice *device = [ASDevice deviceWithMappedObject:(CKRecord <ASMappedObject> *)record];
-         NSLog(@"[DEBUG] accept NEW Device %@", device.UUIDString);
-         [deviceList addDevice:device];
-         } else {
-         if ([record.recordType isEqualToString:ASCloudDeletionInfoRecordType]) {
-         [_recievedDeletionInfoRecords addObject:record];
-         [preparedToCloudRecords addRecordIDToDelete:record.recordID];
-         } else if (entityName) {
-         [_recievedUpdatedRecords addObject:record];
-         }
-         [self performMergeAndCleanupIfNeeded];
-         }
-         } else {
-         @throw [NSException exceptionWithName:@"CKFetchRecordsOperation failed"
-         reason:[NSString stringWithFormat:@"Object with recordID %@ not found.", notification.recordID.recordName]
-         userInfo:nil];
-         }
-         }];
-         //*/
+#ifdef DEBUG
+        NSLog(@"[DEBUG] %@ acceptPushNotification: %@", self.class, notification);
+#endif
+        if (notification.queryNotificationReason == CKQueryNotificationReasonRecordDeleted) {
+            [self getCloudDeletionInfoCompletion:^{
+                [self performMergeAndCleanupIfNeeded];
+            }];
+        } else {            
+            [self recordByRecordID:notification.recordID fetch:^(CKRecord <ASMappedObject>*record, NSError * _Nullable error) {
+                if (record) {
+                    NSLog(@"[DEBUG] found record %@", record);
+                    NSString *entityName = self.mapping.reverseMap[record.recordType];
+                    if ([record.recordType isEqualToString:ASCloudDeletionInfoRecordType]) {
+                        [_recievedDeletionInfoRecords addObject:record];
+                        [preparedToCloudRecords addRecordIDToDelete:record.recordID];
+                    } else if (entityName) {
+                        [_recievedUpdatedRecords addObject:record];
+                    }
+                    [self performMergeAndCleanupIfNeeded];
+                } else {
+                    @throw [NSException exceptionWithName:@"CKFetchRecordsOperation failed"
+                                                   reason:[NSString stringWithFormat:@"Object with recordID %@ not found.", notification.recordID.recordName]
+                                                 userInfo:nil];
+                }
+            }];
+            [self smartReplication];
+        }
+        //*/
     } else {
         NSLog(@"[WARNING] Unacceptable notification recieved %@", notification);
     }
@@ -604,11 +605,7 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
     }
     
     dispatch_group_enter(thisGroup);
-    [self getRecordsOfEntityName:ASCloudDeletionInfoRecordType withPredicate:thisDevicePredicate fetch:^(NSArray<__kindof CKRecord *> *records) {
-        for (CKRecord *record in records) {
-            [_recievedDeletionInfoRecords addObject:record];
-            [preparedToCloudRecords addRecordIDToDelete:record.recordID]; //cleanup
-        }
+    [self getCloudDeletionInfoCompletion:^{
         dispatch_group_leave(thisGroup);
     }];
     
@@ -617,6 +614,16 @@ typedef void (^SaveSubscriptionCompletionHandler)(CKSubscription * _Nullable sub
         [self performMergeAndCleanupIfNeeded];
         if (completion) completion();
     });
+}
+
+- (void)getCloudDeletionInfoCompletion:(void (^)(void))completion {
+    [self getRecordsOfEntityName:ASCloudDeletionInfoRecordType withPredicate:thisDevicePredicate fetch:^(NSArray<__kindof CKRecord *> *records) {
+        for (CKRecord *record in records) {
+            [_recievedDeletionInfoRecords addObject:record];
+            [preparedToCloudRecords addRecordIDToDelete:record.recordID]; //cleanup
+        }
+        if (completion) completion();
+    }];
 }
 
 - (void)performMergeAndCleanupIfNeeded {

@@ -3,7 +3,7 @@
 //  ASDataSyncWatch
 //
 //  Created by Stanislav Pletnev on 27.10.16.
-//  Copyright © 2016 anobisoft. All rights reserved.
+//  Copyright © 2016 Anobisoft. All rights reserved.
 //
 
 #import <WatchKit/WatchKit.h>
