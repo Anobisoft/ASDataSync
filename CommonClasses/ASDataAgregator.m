@@ -52,7 +52,7 @@
         watchContextSet = [NSMutableSet new];
 #warning UNCOMPLETED reload "replication needed" status
 #if TARGET_OS_IOS
-        cloudManagers[0] = cloudManagers[ASDatabaseScopePrivate] = [NSMutableDictionary new];
+        cloudManagers[ASDatabaseScopeDefault] = cloudManagers[ASDatabaseScopePrivate] = [NSMutableDictionary new];
         cloudManagers[ASDatabaseScopePublic] = [NSMutableDictionary new];
         cloudManagers[ASDatabaseScopeShared] = nil;
 #endif

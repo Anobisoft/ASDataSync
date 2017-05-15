@@ -16,7 +16,8 @@
 #define ASPublicProtocol_h
 
 typedef NS_ENUM(NSInteger, ASDatabaseScope) {
-    ASDatabaseScopePublic = 1,
+    ASDatabaseScopeDefault = 0,
+    ASDatabaseScopePublic,
     ASDatabaseScopePrivate,
     ASDatabaseScopeShared,
 };

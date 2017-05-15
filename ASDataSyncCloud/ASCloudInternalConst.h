@@ -12,14 +12,14 @@
 #define ASCloudMaxModificationDateForEntityUDKey @"ASCloudMaxModificationDateForEntity"
 #define ASCloudPreparedToCloudRecordsUDKey @"ASCloudPreparedToCloudRecords"
 
-#define ASCloudDevicesInfoRecordType @"Device"
+#define ASCloudDevicesInfoRecordType @"ASDevice"
 
-#define ASCloudDeletionInfoRecordType @"DeleteQueue"
-#define ASCloudDeletionInfoRecordProperty_recordType @"dq_recordType"
-#define ASCloudDeletionInfoRecordProperty_recordID @"dq_recordID"
-#define ASCloudDeletionInfoRecordProperty_deviceID @"dq_deviceID"
+#define ASCloudDeletionInfoRecordType @"ASDeletionInfo"
+#define ASCloudDeletionInfoRecordProperty_recordType @"ASDI_recordType"
+#define ASCloudDeletionInfoRecordProperty_recordID @"ASDI_recordID"
+#define ASCloudDeletionInfoRecordProperty_deviceID @"ASDI_deviceID"
 
-#define ASCloudRealModificationDateProperty @"changeDate"
+#define ASCloudRealModificationDateProperty @"realModificationDate"
 
 #define ASCloudInitTimeout 60
 #define ASCloudTryToPushTimeout 60

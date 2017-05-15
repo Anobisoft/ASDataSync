@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) NSString *instanceIdentifier;
 
-+ (instancetype)instanceWithContainerIdentifier:(NSString *)identifier databaseScope:(ASDatabaseScope)databaseScope; //unique for identifier privateDB as default scope
++ (instancetype)instanceWithContainerIdentifier:(NSString *)identifier databaseScope:(ASDatabaseScope)databaseScope; //unique for identifier+databaseScope. ASDatabaseScopePrivate - default scope
 - (void)totalReplication;
 - (void)smartReplication;
 
