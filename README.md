@@ -1,2 +1,2 @@
 # ASDataSync
-CoreData-CloudKit Syncronization
+CoreData+CloudKit Syncronization
